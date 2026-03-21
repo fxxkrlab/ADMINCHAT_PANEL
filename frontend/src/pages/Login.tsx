@@ -65,8 +65,8 @@ export default function Login() {
   return (
     <div className="flex min-h-screen bg-[#080808]">
       {/* Left side - Brand */}
-      <div className="hidden lg:flex lg:w-1/2 flex-col justify-center px-16 xl:px-24">
-        <div className="max-w-md">
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-center items-center px-12">
+        <div className="max-w-md w-full pl-12 xl:pl-20">
           <h1 className="text-4xl font-bold tracking-tight mb-2 font-['Space_Grotesk']">
             <span className="text-[#00D9FF]">ADMIN</span>
             <span className="text-white">CHAT</span>

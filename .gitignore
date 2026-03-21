@@ -46,3 +46,6 @@ alembic/versions/__pycache__/
 
 # Design files
 docs/designs/*.pen
+
+# Error screenshots
+errorshot/
