@@ -8,9 +8,9 @@ import type { Admin } from '../types';
 // ---- Role badge ----
 function RoleBadge({ role }: { role: string }) {
   const map: Record<string, { label: string; color: string; bg: string }> = {
-    super_admin: { label: 'SUPER ADMIN', color: 'text-accent', bg: 'bg-accent/10' },
-    admin: { label: 'ADMIN', color: 'text-purple', bg: 'bg-purple/10' },
-    agent: { label: 'AGENT', color: 'text-green', bg: 'bg-green/10' },
+    super_admin: { label: 'SUPER ADMIN', color: 'text-[#00D9FF]', bg: 'bg-[#00D9FF]/10' },
+    admin: { label: 'ADMIN', color: 'text-[#8B5CF6]', bg: 'bg-[#8B5CF6]/10' },
+    agent: { label: 'AGENT', color: 'text-[#059669]', bg: 'bg-[#059669]/10' },
   };
   const s = map[role] || map.agent;
   return (
@@ -148,59 +148,59 @@ export default function AdminManage() {
       <Header title="Admin Management" />
       <div className="flex-1 p-8 overflow-auto">
         <div className="flex items-center justify-between mb-8">
-          <p className="text-text-secondary text-sm">
+          <p className="text-[#8a8a8a] text-sm">
             Manage admin accounts and permissions &middot; {admins.length} admin{admins.length !== 1 ? 's' : ''}
           </p>
           <button
             onClick={() => setShowCreateForm(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-black text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[#00D9FF] text-black text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
           >
             <Plus className="w-4 h-4" /> Add Admin
           </button>
         </div>
 
         {/* Admin table */}
-        <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden">
+        <div className="bg-[#0A0A0A] border border-[#1A1A1A] rounded-xl overflow-hidden">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-border-subtle">
-                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Username</th>
-                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Display Name</th>
-                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Role</th>
-                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Status</th>
-                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Created</th>
-                <th className="text-right text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Actions</th>
+              <tr className="border-b border-[#1A1A1A]">
+                <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Username</th>
+                <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Display Name</th>
+                <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Role</th>
+                <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Status</th>
+                <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Created</th>
+                <th className="text-right text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Actions</th>
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} className="text-center text-text-muted text-sm py-12">Loading admins...</td>
+                  <td colSpan={6} className="text-center text-[#6a6a6a] text-sm py-12">Loading admins...</td>
                 </tr>
               ) : admins.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center text-text-muted text-sm py-12">No admin accounts found.</td>
+                  <td colSpan={6} className="text-center text-[#6a6a6a] text-sm py-12">No admin accounts found.</td>
                 </tr>
               ) : (
                 admins.map((admin) => (
-                  <tr key={admin.id} className="border-b border-border-subtle/50 hover:bg-bg-elevated/30 transition-colors">
+                  <tr key={admin.id} className="border-b border-[#1A1A1A]/50 hover:bg-[#141414]/30 transition-colors">
                     <td className="px-6 py-4.5">
-                      <span className="text-sm text-text-primary font-medium font-mono">{admin.username}</span>
+                      <span className="text-sm text-[#FFFFFF] font-medium font-mono">{admin.username}</span>
                     </td>
                     <td className="px-6 py-4.5">
-                      <span className="text-sm text-text-secondary">{admin.display_name || '-'}</span>
+                      <span className="text-sm text-[#8a8a8a]">{admin.display_name || '-'}</span>
                     </td>
                     <td className="px-6 py-4.5">
                       <RoleBadge role={admin.role} />
                     </td>
                     <td className="px-6 py-4.5">
-                      <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${admin.is_active ? 'text-green' : 'text-text-muted'}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${admin.is_active ? 'bg-green' : 'bg-text-muted'}`} />
+                      <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${admin.is_active ? 'text-[#059669]' : 'text-[#6a6a6a]'}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${admin.is_active ? 'bg-[#059669]' : 'bg-text-muted'}`} />
                         {admin.is_active ? 'Active' : 'Disabled'}
                       </span>
                     </td>
                     <td className="px-6 py-4.5">
-                      <span className="text-xs text-text-muted font-mono">
+                      <span className="text-xs text-[#6a6a6a] font-mono">
                         {new Date(admin.created_at).toLocaleDateString()}
                       </span>
                     </td>
@@ -208,14 +208,14 @@ export default function AdminManage() {
                       <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => startEdit(admin)}
-                          className="p-1.5 rounded hover:bg-bg-elevated transition-colors text-text-secondary hover:text-text-primary"
+                          className="p-1.5 rounded hover:bg-[#141414] transition-colors text-[#8a8a8a] hover:text-[#FFFFFF]"
                           title="Edit"
                         >
                           <Pencil className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => openPermissions(admin)}
-                          className="p-1.5 rounded hover:bg-bg-elevated transition-colors text-text-secondary hover:text-accent"
+                          className="p-1.5 rounded hover:bg-[#141414] transition-colors text-[#8a8a8a] hover:text-[#00D9FF]"
                           title="Permissions"
                         >
                           <Shield className="w-3.5 h-3.5" />
@@ -224,7 +224,7 @@ export default function AdminManage() {
                           <button
                             onClick={() => deactivateMutation.mutate(admin.id)}
                             disabled={deactivateMutation.isPending}
-                            className="p-1.5 rounded hover:bg-red/10 transition-colors text-text-secondary hover:text-red"
+                            className="p-1.5 rounded hover:bg-[#FF4444]/10 transition-colors text-[#8a8a8a] hover:text-[#FF4444]"
                             title="Disable"
                           >
                             <UserX className="w-3.5 h-3.5" />
@@ -242,59 +242,59 @@ export default function AdminManage() {
         {/* Create Admin Modal */}
         {showCreateForm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="bg-bg-page border border-border rounded-xl p-6 w-full max-w-md shadow-2xl">
+            <div className="bg-[#0C0C0C] border border-[#2f2f2f] rounded-xl p-6 w-full max-w-md shadow-2xl">
               <div className="flex items-center justify-between mb-5">
-                <h3 className="text-sm font-semibold text-text-primary">Add New Admin</h3>
-                <button onClick={() => { setShowCreateForm(false); resetCreateForm(); }} className="text-text-muted hover:text-text-primary">
+                <h3 className="text-sm font-semibold text-[#FFFFFF]">Add New Admin</h3>
+                <button onClick={() => { setShowCreateForm(false); resetCreateForm(); }} className="text-[#6a6a6a] hover:text-[#FFFFFF]">
                   <X className="w-4 h-4" />
                 </button>
               </div>
               <form onSubmit={handleCreateSubmit} className="flex flex-col gap-4">
                 <div>
-                  <label className="block text-xs text-text-secondary mb-2">Username *</label>
+                  <label className="block text-xs text-[#8a8a8a] mb-2">Username *</label>
                   <input
                     type="text"
                     value={formUsername}
                     onChange={(e) => setFormUsername(e.target.value)}
-                    className="w-full h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
+                    className="w-full h-11 px-4 bg-[#141414] border border-[#2f2f2f] rounded-lg text-sm text-[#FFFFFF] focus:outline-none focus:border-[#00D9FF] transition-colors"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-text-secondary mb-2">Password *</label>
+                  <label className="block text-xs text-[#8a8a8a] mb-2">Password *</label>
                   <input
                     type="password"
                     value={formPassword}
                     onChange={(e) => setFormPassword(e.target.value)}
-                    className="w-full h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
+                    className="w-full h-11 px-4 bg-[#141414] border border-[#2f2f2f] rounded-lg text-sm text-[#FFFFFF] focus:outline-none focus:border-[#00D9FF] transition-colors"
                     required
                     minLength={6}
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-text-secondary mb-2">Display Name</label>
+                  <label className="block text-xs text-[#8a8a8a] mb-2">Display Name</label>
                   <input
                     type="text"
                     value={formDisplayName}
                     onChange={(e) => setFormDisplayName(e.target.value)}
-                    className="w-full h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
+                    className="w-full h-11 px-4 bg-[#141414] border border-[#2f2f2f] rounded-lg text-sm text-[#FFFFFF] focus:outline-none focus:border-[#00D9FF] transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-text-secondary mb-2">Email</label>
+                  <label className="block text-xs text-[#8a8a8a] mb-2">Email</label>
                   <input
                     type="email"
                     value={formEmail}
                     onChange={(e) => setFormEmail(e.target.value)}
-                    className="w-full h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
+                    className="w-full h-11 px-4 bg-[#141414] border border-[#2f2f2f] rounded-lg text-sm text-[#FFFFFF] focus:outline-none focus:border-[#00D9FF] transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-text-secondary mb-2">Role</label>
+                  <label className="block text-xs text-[#8a8a8a] mb-2">Role</label>
                   <select
                     value={formRole}
                     onChange={(e) => setFormRole(e.target.value)}
-                    className="w-full h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
+                    className="w-full h-11 px-4 bg-[#141414] border border-[#2f2f2f] rounded-lg text-sm text-[#FFFFFF] focus:outline-none focus:border-[#00D9FF] transition-colors"
                   >
                     <option value="agent">Agent</option>
                     <option value="admin">Admin</option>
@@ -305,20 +305,20 @@ export default function AdminManage() {
                   <button
                     type="button"
                     onClick={() => { setShowCreateForm(false); resetCreateForm(); }}
-                    className="px-4 py-2 text-sm text-text-secondary hover:text-text-primary"
+                    className="px-4 py-2 text-sm text-[#8a8a8a] hover:text-[#FFFFFF]"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={createMutation.isPending}
-                    className="px-4 py-2 bg-accent text-black text-sm font-medium rounded-lg hover:opacity-90 disabled:opacity-50"
+                    className="px-4 py-2 bg-[#00D9FF] text-black text-sm font-medium rounded-lg hover:opacity-90 disabled:opacity-50"
                   >
                     {createMutation.isPending ? 'Creating...' : 'Create Admin'}
                   </button>
                 </div>
                 {createMutation.isError && (
-                  <p className="text-xs text-red">
+                  <p className="text-xs text-[#FF4444]">
                     Failed: {(createMutation.error as Error)?.message || 'Unknown error'}
                   </p>
                 )}
@@ -330,39 +330,39 @@ export default function AdminManage() {
         {/* Edit Admin Modal */}
         {editingAdmin && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="bg-bg-page border border-border rounded-xl p-6 w-full max-w-md shadow-2xl">
+            <div className="bg-[#0C0C0C] border border-[#2f2f2f] rounded-xl p-6 w-full max-w-md shadow-2xl">
               <div className="flex items-center justify-between mb-5">
-                <h3 className="text-sm font-semibold text-text-primary">Edit Admin: {editingAdmin.username}</h3>
-                <button onClick={() => setEditingAdmin(null)} className="text-text-muted hover:text-text-primary">
+                <h3 className="text-sm font-semibold text-[#FFFFFF]">Edit Admin: {editingAdmin.username}</h3>
+                <button onClick={() => setEditingAdmin(null)} className="text-[#6a6a6a] hover:text-[#FFFFFF]">
                   <X className="w-4 h-4" />
                 </button>
               </div>
               <form onSubmit={handleEditSubmit} className="flex flex-col gap-4">
                 <div>
-                  <label className="block text-xs text-text-secondary mb-2">Display Name</label>
+                  <label className="block text-xs text-[#8a8a8a] mb-2">Display Name</label>
                   <input
                     type="text"
                     value={editDisplayName}
                     onChange={(e) => setEditDisplayName(e.target.value)}
-                    className="w-full h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
+                    className="w-full h-11 px-4 bg-[#141414] border border-[#2f2f2f] rounded-lg text-sm text-[#FFFFFF] focus:outline-none focus:border-[#00D9FF] transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-text-secondary mb-2">Email</label>
+                  <label className="block text-xs text-[#8a8a8a] mb-2">Email</label>
                   <input
                     type="email"
                     value={editEmail}
                     onChange={(e) => setEditEmail(e.target.value)}
                     placeholder="Leave blank to keep current"
-                    className="w-full h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent transition-colors"
+                    className="w-full h-11 px-4 bg-[#141414] border border-[#2f2f2f] rounded-lg text-sm text-[#FFFFFF] placeholder:text-[#4a4a4a] focus:outline-none focus:border-[#00D9FF] transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-text-secondary mb-2">Role</label>
+                  <label className="block text-xs text-[#8a8a8a] mb-2">Role</label>
                   <select
                     value={editRole}
                     onChange={(e) => setEditRole(e.target.value)}
-                    className="w-full h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
+                    className="w-full h-11 px-4 bg-[#141414] border border-[#2f2f2f] rounded-lg text-sm text-[#FFFFFF] focus:outline-none focus:border-[#00D9FF] transition-colors"
                   >
                     <option value="agent">Agent</option>
                     <option value="admin">Admin</option>
@@ -370,23 +370,23 @@ export default function AdminManage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs text-text-secondary mb-2">New Password</label>
+                  <label className="block text-xs text-[#8a8a8a] mb-2">New Password</label>
                   <input
                     type="password"
                     value={editPassword}
                     onChange={(e) => setEditPassword(e.target.value)}
                     placeholder="Leave blank to keep current"
-                    className="w-full h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent transition-colors"
+                    className="w-full h-11 px-4 bg-[#141414] border border-[#2f2f2f] rounded-lg text-sm text-[#FFFFFF] placeholder:text-[#4a4a4a] focus:outline-none focus:border-[#00D9FF] transition-colors"
                   />
                 </div>
                 <div className="flex justify-end gap-3 mt-2">
-                  <button type="button" onClick={() => setEditingAdmin(null)} className="px-4 py-2 text-sm text-text-secondary hover:text-text-primary">
+                  <button type="button" onClick={() => setEditingAdmin(null)} className="px-4 py-2 text-sm text-[#8a8a8a] hover:text-[#FFFFFF]">
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={updateMutation.isPending}
-                    className="px-4 py-2 bg-accent text-black text-sm font-medium rounded-lg hover:opacity-90 disabled:opacity-50"
+                    className="px-4 py-2 bg-[#00D9FF] text-black text-sm font-medium rounded-lg hover:opacity-90 disabled:opacity-50"
                   >
                     {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
                   </button>
@@ -399,12 +399,12 @@ export default function AdminManage() {
         {/* Permissions Editor Modal */}
         {permissionsAdmin && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="bg-bg-page border border-border rounded-xl p-6 w-full max-w-md shadow-2xl">
+            <div className="bg-[#0C0C0C] border border-[#2f2f2f] rounded-xl p-6 w-full max-w-md shadow-2xl">
               <div className="flex items-center justify-between mb-5">
-                <h3 className="text-sm font-semibold text-text-primary">
+                <h3 className="text-sm font-semibold text-[#FFFFFF]">
                   Permissions: {permissionsAdmin.username}
                 </h3>
-                <button onClick={() => setPermissionsAdmin(null)} className="text-text-muted hover:text-text-primary">
+                <button onClick={() => setPermissionsAdmin(null)} className="text-[#6a6a6a] hover:text-[#FFFFFF]">
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -412,27 +412,27 @@ export default function AdminManage() {
                 {PERMISSION_KEYS.map(({ key, label }) => (
                   <label
                     key={key}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-bg-elevated/50 cursor-pointer transition-colors"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-[#141414]/50 cursor-pointer transition-colors"
                   >
                     <button
                       type="button"
                       onClick={() => togglePermission(key)}
                       className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
                         permissionsState[key]
-                          ? 'bg-accent border-accent'
-                          : 'border-border bg-bg-elevated'
+                          ? 'bg-[#00D9FF] border-[#00D9FF]'
+                          : 'border-[#2f2f2f] bg-[#141414]'
                       }`}
                     >
                       {permissionsState[key] && <Check className="w-3 h-3 text-black" />}
                     </button>
-                    <span className="text-sm text-text-primary">{label}</span>
+                    <span className="text-sm text-[#FFFFFF]">{label}</span>
                   </label>
                 ))}
               </div>
               <div className="flex justify-end gap-3 mt-6">
                 <button
                   onClick={() => setPermissionsAdmin(null)}
-                  className="px-4 py-2 text-sm text-text-secondary hover:text-text-primary"
+                  className="px-4 py-2 text-sm text-[#8a8a8a] hover:text-[#FFFFFF]"
                 >
                   Cancel
                 </button>
@@ -446,7 +446,7 @@ export default function AdminManage() {
                     }
                   }}
                   disabled={permissionsMutation.isPending}
-                  className="px-4 py-2 bg-accent text-black text-sm font-medium rounded-lg hover:opacity-90 disabled:opacity-50"
+                  className="px-4 py-2 bg-[#00D9FF] text-black text-sm font-medium rounded-lg hover:opacity-90 disabled:opacity-50"
                 >
                   {permissionsMutation.isPending ? 'Saving...' : 'Save Permissions'}
                 </button>

@@ -9,7 +9,7 @@ function TrendBadge({ value }: { value: number }) {
   if (value === 0) return null;
   const isUp = value > 0;
   return (
-    <span className={`inline-flex items-center gap-0.5 text-[11px] font-semibold font-['JetBrains_Mono'] ${isUp ? 'text-green' : 'text-red'}`}>
+    <span className={`inline-flex items-center gap-0.5 text-[11px] font-semibold font-['JetBrains_Mono'] ${isUp ? 'text-[#059669]' : 'text-[#FF4444]'}`}>
       {isUp ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
       {isUp ? '+' : ''}{value}%
     </span>
@@ -24,10 +24,10 @@ function StatCard({ label, value, icon: Icon, color, trend }: {
   trend?: number;
 }) {
   return (
-    <div className="bg-bg-card border border-border rounded-[10px] p-5">
+    <div className="bg-[#0A0A0A] border border-[#2f2f2f] rounded-[10px] p-5">
       <div className="flex items-center gap-2 mb-3">
         <Icon size={18} className={color} />
-        <span className="text-[13px] text-text-secondary font-['Inter'] font-medium">{label}</span>
+        <span className="text-[13px] text-[#8a8a8a] font-['Inter'] font-medium">{label}</span>
       </div>
       <div className="flex items-end gap-2">
         <span className={`text-[32px] font-bold font-['Space_Grotesk'] leading-none ${color}`}>
@@ -40,15 +40,15 @@ function StatCard({ label, value, icon: Icon, color, trend }: {
 }
 
 function BotStatusDot({ status }: { status: string }) {
-  const color = status === 'online' ? 'bg-green' : status === 'limited' ? 'bg-orange' : 'bg-red';
+  const color = status === 'online' ? 'bg-[#059669]' : status === 'limited' ? 'bg-[#FF8800]' : 'bg-[#FF4444]';
   return <div className={`w-2 h-2 rounded-full ${color} shrink-0`} />;
 }
 
 function BotStatusBadge({ status, remaining }: { status: string; remaining?: number | null }) {
   const map: Record<string, { label: string; cls: string }> = {
-    online: { label: 'ONLINE', cls: 'text-green bg-green/10' },
-    limited: { label: 'LIMITED', cls: 'text-orange bg-orange/10' },
-    offline: { label: 'OFFLINE', cls: 'text-red bg-red/10' },
+    online: { label: 'ONLINE', cls: 'text-[#059669] bg-[#059669]/10' },
+    limited: { label: 'LIMITED', cls: 'text-[#FF8800] bg-[#FF8800]/10' },
+    offline: { label: 'OFFLINE', cls: 'text-[#FF4444] bg-[#FF4444]/10' },
   };
   const s = map[status] ?? map.offline;
   return (
@@ -63,12 +63,12 @@ function FaqBar({ name, hits, maxHits }: { name: string; hits: number; maxHits: 
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between">
-        <span className="text-[13px] text-text-primary font-['Inter'] truncate" title={name}>{name}</span>
-        <span className="text-[11px] text-text-secondary font-['JetBrains_Mono'] ml-3 shrink-0">{hits}</span>
+        <span className="text-[13px] text-[#FFFFFF] font-['Inter'] truncate" title={name}>{name}</span>
+        <span className="text-[11px] text-[#8a8a8a] font-['JetBrains_Mono'] ml-3 shrink-0">{hits}</span>
       </div>
-      <div className="w-full h-1.5 bg-bg-elevated rounded-full overflow-hidden">
+      <div className="w-full h-1.5 bg-[#141414] rounded-full overflow-hidden">
         <div
-          className="h-full rounded-full bg-accent"
+          className="h-full rounded-full bg-[#00D9FF]"
           style={{ width: `${pct}%`, minWidth: pct > 0 ? '4px' : '0' }}
         />
       </div>
@@ -112,64 +112,64 @@ export default function Dashboard() {
             label="Total Received"
             value={stats?.total_conversations ?? 0}
             icon={MessageSquare}
-            color="text-accent"
+            color="text-[#00D9FF]"
             trend={stats?.trends?.conversations}
           />
           <StatCard
             label="Resolved"
             value={stats?.resolved_conversations ?? 0}
             icon={CheckCircle}
-            color="text-green"
+            color="text-[#059669]"
           />
           <StatCard
             label="Open / Unresolved"
             value={stats?.open_conversations ?? 0}
             icon={AlertCircle}
-            color="text-orange"
+            color="text-[#FF8800]"
           />
           <StatCard
             label="Blocked"
             value={stats?.blocked_users ?? 0}
             icon={ShieldBan}
-            color="text-red"
+            color="text-[#FF4444]"
           />
         </div>
 
         {/* Two-column panels */}
         <div className="grid grid-cols-2 gap-4 mb-6">
           {/* Bot Pool Status */}
-          <div className="bg-bg-card border border-border rounded-[10px] p-5">
+          <div className="bg-[#0A0A0A] border border-[#2f2f2f] rounded-[10px] p-5">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-[18px] font-semibold text-text-primary font-['Space_Grotesk']">Bot Pool Status</h3>
-              <span className="text-[10px] font-semibold font-['JetBrains_Mono'] px-2 py-0.5 rounded bg-green/10 text-green">
+              <h3 className="text-[18px] font-semibold text-[#FFFFFF] font-['Space_Grotesk']">Bot Pool Status</h3>
+              <span className="text-[10px] font-semibold font-['JetBrains_Mono'] px-2 py-0.5 rounded bg-[#059669]/10 text-[#059669]">
                 {stats?.active_bots ?? 0} Active
               </span>
             </div>
             <div className="space-y-2">
               {stats?.bot_pool && stats.bot_pool.length > 0 ? (
                 stats.bot_pool.map((bot) => (
-                  <div key={bot.id} className="flex items-center gap-3 bg-bg-elevated rounded-lg px-4 py-3">
+                  <div key={bot.id} className="flex items-center gap-3 bg-[#141414] rounded-lg px-4 py-3">
                     <BotStatusDot status={bot.status} />
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-text-primary truncate">{bot.name}</p>
+                      <p className="text-sm text-[#FFFFFF] truncate">{bot.name}</p>
                     </div>
                     {bot.username && (
-                      <span className="text-[11px] text-text-secondary font-['JetBrains_Mono']">{bot.rate_limit_remaining ?? 0} msgs</span>
+                      <span className="text-[11px] text-[#8a8a8a] font-['JetBrains_Mono']">{bot.rate_limit_remaining ?? 0} msgs</span>
                     )}
                     <BotStatusBadge status={bot.status} remaining={bot.rate_limit_remaining} />
                   </div>
                 ))
               ) : (
-                <div className="text-text-muted text-sm py-4 text-center">No bots configured</div>
+                <div className="text-[#6a6a6a] text-sm py-4 text-center">No bots configured</div>
               )}
             </div>
           </div>
 
           {/* FAQ Performance */}
-          <div className="bg-bg-card border border-border rounded-[10px] p-5">
+          <div className="bg-[#0A0A0A] border border-[#2f2f2f] rounded-[10px] p-5">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-[18px] font-semibold text-text-primary font-['Space_Grotesk']">FAQ Performance</h3>
-              <span className="text-[10px] font-semibold font-['JetBrains_Mono'] px-2 py-0.5 rounded bg-accent/10 text-accent">
+              <h3 className="text-[18px] font-semibold text-[#FFFFFF] font-['Space_Grotesk']">FAQ Performance</h3>
+              <span className="text-[10px] font-semibold font-['JetBrains_Mono'] px-2 py-0.5 rounded bg-[#00D9FF]/10 text-[#00D9FF]">
                 {((stats?.faq_hit_rate ?? 0) * 100).toFixed(0)}% hit rate
               </span>
             </div>
@@ -182,7 +182,7 @@ export default function Dashboard() {
                   ));
                 })()
               ) : (
-                <div className="text-text-muted text-sm py-4 text-center">No FAQ data yet</div>
+                <div className="text-[#6a6a6a] text-sm py-4 text-center">No FAQ data yet</div>
               )}
             </div>
           </div>
@@ -191,51 +191,51 @@ export default function Dashboard() {
         {/* Missed Knowledge + Today Messages */}
         <div className="grid grid-cols-2 gap-4">
           {/* Missed Knowledge */}
-          <div className="bg-bg-card border border-border rounded-[10px] p-5">
+          <div className="bg-[#0A0A0A] border border-[#2f2f2f] rounded-[10px] p-5">
             <div className="flex items-center gap-2 mb-4">
-              <AlertCircle size={16} className="text-orange" />
-              <h3 className="text-[18px] font-semibold text-text-primary font-['Space_Grotesk']">Missed Knowledge</h3>
+              <AlertCircle size={16} className="text-[#FF8800]" />
+              <h3 className="text-[18px] font-semibold text-[#FFFFFF] font-['Space_Grotesk']">Missed Knowledge</h3>
             </div>
             <div className="space-y-2">
               {stats?.missed_keywords && stats.missed_keywords.length > 0 ? (
                 stats.missed_keywords.map((kw) => (
-                  <div key={kw.id} className="flex items-center justify-between bg-bg-elevated rounded-lg px-4 py-3">
-                    <span className="text-sm text-text-primary font-['JetBrains_Mono']">{kw.keyword}</span>
-                    <span className="text-[11px] text-text-secondary font-['JetBrains_Mono'] bg-bg-card px-2 py-0.5 rounded">
+                  <div key={kw.id} className="flex items-center justify-between bg-[#141414] rounded-lg px-4 py-3">
+                    <span className="text-sm text-[#FFFFFF] font-['JetBrains_Mono']">{kw.keyword}</span>
+                    <span className="text-[11px] text-[#8a8a8a] font-['JetBrains_Mono'] bg-[#0A0A0A] px-2 py-0.5 rounded">
                       {kw.count}x
                     </span>
                   </div>
                 ))
               ) : (
-                <div className="text-text-muted text-sm py-4 text-center">No missed keywords</div>
+                <div className="text-[#6a6a6a] text-sm py-4 text-center">No missed keywords</div>
               )}
             </div>
           </div>
 
           {/* Quick Stats */}
-          <div className="bg-bg-card border border-border rounded-[10px] p-5">
+          <div className="bg-[#0A0A0A] border border-[#2f2f2f] rounded-[10px] p-5">
             <div className="flex items-center gap-2 mb-4">
-              <MessageSquare size={16} className="text-accent" />
-              <h3 className="text-[18px] font-semibold text-text-primary font-['Space_Grotesk']">Today's Activity</h3>
+              <MessageSquare size={16} className="text-[#00D9FF]" />
+              <h3 className="text-[18px] font-semibold text-[#FFFFFF] font-['Space_Grotesk']">Today's Activity</h3>
             </div>
             <div className="space-y-2">
-              <div className="flex items-center justify-between bg-bg-elevated rounded-lg px-4 py-3">
-                <span className="text-sm text-text-secondary">Messages Today</span>
-                <span className="text-lg font-semibold text-accent font-['Space_Grotesk']">
+              <div className="flex items-center justify-between bg-[#141414] rounded-lg px-4 py-3">
+                <span className="text-sm text-[#8a8a8a]">Messages Today</span>
+                <span className="text-lg font-semibold text-[#00D9FF] font-['Space_Grotesk']">
                   {stats?.total_messages_today?.toLocaleString() ?? 0}
                 </span>
               </div>
-              <div className="flex items-center justify-between bg-bg-elevated rounded-lg px-4 py-3">
-                <span className="text-sm text-text-secondary">Messages Trend</span>
+              <div className="flex items-center justify-between bg-[#141414] rounded-lg px-4 py-3">
+                <span className="text-sm text-[#8a8a8a]">Messages Trend</span>
                 {stats?.trends ? (
                   <TrendBadge value={stats.trends.messages} />
                 ) : (
-                  <span className="text-xs text-text-muted">--</span>
+                  <span className="text-xs text-[#6a6a6a]">--</span>
                 )}
               </div>
-              <div className="flex items-center justify-between bg-bg-elevated rounded-lg px-4 py-3">
-                <span className="text-sm text-text-secondary">FAQ Hit Rate</span>
-                <span className="text-lg font-semibold text-green font-['Space_Grotesk']">
+              <div className="flex items-center justify-between bg-[#141414] rounded-lg px-4 py-3">
+                <span className="text-sm text-[#8a8a8a]">FAQ Hit Rate</span>
+                <span className="text-lg font-semibold text-[#059669] font-['Space_Grotesk']">
                   {((stats?.faq_hit_rate ?? 0) * 100).toFixed(0)}%
                 </span>
               </div>

@@ -58,14 +58,14 @@ export default function MissedKnowledge() {
         {/* Header info */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-2">
-            <AlertTriangle size={18} className="text-orange" />
-            <p className="text-text-secondary text-sm">
+            <AlertTriangle size={18} className="text-[#FF8800]" />
+            <p className="text-[#8a8a8a] text-sm">
               Keywords from unmatched user messages. Create FAQ rules to cover
               these topics.
             </p>
           </div>
           {dataUpdatedAt > 0 && (
-            <div className="flex items-center gap-1 text-text-muted text-xs">
+            <div className="flex items-center gap-1 text-[#6a6a6a] text-xs">
               <Clock size={12} />
               <span>Updated {timeAgo(new Date(dataUpdatedAt).toISOString())}</span>
             </div>
@@ -73,21 +73,21 @@ export default function MissedKnowledge() {
         </div>
 
         {/* Table */}
-        <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden">
+        <div className="bg-[#0A0A0A] border border-[#1A1A1A] rounded-xl overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-border-subtle">
-                <th className="text-left px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Keyword</th>
-                <th className="text-center px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">
+              <tr className="border-b border-[#1A1A1A]">
+                <th className="text-left px-6 py-4 text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono']">Keyword</th>
+                <th className="text-center px-6 py-4 text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono']">
                   Occurrences
                 </th>
-                <th className="text-left px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">
+                <th className="text-left px-6 py-4 text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono']">
                   Sample Messages
                 </th>
-                <th className="text-center px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">
+                <th className="text-center px-6 py-4 text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono']">
                   Last Seen
                 </th>
-                <th className="text-right px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Actions</th>
+                <th className="text-right px-6 py-4 text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono']">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -95,7 +95,7 @@ export default function MissedKnowledge() {
                 <tr>
                   <td
                     colSpan={5}
-                    className="px-4 py-8 text-center text-text-muted"
+                    className="px-4 py-8 text-center text-[#6a6a6a]"
                   >
                     Loading...
                   </td>
@@ -104,7 +104,7 @@ export default function MissedKnowledge() {
                 <tr>
                   <td
                     colSpan={5}
-                    className="px-4 py-8 text-center text-text-muted"
+                    className="px-4 py-8 text-center text-[#6a6a6a]"
                   >
                     No missed keywords found. Your FAQ coverage looks good!
                   </td>
@@ -113,55 +113,55 @@ export default function MissedKnowledge() {
                 keywords.map((kw) => (
                   <tr
                     key={kw.id}
-                    className="border-b border-border-subtle/50 last:border-0 hover:bg-bg-elevated/50 transition-colors"
+                    className="border-b border-[#1A1A1A]/50 last:border-0 hover:bg-[#141414]/50 transition-colors"
                   >
                     <td className="px-6 py-4.5">
-                      <span className="inline-block px-2 py-1 rounded-md bg-orange/10 text-orange text-sm font-medium">
+                      <span className="inline-block px-2 py-1 rounded-md bg-[#FF8800]/10 text-[#FF8800] text-sm font-medium">
                         {kw.keyword}
                       </span>
                     </td>
                     <td className="px-6 py-4.5 text-center">
-                      <span className="font-mono text-accent font-medium">
+                      <span className="font-mono text-[#00D9FF] font-medium">
                         {kw.occurrence_count}
                       </span>
                     </td>
-                    <td className="px-6 py-4.5 text-text-secondary text-xs max-w-[300px]">
+                    <td className="px-6 py-4.5 text-[#8a8a8a] text-xs max-w-[300px]">
                       {kw.sample_messages && kw.sample_messages.length > 0 ? (
                         <div className="space-y-1">
                           {kw.sample_messages.slice(0, 3).map((msg, idx) => (
                             <div
                               key={idx}
-                              className="truncate text-text-muted"
+                              className="truncate text-[#6a6a6a]"
                               title={msg}
                             >
                               "{msg}"
                             </div>
                           ))}
                           {kw.sample_messages.length > 3 && (
-                            <span className="text-text-placeholder">
+                            <span className="text-[#4a4a4a]">
                               +{kw.sample_messages.length - 3} more
                             </span>
                           )}
                         </div>
                       ) : (
-                        <span className="text-text-placeholder">-</span>
+                        <span className="text-[#4a4a4a]">-</span>
                       )}
                     </td>
-                    <td className="px-6 py-4.5 text-center text-text-secondary text-xs">
+                    <td className="px-6 py-4.5 text-center text-[#8a8a8a] text-xs">
                       {formatDate(kw.last_seen_at)}
                     </td>
                     <td className="px-6 py-4.5 text-right">
                       <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => handleCreateFAQ(kw.keyword)}
-                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-medium bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
+                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-medium bg-[#00D9FF]/10 text-[#00D9FF] hover:bg-[#00D9FF]/20 transition-colors"
                         >
                           <Plus size={12} />
                           Create FAQ
                         </button>
                         <button
                           onClick={() => handleDelete(kw.id, kw.keyword)}
-                          className="p-1.5 rounded hover:bg-bg-elevated text-text-secondary hover:text-red transition-colors"
+                          className="p-1.5 rounded hover:bg-[#141414] text-[#8a8a8a] hover:text-[#FF4444] transition-colors"
                           title="Mark as resolved"
                         >
                           <Trash2 size={14} />

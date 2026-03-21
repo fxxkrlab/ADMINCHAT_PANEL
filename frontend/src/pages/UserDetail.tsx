@@ -79,7 +79,7 @@ export default function UserDetail() {
     return (
       <div className="flex flex-col h-full">
         <Header title="User Detail" />
-        <div className="flex-1 flex items-center justify-center text-text-muted text-sm">
+        <div className="flex-1 flex items-center justify-center text-[#6a6a6a] text-sm">
           {isLoading ? 'Loading...' : 'User not found'}
         </div>
       </div>
@@ -100,7 +100,7 @@ export default function UserDetail() {
         {/* Back button */}
         <button
           onClick={() => navigate('/users')}
-          className="flex items-center gap-1.5 text-sm text-text-muted hover:text-accent mb-4 transition-colors"
+          className="flex items-center gap-1.5 text-sm text-[#6a6a6a] hover:text-[#00D9FF] mb-4 transition-colors"
         >
           <ArrowLeft size={16} />
           Back to Users
@@ -110,7 +110,7 @@ export default function UserDetail() {
           {/* Left column: User info */}
           <div className="col-span-2 space-y-4">
             {/* Profile card */}
-            <div className="bg-bg-card border border-border-subtle rounded-xl p-6">
+            <div className="bg-[#0A0A0A] border border-[#1A1A1A] rounded-xl p-6">
               <div className="flex items-start gap-5">
                 <div
                   className="w-20 h-20 rounded-full flex items-center justify-center text-white text-3xl font-semibold font-['Space_Grotesk'] shrink-0"
@@ -120,18 +120,18 @@ export default function UserDetail() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <h2 className="text-xl font-semibold text-text-primary font-['Space_Grotesk']">
+                    <h2 className="text-xl font-semibold text-[#FFFFFF] font-['Space_Grotesk']">
                       {user.first_name ?? ''} {user.last_name ?? ''}
                     </h2>
                     {user.is_premium && <Crown size={16} className="text-[#FFD700]" />}
                     {user.is_blocked && (
-                      <span className="px-2 py-0.5 rounded text-xs bg-red/10 text-red border border-red/20">
+                      <span className="px-2 py-0.5 rounded text-xs bg-[#FF4444]/10 text-[#FF4444] border border-red/20">
                         BLOCKED
                       </span>
                     )}
                   </div>
                   {user.username && (
-                    <p className="text-sm text-accent font-mono mb-3">@{user.username}</p>
+                    <p className="text-sm text-[#00D9FF] font-mono mb-3">@{user.username}</p>
                   )}
 
                   <div className="grid grid-cols-2 gap-x-8 gap-y-2">
@@ -149,69 +149,69 @@ export default function UserDetail() {
             </div>
 
             {/* Turnstile verification */}
-            <div className="bg-bg-card border border-border-subtle rounded-xl p-6">
+            <div className="bg-[#0A0A0A] border border-[#1A1A1A] rounded-xl p-6">
               <div className="flex items-center gap-2 mb-3">
-                <Shield size={16} className="text-accent" />
-                <h3 className="text-sm font-semibold text-text-primary font-['Space_Grotesk']">Turnstile Verification</h3>
+                <Shield size={16} className="text-[#00D9FF]" />
+                <h3 className="text-sm font-semibold text-[#FFFFFF] font-['Space_Grotesk']">Turnstile Verification</h3>
               </div>
               <div className="flex items-center gap-3">
                 {user.turnstile_verified ? (
                   <>
-                    <CheckCircle size={16} className="text-green" />
-                    <span className="text-sm text-green">Verified</span>
+                    <CheckCircle size={16} className="text-[#059669]" />
+                    <span className="text-sm text-[#059669]">Verified</span>
                     {user.turnstile_expires_at && (
-                      <span className="text-xs text-text-muted ml-2">
+                      <span className="text-xs text-[#6a6a6a] ml-2">
                         Expires: {formatDate(user.turnstile_expires_at)}
                       </span>
                     )}
                   </>
                 ) : (
                   <>
-                    <XCircle size={16} className="text-red" />
-                    <span className="text-sm text-red">Not Verified</span>
+                    <XCircle size={16} className="text-[#FF4444]" />
+                    <span className="text-sm text-[#FF4444]">Not Verified</span>
                   </>
                 )}
               </div>
             </div>
 
             {/* Conversation history */}
-            <div className="bg-bg-card border border-border-subtle rounded-xl p-6">
+            <div className="bg-[#0A0A0A] border border-[#1A1A1A] rounded-xl p-6">
               <div className="flex items-center gap-2 mb-3">
-                <MessageSquare size={16} className="text-accent" />
-                <h3 className="text-sm font-semibold text-text-primary font-['Space_Grotesk']">Conversation History</h3>
+                <MessageSquare size={16} className="text-[#00D9FF]" />
+                <h3 className="text-sm font-semibold text-[#FFFFFF] font-['Space_Grotesk']">Conversation History</h3>
               </div>
               {user.conversations.length === 0 ? (
-                <p className="text-sm text-text-muted py-2">No conversations yet.</p>
+                <p className="text-sm text-[#6a6a6a] py-2">No conversations yet.</p>
               ) : (
                 <div className="space-y-2">
                   {user.conversations.map((conv) => (
                     <div
                       key={conv.id}
                       onClick={() => navigate(`/chat/${conv.id}`)}
-                      className="flex items-center justify-between px-4 py-3 rounded-lg bg-bg-elevated cursor-pointer hover:bg-bg-elevated/80 transition-colors group"
+                      className="flex items-center justify-between px-4 py-3 rounded-lg bg-[#141414] cursor-pointer hover:bg-[#141414]/80 transition-colors group"
                     >
                       <div className="flex items-center gap-3">
                         <span className={`w-2 h-2 rounded-full ${
-                          conv.status === 'open' ? 'bg-orange' : conv.status === 'resolved' ? 'bg-green' : 'bg-red'
+                          conv.status === 'open' ? 'bg-[#FF8800]' : conv.status === 'resolved' ? 'bg-[#059669]' : 'bg-[#FF4444]'
                         }`} />
                         <div>
-                          <p className="text-sm text-text-primary">
+                          <p className="text-sm text-[#FFFFFF]">
                             #{conv.id} - {conv.source_type}
                           </p>
-                          <p className="text-xs text-text-muted">{formatDate(conv.created_at)}</p>
+                          <p className="text-xs text-[#6a6a6a]">{formatDate(conv.created_at)}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className={`text-xs px-2 py-0.5 rounded ${
                           conv.status === 'open'
-                            ? 'bg-orange/10 text-orange'
+                            ? 'bg-[#FF8800]/10 text-[#FF8800]'
                             : conv.status === 'resolved'
-                            ? 'bg-green/10 text-green'
-                            : 'bg-red/10 text-red'
+                            ? 'bg-[#059669]/10 text-[#059669]'
+                            : 'bg-[#FF4444]/10 text-[#FF4444]'
                         }`}>
                           {conv.status}
                         </span>
-                        <ExternalLink size={14} className="text-text-muted group-hover:text-accent transition-colors" />
+                        <ExternalLink size={14} className="text-[#6a6a6a] group-hover:text-[#00D9FF] transition-colors" />
                       </div>
                     </div>
                   ))}
@@ -223,15 +223,15 @@ export default function UserDetail() {
           {/* Right column: Tags, Groups, Actions */}
           <div className="space-y-4">
             {/* Tags management */}
-            <div className="bg-bg-card border border-border-subtle rounded-xl p-6">
+            <div className="bg-[#0A0A0A] border border-[#1A1A1A] rounded-xl p-6">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <Tag size={16} className="text-accent" />
-                  <h3 className="text-sm font-semibold text-text-primary font-['Space_Grotesk']">Tags</h3>
+                  <Tag size={16} className="text-[#00D9FF]" />
+                  <h3 className="text-sm font-semibold text-[#FFFFFF] font-['Space_Grotesk']">Tags</h3>
                 </div>
                 <button
                   onClick={() => setShowTagPicker(!showTagPicker)}
-                  className="w-6 h-6 rounded flex items-center justify-center text-text-muted hover:text-accent hover:bg-accent/10 transition-colors"
+                  className="w-6 h-6 rounded flex items-center justify-center text-[#6a6a6a] hover:text-[#00D9FF] hover:bg-[#00D9FF]/10 transition-colors"
                 >
                   <Plus size={14} />
                 </button>
@@ -239,7 +239,7 @@ export default function UserDetail() {
 
               <div className="flex flex-wrap gap-1.5 mb-2">
                 {user.tags.length === 0 ? (
-                  <p className="text-xs text-text-muted">No tags assigned</p>
+                  <p className="text-xs text-[#6a6a6a]">No tags assigned</p>
                 ) : (
                   user.tags.map((tag) => (
                     <span
@@ -264,35 +264,35 @@ export default function UserDetail() {
               </div>
 
               {showTagPicker && (
-                <div className="border-t border-border-subtle pt-2 mt-2 space-y-1">
+                <div className="border-t border-[#1A1A1A] pt-2 mt-2 space-y-1">
                   {availableTags.length > 0 ? (
                     availableTags.map((tag: TagItem) => (
                       <button
                         key={tag.id}
                         onClick={() => addTagMutation.mutate(tag.id)}
-                        className="flex items-center gap-2 w-full px-2 py-1.5 rounded text-xs hover:bg-bg-elevated transition-colors"
+                        className="flex items-center gap-2 w-full px-2 py-1.5 rounded text-xs hover:bg-[#141414] transition-colors"
                       >
                         <span className="w-3 h-3 rounded-full" style={{ backgroundColor: tag.color }} />
-                        <span className="text-text-secondary">{tag.name}</span>
+                        <span className="text-[#8a8a8a]">{tag.name}</span>
                       </button>
                     ))
                   ) : (
-                    <p className="text-xs text-text-muted py-1">No more tags available</p>
+                    <p className="text-xs text-[#6a6a6a] py-1">No more tags available</p>
                   )}
                 </div>
               )}
             </div>
 
             {/* Groups management */}
-            <div className="bg-bg-card border border-border-subtle rounded-xl p-6">
+            <div className="bg-[#0A0A0A] border border-[#1A1A1A] rounded-xl p-6">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <Users size={16} className="text-accent" />
-                  <h3 className="text-sm font-semibold text-text-primary font-['Space_Grotesk']">Groups</h3>
+                  <Users size={16} className="text-[#00D9FF]" />
+                  <h3 className="text-sm font-semibold text-[#FFFFFF] font-['Space_Grotesk']">Groups</h3>
                 </div>
                 <button
                   onClick={() => setShowGroupPicker(!showGroupPicker)}
-                  className="w-6 h-6 rounded flex items-center justify-center text-text-muted hover:text-accent hover:bg-accent/10 transition-colors"
+                  className="w-6 h-6 rounded flex items-center justify-center text-[#6a6a6a] hover:text-[#00D9FF] hover:bg-[#00D9FF]/10 transition-colors"
                 >
                   <Plus size={14} />
                 </button>
@@ -300,54 +300,54 @@ export default function UserDetail() {
 
               <div className="space-y-1.5">
                 {user.groups.length === 0 ? (
-                  <p className="text-xs text-text-muted">No groups assigned</p>
+                  <p className="text-xs text-[#6a6a6a]">No groups assigned</p>
                 ) : (
                   user.groups.map((group) => (
                     <div
                       key={group.id}
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-bg-elevated"
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#141414]"
                     >
-                      <Users size={12} className="text-purple" />
-                      <span className="text-sm text-text-primary">{group.name}</span>
+                      <Users size={12} className="text-[#8B5CF6]" />
+                      <span className="text-sm text-[#FFFFFF]">{group.name}</span>
                     </div>
                   ))
                 )}
               </div>
 
               {showGroupPicker && (
-                <div className="border-t border-border-subtle pt-2 mt-2 space-y-1">
+                <div className="border-t border-[#1A1A1A] pt-2 mt-2 space-y-1">
                   {availableGroups.length > 0 ? (
                     availableGroups.map((group: UserGroupItem) => (
                       <button
                         key={group.id}
                         onClick={() => addGroupMutation.mutate(group.id)}
-                        className="flex items-center gap-2 w-full px-2 py-1.5 rounded text-xs hover:bg-bg-elevated transition-colors"
+                        className="flex items-center gap-2 w-full px-2 py-1.5 rounded text-xs hover:bg-[#141414] transition-colors"
                       >
-                        <Users size={12} className="text-text-muted" />
-                        <span className="text-text-secondary">{group.name}</span>
+                        <Users size={12} className="text-[#6a6a6a]" />
+                        <span className="text-[#8a8a8a]">{group.name}</span>
                       </button>
                     ))
                   ) : (
-                    <p className="text-xs text-text-muted py-1">No more groups available</p>
+                    <p className="text-xs text-[#6a6a6a] py-1">No more groups available</p>
                   )}
                 </div>
               )}
             </div>
 
             {/* Block / Unblock */}
-            <div className="bg-bg-card border border-border-subtle rounded-xl p-6">
-              <h3 className="text-sm font-semibold text-text-primary font-['Space_Grotesk'] mb-3">Actions</h3>
+            <div className="bg-[#0A0A0A] border border-[#1A1A1A] rounded-xl p-6">
+              <h3 className="text-sm font-semibold text-[#FFFFFF] font-['Space_Grotesk'] mb-3">Actions</h3>
               {user.is_blocked ? (
                 <div>
                   {user.block_reason && (
-                    <p className="text-xs text-text-muted mb-2">
-                      Reason: <span className="text-red">{user.block_reason}</span>
+                    <p className="text-xs text-[#6a6a6a] mb-2">
+                      Reason: <span className="text-[#FF4444]">{user.block_reason}</span>
                     </p>
                   )}
                   <button
                     onClick={() => unblockMutation.mutate()}
                     disabled={unblockMutation.isPending}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-green/10 text-green border border-green/20 hover:bg-green/20 transition-colors text-sm font-medium disabled:opacity-50"
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[#059669]/10 text-[#059669] border border-green/20 hover:bg-[#059669]/20 transition-colors text-sm font-medium disabled:opacity-50"
                   >
                     <ShieldOff size={16} />
                     {unblockMutation.isPending ? 'Unblocking...' : 'Unblock User'}
@@ -358,7 +358,7 @@ export default function UserDetail() {
                   {!showBlockModal ? (
                     <button
                       onClick={() => setShowBlockModal(true)}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-red/10 text-red border border-red/20 hover:bg-red/20 transition-colors text-sm font-medium"
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[#FF4444]/10 text-[#FF4444] border border-red/20 hover:bg-[#FF4444]/20 transition-colors text-sm font-medium"
                     >
                       <Shield size={16} />
                       Block User
@@ -370,19 +370,19 @@ export default function UserDetail() {
                         placeholder="Block reason (optional)"
                         value={blockReason}
                         onChange={(e) => setBlockReason(e.target.value)}
-                        className="w-full h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-red transition-colors"
+                        className="w-full h-11 px-4 bg-[#141414] border border-[#2f2f2f] rounded-lg text-sm text-[#FFFFFF] placeholder:text-[#4a4a4a] focus:outline-none focus:border-red transition-colors"
                       />
                       <div className="flex gap-2">
                         <button
                           onClick={() => blockMutation.mutate(blockReason || undefined)}
                           disabled={blockMutation.isPending}
-                          className="flex-1 px-3 py-2 rounded-lg bg-red text-white text-sm font-medium hover:bg-red/80 transition-colors disabled:opacity-50"
+                          className="flex-1 px-3 py-2 rounded-lg bg-[#FF4444] text-white text-sm font-medium hover:bg-red/80 transition-colors disabled:opacity-50"
                         >
                           {blockMutation.isPending ? 'Blocking...' : 'Confirm Block'}
                         </button>
                         <button
                           onClick={() => { setShowBlockModal(false); setBlockReason(''); }}
-                          className="px-3 py-2 rounded-lg bg-bg-elevated text-text-muted text-sm hover:text-text-secondary transition-colors"
+                          className="px-3 py-2 rounded-lg bg-[#141414] text-[#6a6a6a] text-sm hover:text-[#8a8a8a] transition-colors"
                         >
                           Cancel
                         </button>
@@ -407,9 +407,9 @@ function InfoRow({ icon: Icon, label, value, mono }: {
 }) {
   return (
     <div className="flex items-center gap-2">
-      <Icon size={13} className="text-text-muted shrink-0" />
-      <span className="text-xs text-text-muted w-24">{label}</span>
-      <span className={`text-xs text-text-secondary ${mono ? "font-['JetBrains_Mono']" : ''}`}>{value}</span>
+      <Icon size={13} className="text-[#6a6a6a] shrink-0" />
+      <span className="text-xs text-[#6a6a6a] w-24">{label}</span>
+      <span className={`text-xs text-[#8a8a8a] ${mono ? "font-['JetBrains_Mono']" : ''}`}>{value}</span>
     </div>
   );
 }

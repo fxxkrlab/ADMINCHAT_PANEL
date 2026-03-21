@@ -76,7 +76,7 @@ export default function Chat() {
       {/* WebSocket connection indicator */}
       <div className="fixed bottom-12 right-4 z-40">
         <div
-          className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green' : 'bg-red'}`}
+          className={`w-2 h-2 rounded-full ${isConnected ? 'bg-[#059669]' : 'bg-[#FF4444]'}`}
           title={isConnected ? 'WebSocket connected' : 'WebSocket disconnected'}
         />
       </div>

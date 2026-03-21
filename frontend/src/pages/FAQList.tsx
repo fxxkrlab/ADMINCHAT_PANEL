@@ -65,14 +65,14 @@ export default function FAQList() {
         {/* Toolbar */}
         <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
           <div className="flex items-center gap-3">
-            <p className="text-text-secondary text-sm">
+            <p className="text-[#8a8a8a] text-sm">
               Manage FAQ rules and auto-replies
             </p>
             {/* Filters */}
             <select
               value={filterReplyMode}
               onChange={(e) => setFilterReplyMode(e.target.value)}
-              className="h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors appearance-none cursor-pointer"
+              className="h-11 px-4 bg-[#141414] border border-[#2f2f2f] rounded-lg text-sm text-[#FFFFFF] focus:outline-none focus:border-[#00D9FF] transition-colors appearance-none cursor-pointer"
             >
               <option value="">All Modes</option>
               {Object.entries(REPLY_MODE_LABELS).map(([value, label]) => (
@@ -84,7 +84,7 @@ export default function FAQList() {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors appearance-none cursor-pointer"
+              className="h-11 px-4 bg-[#141414] border border-[#2f2f2f] rounded-lg text-sm text-[#FFFFFF] focus:outline-none focus:border-[#00D9FF] transition-colors appearance-none cursor-pointer"
             >
               <option value="">All Status</option>
               <option value="active">Active</option>
@@ -93,26 +93,26 @@ export default function FAQList() {
           </div>
           <button
             onClick={() => navigate('/faq/new')}
-            className="px-4 py-2 bg-accent text-black text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
+            className="px-4 py-2 bg-[#00D9FF] text-black text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
           >
             + New Rule
           </button>
         </div>
 
         {/* Table */}
-        <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden">
+        <div className="bg-[#0A0A0A] border border-[#1A1A1A] rounded-xl overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-border-subtle">
-                <th className="text-left px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Rule Name</th>
-                <th className="text-center px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Questions</th>
-                <th className="text-center px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Answers</th>
-                <th className="text-center px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Response</th>
-                <th className="text-center px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Reply Mode</th>
-                <th className="text-center px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Priority</th>
-                <th className="text-center px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Hits</th>
-                <th className="text-center px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Status</th>
-                <th className="text-right px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Actions</th>
+              <tr className="border-b border-[#1A1A1A]">
+                <th className="text-left px-6 py-4 text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono']">Rule Name</th>
+                <th className="text-center px-6 py-4 text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono']">Questions</th>
+                <th className="text-center px-6 py-4 text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono']">Answers</th>
+                <th className="text-center px-6 py-4 text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono']">Response</th>
+                <th className="text-center px-6 py-4 text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono']">Reply Mode</th>
+                <th className="text-center px-6 py-4 text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono']">Priority</th>
+                <th className="text-center px-6 py-4 text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono']">Hits</th>
+                <th className="text-center px-6 py-4 text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono']">Status</th>
+                <th className="text-right px-6 py-4 text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono']">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -124,7 +124,7 @@ export default function FAQList() {
                 </>
               ) : rules.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-4 py-8 text-center text-text-muted">
+                  <td colSpan={9} className="px-4 py-8 text-center text-[#6a6a6a]">
                     No FAQ rules found. Create your first rule to get started.
                   </td>
                 </tr>
@@ -132,41 +132,41 @@ export default function FAQList() {
                 rules.map((rule) => (
                   <tr
                     key={rule.id}
-                    className="border-b border-border-subtle/50 last:border-0 hover:bg-bg-elevated/50 transition-colors"
+                    className="border-b border-[#1A1A1A]/50 last:border-0 hover:bg-[#141414]/50 transition-colors"
                   >
-                    <td className="px-6 py-4.5 text-text-primary font-medium">
+                    <td className="px-6 py-4.5 text-[#FFFFFF] font-medium">
                       {rule.name || `Rule #${rule.id}`}
                     </td>
-                    <td className="px-6 py-4.5 text-center text-text-secondary">
+                    <td className="px-6 py-4.5 text-center text-[#8a8a8a]">
                       <span className="inline-flex items-center justify-center min-w-[24px] h-6 px-2 rounded-full bg-[#2563EB]/15 text-[#2563EB] text-xs font-medium">
                         {rule.questions.length}
                       </span>
                     </td>
-                    <td className="px-6 py-4.5 text-center text-text-secondary">
-                      <span className="inline-flex items-center justify-center min-w-[24px] h-6 px-2 rounded-full bg-green/15 text-green text-xs font-medium">
+                    <td className="px-6 py-4.5 text-center text-[#8a8a8a]">
+                      <span className="inline-flex items-center justify-center min-w-[24px] h-6 px-2 rounded-full bg-[#059669]/15 text-[#059669] text-xs font-medium">
                         {rule.answers.length}
                       </span>
                     </td>
-                    <td className="px-6 py-4.5 text-center text-text-secondary text-xs">
+                    <td className="px-6 py-4.5 text-center text-[#8a8a8a] text-xs">
                       {RESPONSE_MODE_LABELS[rule.response_mode] || rule.response_mode}
                     </td>
                     <td className="px-6 py-4.5 text-center">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-purple/15 text-purple font-mono">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-[#8B5CF6]/15 text-[#8B5CF6] font-mono">
                         {REPLY_MODE_LABELS[rule.reply_mode] || rule.reply_mode}
                       </span>
                     </td>
-                    <td className="px-6 py-4.5 text-center text-text-secondary font-mono text-xs">
+                    <td className="px-6 py-4.5 text-center text-[#8a8a8a] font-mono text-xs">
                       {rule.priority}
                     </td>
                     <td className="px-6 py-4.5 text-center">
-                      <span className="font-mono text-accent text-xs">
+                      <span className="font-mono text-[#00D9FF] text-xs">
                         {rule.hit_count}
                       </span>
                     </td>
                     <td className="px-6 py-4.5 text-center">
                       <span
                         className={`inline-block w-2 h-2 rounded-full ${
-                          rule.is_active ? 'bg-green' : 'bg-text-muted'
+                          rule.is_active ? 'bg-[#059669]' : 'bg-text-muted'
                         }`}
                       />
                     </td>
@@ -174,17 +174,17 @@ export default function FAQList() {
                       <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => navigate(`/faq/${rule.id}/edit`)}
-                          className="p-1.5 rounded hover:bg-bg-elevated text-text-secondary hover:text-accent transition-colors"
+                          className="p-1.5 rounded hover:bg-[#141414] text-[#8a8a8a] hover:text-[#00D9FF] transition-colors"
                           title="Edit"
                         >
                           <Pencil size={14} />
                         </button>
                         <button
                           onClick={() => toggleMutation.mutate(rule)}
-                          className={`p-1.5 rounded hover:bg-bg-elevated transition-colors ${
+                          className={`p-1.5 rounded hover:bg-[#141414] transition-colors ${
                             rule.is_active
-                              ? 'text-green hover:text-orange'
-                              : 'text-text-muted hover:text-green'
+                              ? 'text-[#059669] hover:text-[#FF8800]'
+                              : 'text-[#6a6a6a] hover:text-[#059669]'
                           }`}
                           title={rule.is_active ? 'Disable' : 'Enable'}
                         >
@@ -192,7 +192,7 @@ export default function FAQList() {
                         </button>
                         <button
                           onClick={() => handleDelete(rule)}
-                          className="p-1.5 rounded hover:bg-bg-elevated text-text-secondary hover:text-red transition-colors"
+                          className="p-1.5 rounded hover:bg-[#141414] text-[#8a8a8a] hover:text-[#FF4444] transition-colors"
                           title="Delete"
                         >
                           <Trash2 size={14} />

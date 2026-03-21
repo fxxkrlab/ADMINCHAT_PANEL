@@ -134,13 +134,13 @@ export default function TurnstileVerify() {
 
   if (!uid) {
     return (
-      <div className="min-h-screen bg-bg-page flex items-center justify-center p-4">
-        <div className="w-full max-w-md bg-bg-card border border-border rounded-xl p-8 text-center">
-          <XCircle size={48} className="text-red mx-auto mb-4" />
+      <div className="min-h-screen bg-[#0C0C0C] flex items-center justify-center p-4">
+        <div className="w-full max-w-md bg-[#0A0A0A] border border-[#2f2f2f] rounded-xl p-8 text-center">
+          <XCircle size={48} className="text-[#FF4444] mx-auto mb-4" />
           <h1 className="text-xl font-semibold text-white mb-2" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
             Invalid Link
           </h1>
-          <p className="text-text-secondary text-sm">
+          <p className="text-[#8a8a8a] text-sm">
             Missing user ID. Please use the verification link sent by the bot in Telegram.
           </p>
         </div>
@@ -149,12 +149,12 @@ export default function TurnstileVerify() {
   }
 
   return (
-    <div className="min-h-screen bg-bg-page flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-bg-card border border-border rounded-xl p-8">
+    <div className="min-h-screen bg-[#0C0C0C] flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-[#0A0A0A] border border-[#2f2f2f] rounded-xl p-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-accent/10 mb-4">
-            <Shield size={28} className="text-accent" />
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#00D9FF]/10 mb-4">
+            <Shield size={28} className="text-[#00D9FF]" />
           </div>
           <h1
             className="text-xl font-semibold text-white mb-2"
@@ -162,7 +162,7 @@ export default function TurnstileVerify() {
           >
             ADMINCHAT Verification
           </h1>
-          <p className="text-text-secondary text-sm">
+          <p className="text-[#8a8a8a] text-sm">
             Please complete the verification to continue chatting
           </p>
         </div>
@@ -170,8 +170,8 @@ export default function TurnstileVerify() {
         {/* States */}
         {state === 'loading' && (
           <div className="flex flex-col items-center gap-3 py-6">
-            <Loader2 size={32} className="text-accent animate-spin" />
-            <p className="text-text-muted text-sm">Loading verification...</p>
+            <Loader2 size={32} className="text-[#00D9FF] animate-spin" />
+            <p className="text-[#6a6a6a] text-sm">Loading verification...</p>
           </div>
         )}
 
@@ -183,18 +183,18 @@ export default function TurnstileVerify() {
 
         {state === 'verifying' && (
           <div className="flex flex-col items-center gap-3 py-6">
-            <Loader2 size={32} className="text-accent animate-spin" />
-            <p className="text-text-secondary text-sm">Verifying...</p>
+            <Loader2 size={32} className="text-[#00D9FF] animate-spin" />
+            <p className="text-[#8a8a8a] text-sm">Verifying...</p>
           </div>
         )}
 
         {state === 'success' && (
           <div className="flex flex-col items-center gap-3 py-6">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#059669]/10">
-              <CheckCircle size={36} className="text-green" />
+              <CheckCircle size={36} className="text-[#059669]" />
             </div>
             <h2 className="text-lg font-semibold text-white">Verification Complete!</h2>
-            <p className="text-text-secondary text-sm text-center">
+            <p className="text-[#8a8a8a] text-sm text-center">
               You can now return to Telegram and continue chatting.
             </p>
           </div>
@@ -203,14 +203,14 @@ export default function TurnstileVerify() {
         {(state === 'error' || state === 'config_error') && (
           <div className="flex flex-col items-center gap-3 py-6">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#FF4444]/10">
-              <XCircle size={36} className="text-red" />
+              <XCircle size={36} className="text-[#FF4444]" />
             </div>
             <h2 className="text-lg font-semibold text-white">Verification Failed</h2>
-            <p className="text-text-secondary text-sm text-center">{errorMessage}</p>
+            <p className="text-[#8a8a8a] text-sm text-center">{errorMessage}</p>
             {state === 'error' && (
               <button
                 onClick={() => window.location.reload()}
-                className="mt-3 px-5 py-2 rounded-lg bg-accent/10 text-accent text-sm font-medium hover:bg-accent/20 transition-colors border border-accent/20"
+                className="mt-3 px-5 py-2 rounded-lg bg-[#00D9FF]/10 text-[#00D9FF] text-sm font-medium hover:bg-[#00D9FF]/20 transition-colors border border-[#00D9FF]/20"
               >
                 Try Again
               </button>
@@ -219,8 +219,8 @@ export default function TurnstileVerify() {
         )}
 
         {/* Footer */}
-        <div className="mt-8 pt-4 border-t border-border-subtle text-center">
-          <p className="text-text-placeholder text-xs">
+        <div className="mt-8 pt-4 border-t border-[#1A1A1A] text-center">
+          <p className="text-[#4a4a4a] text-xs">
             Protected by Cloudflare Turnstile
           </p>
         </div>

@@ -38,24 +38,24 @@ export default function Blacklist() {
       <Header title="Blacklist" />
       <div className="flex-1 p-8 overflow-y-auto">
         <div className="flex items-center justify-between mb-8">
-          <p className="text-sm text-text-muted">
+          <p className="text-sm text-[#6a6a6a]">
             {total} blocked user{total !== 1 ? 's' : ''}
           </p>
         </div>
 
         {isLoading ? (
-          <div className="flex items-center justify-center py-20 text-text-muted text-sm">
+          <div className="flex items-center justify-center py-20 text-[#6a6a6a] text-sm">
             Loading...
           </div>
         ) : users.length === 0 ? (
-          <div className="bg-bg-card border border-border-subtle rounded-xl p-12 text-center text-text-muted text-sm">
+          <div className="bg-[#0A0A0A] border border-[#1A1A1A] rounded-xl p-12 text-center text-[#6a6a6a] text-sm">
             No blocked users.
           </div>
         ) : (
           <>
-            <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden">
+            <div className="bg-[#0A0A0A] border border-[#1A1A1A] rounded-xl overflow-hidden">
               {/* Table header */}
-              <div className="grid grid-cols-[48px_1fr_120px_1fr_160px_160px_100px] gap-4 px-6 py-4 border-b border-border-subtle text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">
+              <div className="grid grid-cols-[48px_1fr_120px_1fr_160px_160px_100px] gap-4 px-6 py-4 border-b border-[#1A1A1A] text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono']">
                 <span />
                 <span>Name</span>
                 <span>TGUID</span>
@@ -73,7 +73,7 @@ export default function Blacklist() {
                 return (
                   <div
                     key={user.id}
-                    className="grid grid-cols-[48px_1fr_120px_1fr_160px_160px_100px] gap-4 px-6 py-4 border-b border-border-subtle last:border-b-0 items-center hover:bg-bg-elevated/50 transition-colors"
+                    className="grid grid-cols-[48px_1fr_120px_1fr_160px_160px_100px] gap-4 px-6 py-4 border-b border-[#1A1A1A] last:border-b-0 items-center hover:bg-[#141414]/50 transition-colors"
                   >
                     {/* Avatar */}
                     <div
@@ -85,31 +85,31 @@ export default function Blacklist() {
 
                     {/* Name */}
                     <div className="min-w-0">
-                      <p className="text-sm text-text-primary truncate">
+                      <p className="text-sm text-[#FFFFFF] truncate">
                         {user.first_name ?? 'Unknown'} {user.last_name ?? ''}
                       </p>
                       {user.username && (
-                        <p className="text-xs text-accent font-mono truncate">@{user.username}</p>
+                        <p className="text-xs text-[#00D9FF] font-mono truncate">@{user.username}</p>
                       )}
                     </div>
 
                     {/* TGUID */}
-                    <span className="text-xs text-text-secondary font-['JetBrains_Mono']">
+                    <span className="text-xs text-[#8a8a8a] font-['JetBrains_Mono']">
                       {user.tg_uid}
                     </span>
 
                     {/* Block Reason */}
-                    <span className="text-xs text-red truncate" title={user.block_reason ?? undefined}>
+                    <span className="text-xs text-[#FF4444] truncate" title={user.block_reason ?? undefined}>
                       {user.block_reason || '--'}
                     </span>
 
                     {/* Blocked Date */}
-                    <span className="text-xs text-text-muted font-['JetBrains_Mono']">
+                    <span className="text-xs text-[#6a6a6a] font-['JetBrains_Mono']">
                       {formatDate(user.updated_at)}
                     </span>
 
                     {/* Last Active */}
-                    <span className="text-xs text-text-muted font-['JetBrains_Mono']">
+                    <span className="text-xs text-[#6a6a6a] font-['JetBrains_Mono']">
                       {formatDate(user.last_active_at)}
                     </span>
 
@@ -118,7 +118,7 @@ export default function Blacklist() {
                       <button
                         onClick={() => unblockMutation.mutate(user.id)}
                         disabled={unblockMutation.isPending}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-green/10 text-green border border-green/20 hover:bg-green/20 transition-colors text-xs font-medium disabled:opacity-50"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#059669]/10 text-[#059669] border border-green/20 hover:bg-[#059669]/20 transition-colors text-xs font-medium disabled:opacity-50"
                       >
                         <ShieldOff size={12} />
                         Unblock
@@ -135,17 +135,17 @@ export default function Blacklist() {
                 <button
                   onClick={() => setPage(Math.max(1, page - 1))}
                   disabled={page === 1}
-                  className="p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-bg-elevated disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  className="p-2 rounded-lg text-[#6a6a6a] hover:text-[#FFFFFF] hover:bg-[#141414] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 >
                   <ChevronLeft size={16} />
                 </button>
-                <span className="text-sm text-text-muted px-3">
+                <span className="text-sm text-[#6a6a6a] px-3">
                   Page {page} of {totalPages}
                 </span>
                 <button
                   onClick={() => setPage(Math.min(totalPages, page + 1))}
                   disabled={page === totalPages}
-                  className="p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-bg-elevated disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  className="p-2 rounded-lg text-[#6a6a6a] hover:text-[#FFFFFF] hover:bg-[#141414] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 >
                   <ChevronRight size={16} />
                 </button>

@@ -60,13 +60,13 @@ function SidebarInner() {
     <aside
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
-      className={`fixed top-0 left-0 z-50 flex flex-col h-screen bg-bg-sidebar border-r border-border-subtle shrink-0 transition-all duration-200 ease-in-out ${
+      className={`fixed top-0 left-0 z-50 flex flex-col h-screen bg-[#080808] border-r border-[#1A1A1A] shrink-0 transition-all duration-200 ease-in-out ${
         expanded ? 'w-56' : 'w-16'
       }`}
     >
       {/* Logo */}
-      <div className="flex items-center h-14 border-b border-border-subtle px-4 overflow-hidden">
-        <span className="text-accent font-bold text-sm tracking-tight whitespace-nowrap">
+      <div className="flex items-center h-14 border-b border-[#1A1A1A] px-4 overflow-hidden">
+        <span className="text-[#00D9FF] font-bold text-sm tracking-tight whitespace-nowrap">
           {expanded ? 'ADMINCHAT' : 'AC'}
         </span>
       </div>
@@ -83,15 +83,15 @@ function SidebarInner() {
                 expanded ? 'px-3' : 'justify-center'
               } ${
                 isActive
-                  ? 'bg-accent-10 text-accent'
-                  : 'text-text-muted hover:text-text-secondary hover:bg-bg-elevated'
+                  ? 'bg-[#00D9FF10] text-[#00D9FF]'
+                  : 'text-[#6a6a6a] hover:text-[#8a8a8a] hover:bg-[#141414]'
               }`
             }
           >
             {({ isActive }) => (
               <>
                 {isActive && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-accent rounded-r-full" />
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-[#00D9FF] rounded-r-full" />
                 )}
                 <span className="shrink-0">{item.icon}</span>
                 <span
@@ -108,10 +108,10 @@ function SidebarInner() {
       </nav>
 
       {/* Bottom - logout + version */}
-      <div className="flex flex-col gap-2 py-3 border-t border-border-subtle px-2">
+      <div className="flex flex-col gap-2 py-3 border-t border-[#1A1A1A] px-2">
         <button
           onClick={logout}
-          className={`flex items-center gap-3 h-11 rounded-lg text-text-muted hover:text-red hover:bg-red/10 transition-colors ${
+          className={`flex items-center gap-3 h-11 rounded-lg text-[#6a6a6a] hover:text-[#FF4444] hover:bg-[#FF4444]/10 transition-colors ${
             expanded ? 'px-3' : 'justify-center'
           }`}
           title="Logout"
@@ -126,8 +126,8 @@ function SidebarInner() {
           </span>
         </button>
         <div className="flex flex-col items-center px-1 select-none">
-          <span className="text-text-placeholder text-[8px] leading-tight">v{__APP_VERSION__}</span>
-          <span className="text-text-placeholder text-[7px] leading-tight">&reg; NH&times;SK</span>
+          <span className="text-[#4a4a4a] text-[8px] leading-tight">v{__APP_VERSION__}</span>
+          <span className="text-[#4a4a4a] text-[7px] leading-tight">&reg; NH&times;SK</span>
         </div>
       </div>
     </aside>
