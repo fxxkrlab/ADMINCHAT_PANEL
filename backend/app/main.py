@@ -137,7 +137,22 @@ async def telegram_webhook(token_hash: str, request: Request):
     except Exception:
         return JSONResponse({"ok": False}, status_code=400)
 
-    handled = await bot_manager.feed_webhook_update(token_hash, data)
+    # Log incoming update for debugging
+    msg = data.get("message", {})
+    chat_type = msg.get("chat", {}).get("type", "unknown")
+    chat_title = msg.get("chat", {}).get("title", "")
+    text = (msg.get("text") or "")[:50]
+    logger.info(
+        "Webhook update: chat_type=%s chat=%s text=%s update_id=%s",
+        chat_type, chat_title or msg.get("chat", {}).get("id"), text, data.get("update_id"),
+    )
+
+    try:
+        handled = await bot_manager.feed_webhook_update(token_hash, data)
+    except Exception:
+        logger.exception("Error processing webhook update")
+        return JSONResponse({"ok": True})
+
     if not handled:
         logger.warning("Webhook update for unknown token_hash: %s", token_hash[:16])
         return JSONResponse({"ok": False}, status_code=404)
