@@ -49,6 +49,13 @@ async def lifespan(app: FastAPI):
     # Import models to ensure they are registered with SQLAlchemy
     import app.models  # noqa: F401
 
+    # Create all tables if they don't exist (first run)
+    from app.database import engine
+    from app.models.base import Base
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    logger.info("Database tables ensured")
+
     # Create initial admin if no admins exist
     await create_initial_admin()
 
