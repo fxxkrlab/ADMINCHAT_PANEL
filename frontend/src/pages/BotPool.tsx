@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { RefreshCw, Play, Square, Pencil, Trash2, Plus, Zap, AlertTriangle, Wifi, WifiOff, X } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import Header from '../components/layout/Header';
 import { getBots, createBot, updateBot, deleteBot, restartBot, type BotCreateData, type BotUpdateData } from '../services/botApi';
 import type { Bot } from '../types';
@@ -90,7 +90,7 @@ export default function BotPool() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['bots'] }),
   });
 
-  const toggleMutation = useMutation({
+  const _toggleMutation = useMutation({
     mutationFn: ({ id, active }: { id: number; active: boolean }) =>
       updateBot(id, { is_active: active }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['bots'] }),
