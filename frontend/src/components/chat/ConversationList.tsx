@@ -79,8 +79,8 @@ const ConversationItem = memo(function ConversationItem({
   return (
     <button
       onClick={onClick}
-      className={`w-full text-left px-4 py-3 border-b border-[#1A1A1A] transition-colors hover:bg-[#141414]/50 ${
-        isActive ? 'bg-[#141414]' : ''
+      className={`w-full text-left px-4 py-3 border-b border-border-subtle transition-colors hover:bg-bg-elevated/50 ${
+        isActive ? 'bg-bg-elevated' : ''
       }`}
     >
       <div className="flex items-start gap-3">
@@ -103,7 +103,7 @@ const ConversationItem = memo(function ConversationItem({
             <span className="text-[14px] font-bold text-white truncate">
               {getDisplayName(conversation)}
             </span>
-            <span className="text-[11px] text-[#6a6a6a] font-['JetBrains_Mono'] shrink-0">
+            <span className="text-[11px] text-text-muted font-['JetBrains_Mono'] shrink-0">
               {lastMsgTime ? formatRelativeTime(lastMsgTime) : ''}
             </span>
           </div>
@@ -112,7 +112,7 @@ const ConversationItem = memo(function ConversationItem({
             ID: {getTgUid(conversation)}
           </div>
 
-          <p className="text-[13px] text-[#8a8a8a] truncate mt-1">
+          <p className="text-[13px] text-text-secondary truncate mt-1">
             {getLastMessagePreview(conversation)}
           </p>
 
@@ -223,7 +223,7 @@ export default function ConversationList() {
   ];
 
   return (
-    <div className="flex flex-col h-full w-80 border-r border-[#1A1A1A] bg-[#0A0A0A] shrink-0">
+    <div className="flex flex-col h-full w-80 border-r border-border-subtle bg-bg-card shrink-0">
       {/* Header */}
       <div className="px-4 pt-4 pb-3">
         <div className="flex items-center gap-2 mb-3">
@@ -237,14 +237,14 @@ export default function ConversationList() {
         <div className="relative">
           <Search
             size={14}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-[#4a4a4a]"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-text-placeholder"
           />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
             placeholder="Search conversations..."
-            className="w-full h-9 pl-9 pr-4 bg-[#141414] border border-[#2f2f2f] rounded-lg text-sm text-white placeholder:text-[#4a4a4a] focus:outline-none focus:border-accent transition-colors"
+            className="w-full h-9 pl-9 pr-4 bg-bg-elevated border border-border rounded-lg text-sm text-white placeholder:text-text-placeholder focus:outline-none focus:border-accent transition-colors"
           />
         </div>
       </div>
@@ -258,7 +258,7 @@ export default function ConversationList() {
             className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
               activeTab === tab.key
                 ? 'bg-accent text-black'
-                : 'bg-[#141414] border border-[#2f2f2f] text-[#8a8a8a] hover:text-white'
+                : 'bg-bg-elevated border border-border text-text-secondary hover:text-white'
             }`}
           >
             {tab.label}
@@ -275,7 +275,7 @@ export default function ConversationList() {
             ))}
           </div>
         ) : conversations.length === 0 ? (
-          <div className="px-3 py-8 text-center text-[#6a6a6a] text-sm">
+          <div className="px-3 py-8 text-center text-text-muted text-sm">
             No conversations found.
           </div>
         ) : (

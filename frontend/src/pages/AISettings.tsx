@@ -413,7 +413,7 @@ export default function AISettings() {
         {/* ======== CREATE / EDIT FORM MODAL ======== */}
         {showForm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="bg-[#0C0C0C] border border-border rounded-xl p-6 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-auto">
+            <div className="bg-bg-page border border-border rounded-xl p-6 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-auto">
               <div className="flex items-center justify-between mb-5">
                 <h3 className="text-sm font-semibold text-text-primary">
                   {editingConfig ? `Edit Provider: ${editingConfig.name}` : 'Add AI Provider'}
@@ -571,7 +571,7 @@ export default function AISettings() {
         {/* Delete confirmation */}
         {deleteConfirm !== null && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="bg-[#0C0C0C] border border-border rounded-xl p-6 w-full max-w-sm shadow-2xl">
+            <div className="bg-bg-page border border-border rounded-xl p-6 w-full max-w-sm shadow-2xl">
               <h3 className="text-sm font-semibold text-text-primary mb-3">Delete AI Provider</h3>
               <p className="text-sm text-text-secondary mb-5">
                 Are you sure? This will remove the AI configuration permanently.

@@ -242,7 +242,7 @@ export default function AdminManage() {
         {/* Create Admin Modal */}
         {showCreateForm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="bg-[#0C0C0C] border border-border rounded-xl p-6 w-full max-w-md shadow-2xl">
+            <div className="bg-bg-page border border-border rounded-xl p-6 w-full max-w-md shadow-2xl">
               <div className="flex items-center justify-between mb-5">
                 <h3 className="text-sm font-semibold text-text-primary">Add New Admin</h3>
                 <button onClick={() => { setShowCreateForm(false); resetCreateForm(); }} className="text-text-muted hover:text-text-primary">
@@ -330,7 +330,7 @@ export default function AdminManage() {
         {/* Edit Admin Modal */}
         {editingAdmin && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="bg-[#0C0C0C] border border-border rounded-xl p-6 w-full max-w-md shadow-2xl">
+            <div className="bg-bg-page border border-border rounded-xl p-6 w-full max-w-md shadow-2xl">
               <div className="flex items-center justify-between mb-5">
                 <h3 className="text-sm font-semibold text-text-primary">Edit Admin: {editingAdmin.username}</h3>
                 <button onClick={() => setEditingAdmin(null)} className="text-text-muted hover:text-text-primary">
@@ -399,7 +399,7 @@ export default function AdminManage() {
         {/* Permissions Editor Modal */}
         {permissionsAdmin && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="bg-[#0C0C0C] border border-border rounded-xl p-6 w-full max-w-md shadow-2xl">
+            <div className="bg-bg-page border border-border rounded-xl p-6 w-full max-w-md shadow-2xl">
               <div className="flex items-center justify-between mb-5">
                 <h3 className="text-sm font-semibold text-text-primary">
                   Permissions: {permissionsAdmin.username}

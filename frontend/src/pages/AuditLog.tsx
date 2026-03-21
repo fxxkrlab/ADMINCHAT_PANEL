@@ -7,22 +7,22 @@ import { getAdmins } from '../services/adminApi';
 
 // Action color mapping
 const ACTION_COLORS: Record<string, { label: string; color: string; bg: string }> = {
-  block_user: { label: 'Block User', color: 'text-[#FF4444]', bg: 'bg-[#FF4444]/10' },
-  unblock_user: { label: 'Unblock User', color: 'text-[#059669]', bg: 'bg-[#059669]/10' },
-  create_admin: { label: 'Create Admin', color: 'text-[#00D9FF]', bg: 'bg-[#00D9FF]/10' },
-  deactivate_admin: { label: 'Deactivate Admin', color: 'text-[#FF8800]', bg: 'bg-[#FF8800]/10' },
-  create_bot: { label: 'Add Bot', color: 'text-[#00D9FF]', bg: 'bg-[#00D9FF]/10' },
-  delete_bot: { label: 'Remove Bot', color: 'text-[#FF4444]', bg: 'bg-[#FF4444]/10' },
-  create_faq_rule: { label: 'Create FAQ Rule', color: 'text-[#8B5CF6]', bg: 'bg-[#8B5CF6]/10' },
-  update_faq_rule: { label: 'Update FAQ Rule', color: 'text-[#FF8800]', bg: 'bg-[#FF8800]/10' },
-  delete_faq_rule: { label: 'Delete FAQ Rule', color: 'text-[#FF4444]', bg: 'bg-[#FF4444]/10' },
+  block_user: { label: 'Block User', color: 'text-red', bg: 'bg-[#FF4444]/10' },
+  unblock_user: { label: 'Unblock User', color: 'text-green', bg: 'bg-[#059669]/10' },
+  create_admin: { label: 'Create Admin', color: 'text-accent', bg: 'bg-accent/10' },
+  deactivate_admin: { label: 'Deactivate Admin', color: 'text-orange', bg: 'bg-[#FF8800]/10' },
+  create_bot: { label: 'Add Bot', color: 'text-accent', bg: 'bg-accent/10' },
+  delete_bot: { label: 'Remove Bot', color: 'text-red', bg: 'bg-[#FF4444]/10' },
+  create_faq_rule: { label: 'Create FAQ Rule', color: 'text-purple', bg: 'bg-[#8B5CF6]/10' },
+  update_faq_rule: { label: 'Update FAQ Rule', color: 'text-orange', bg: 'bg-[#FF8800]/10' },
+  delete_faq_rule: { label: 'Delete FAQ Rule', color: 'text-red', bg: 'bg-[#FF4444]/10' },
 };
 
 function ActionBadge({ action }: { action: string }) {
   const config = ACTION_COLORS[action] || {
     label: action.replace(/_/g, ' '),
-    color: 'text-[#8a8a8a]',
-    bg: 'bg-[#141414]',
+    color: 'text-text-secondary',
+    bg: 'bg-bg-elevated',
   };
   return (
     <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold ${config.color} ${config.bg}`}>
@@ -36,7 +36,7 @@ function DetailsCell({ details }: { details: Record<string, unknown> }) {
   const entries = Object.entries(details);
 
   if (entries.length === 0) {
-    return <span className="text-[#4a4a4a] text-xs">--</span>;
+    return <span className="text-text-placeholder text-xs">--</span>;
   }
 
   // Show short summary
@@ -50,11 +50,11 @@ function DetailsCell({ details }: { details: Record<string, unknown> }) {
     return (
       <button
         onClick={() => setExpanded(true)}
-        className="text-left text-xs text-[#8a8a8a] hover:text-white transition-colors flex items-center gap-1 max-w-[200px]"
+        className="text-left text-xs text-text-secondary hover:text-white transition-colors flex items-center gap-1 max-w-[200px]"
         title="Click to expand"
       >
         <span className="truncate">{summary}{hasMore ? '...' : ''}</span>
-        <ChevronDown size={12} className="shrink-0 text-[#6a6a6a]" />
+        <ChevronDown size={12} className="shrink-0 text-text-muted" />
       </button>
     );
   }
@@ -63,12 +63,12 @@ function DetailsCell({ details }: { details: Record<string, unknown> }) {
     <div className="text-xs">
       <button
         onClick={() => setExpanded(false)}
-        className="flex items-center gap-1 text-[#00D9FF] mb-1 hover:underline"
+        className="flex items-center gap-1 text-accent mb-1 hover:underline"
       >
         <span>Collapse</span>
         <ChevronUp size={12} />
       </button>
-      <pre className="bg-[#141414] border border-[#2f2f2f] rounded p-2 text-[#8a8a8a] whitespace-pre-wrap max-w-[300px] overflow-auto font-mono text-[11px]">
+      <pre className="bg-bg-elevated border border-border rounded p-2 text-text-secondary whitespace-pre-wrap max-w-[300px] overflow-auto font-mono text-[11px]">
         {JSON.stringify(details, null, 2)}
       </pre>
     </div>
@@ -144,8 +144,8 @@ export default function AuditLog() {
         {/* Toolbar */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
-            <FileText size={20} className="text-[#00D9FF]" />
-            <span className="text-sm text-[#8a8a8a]">
+            <FileText size={20} className="text-accent" />
+            <span className="text-sm text-text-secondary">
               {total} {total === 1 ? 'entry' : 'entries'}
             </span>
           </div>
@@ -154,7 +154,7 @@ export default function AuditLog() {
             {hasActiveFilters && (
               <button
                 onClick={clearFilters}
-                className="flex items-center gap-1 px-3 py-1.5 text-xs text-[#FF4444] bg-[#FF4444]/10 rounded-lg hover:bg-[#FF4444]/20 transition-colors"
+                className="flex items-center gap-1 px-3 py-1.5 text-xs text-red bg-[#FF4444]/10 rounded-lg hover:bg-[#FF4444]/20 transition-colors"
               >
                 <X size={12} />
                 Clear Filters
@@ -164,8 +164,8 @@ export default function AuditLog() {
               onClick={() => setShowFilters(!showFilters)}
               className={`flex items-center gap-2 px-3 py-1.5 text-xs rounded-lg transition-colors border ${
                 showFilters
-                  ? 'text-[#00D9FF] bg-[#00D9FF]/10 border-[#00D9FF]/20'
-                  : 'text-[#8a8a8a] bg-[#141414] border-[#2f2f2f] hover:text-white'
+                  ? 'text-accent bg-accent/10 border-accent/20'
+                  : 'text-text-secondary bg-bg-elevated border-border hover:text-white'
               }`}
             >
               <Filter size={14} />
@@ -176,14 +176,14 @@ export default function AuditLog() {
 
         {/* Filters panel */}
         {showFilters && (
-          <div className="mb-8 p-4 bg-[#0A0A0A] border border-[#2f2f2f] rounded-xl grid grid-cols-2 md:grid-cols-5 gap-3">
+          <div className="mb-8 p-4 bg-bg-card border border-border rounded-xl grid grid-cols-2 md:grid-cols-5 gap-3">
             {/* Admin filter */}
             <div>
-              <label className="block text-[10px] text-[#6a6a6a] uppercase tracking-wider mb-1">Admin</label>
+              <label className="block text-[10px] text-text-muted uppercase tracking-wider mb-1">Admin</label>
               <select
                 value={adminFilter}
                 onChange={(e) => { setAdminFilter(e.target.value); setPage(1); }}
-                className="w-full h-9 bg-[#141414] border border-[#2f2f2f] rounded-lg px-3 text-xs text-white focus:outline-none focus:border-[#00D9FF] transition-colors"
+                className="w-full h-9 bg-bg-elevated border border-border rounded-lg px-3 text-xs text-white focus:outline-none focus:border-accent transition-colors"
               >
                 <option value="">All</option>
                 {adminsData?.items?.map((a) => (
@@ -194,11 +194,11 @@ export default function AuditLog() {
 
             {/* Action filter */}
             <div>
-              <label className="block text-[10px] text-[#6a6a6a] uppercase tracking-wider mb-1">Action</label>
+              <label className="block text-[10px] text-text-muted uppercase tracking-wider mb-1">Action</label>
               <select
                 value={actionFilter}
                 onChange={(e) => { setActionFilter(e.target.value); setPage(1); }}
-                className="w-full h-9 bg-[#141414] border border-[#2f2f2f] rounded-lg px-3 text-xs text-white focus:outline-none focus:border-[#00D9FF] transition-colors"
+                className="w-full h-9 bg-bg-elevated border border-border rounded-lg px-3 text-xs text-white focus:outline-none focus:border-accent transition-colors"
               >
                 <option value="">All</option>
                 {ACTION_OPTIONS.map((a) => (
@@ -209,11 +209,11 @@ export default function AuditLog() {
 
             {/* Target type filter */}
             <div>
-              <label className="block text-[10px] text-[#6a6a6a] uppercase tracking-wider mb-1">Target Type</label>
+              <label className="block text-[10px] text-text-muted uppercase tracking-wider mb-1">Target Type</label>
               <select
                 value={targetTypeFilter}
                 onChange={(e) => { setTargetTypeFilter(e.target.value); setPage(1); }}
-                className="w-full h-9 bg-[#141414] border border-[#2f2f2f] rounded-lg px-3 text-xs text-white focus:outline-none focus:border-[#00D9FF] transition-colors"
+                className="w-full h-9 bg-bg-elevated border border-border rounded-lg px-3 text-xs text-white focus:outline-none focus:border-accent transition-colors"
               >
                 <option value="">All</option>
                 {TARGET_TYPE_OPTIONS.map((t) => (
@@ -224,78 +224,78 @@ export default function AuditLog() {
 
             {/* Date from */}
             <div>
-              <label className="block text-[10px] text-[#6a6a6a] uppercase tracking-wider mb-1">From</label>
+              <label className="block text-[10px] text-text-muted uppercase tracking-wider mb-1">From</label>
               <input
                 type="date"
                 value={dateFrom}
                 onChange={(e) => { setDateFrom(e.target.value); setPage(1); }}
-                className="w-full h-9 bg-[#141414] border border-[#2f2f2f] rounded-lg px-3 text-xs text-white focus:outline-none focus:border-[#00D9FF] transition-colors"
+                className="w-full h-9 bg-bg-elevated border border-border rounded-lg px-3 text-xs text-white focus:outline-none focus:border-accent transition-colors"
               />
             </div>
 
             {/* Date to */}
             <div>
-              <label className="block text-[10px] text-[#6a6a6a] uppercase tracking-wider mb-1">To</label>
+              <label className="block text-[10px] text-text-muted uppercase tracking-wider mb-1">To</label>
               <input
                 type="date"
                 value={dateTo}
                 onChange={(e) => { setDateTo(e.target.value); setPage(1); }}
-                className="w-full h-9 bg-[#141414] border border-[#2f2f2f] rounded-lg px-3 text-xs text-white focus:outline-none focus:border-[#00D9FF] transition-colors"
+                className="w-full h-9 bg-bg-elevated border border-border rounded-lg px-3 text-xs text-white focus:outline-none focus:border-accent transition-colors"
               />
             </div>
           </div>
         )}
 
         {/* Table */}
-        <div className="bg-[#0A0A0A] border border-[#2f2f2f] rounded-xl overflow-hidden">
+        <div className="bg-bg-card border border-border rounded-xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-[#2f2f2f]">
-                  <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Timestamp</th>
-                  <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Admin</th>
-                  <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Action</th>
-                  <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Target</th>
-                  <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Details</th>
-                  <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">IP Address</th>
+                <tr className="border-b border-border">
+                  <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Timestamp</th>
+                  <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Admin</th>
+                  <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Action</th>
+                  <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Target</th>
+                  <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Details</th>
+                  <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">IP Address</th>
                 </tr>
               </thead>
               <tbody>
                 {isLoading ? (
                   <tr>
-                    <td colSpan={6} className="text-center py-12 text-[#6a6a6a] text-sm">Loading...</td>
+                    <td colSpan={6} className="text-center py-12 text-text-muted text-sm">Loading...</td>
                   </tr>
                 ) : logs.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="text-center py-12 text-[#6a6a6a] text-sm">No audit logs found.</td>
+                    <td colSpan={6} className="text-center py-12 text-text-muted text-sm">No audit logs found.</td>
                   </tr>
                 ) : (
                   logs.map((log: AuditLogEntry) => (
-                    <tr key={log.id} className="border-b border-[#1A1A1A] hover:bg-[#141414]/50 transition-colors">
-                      <td className="px-6 py-4.5 text-xs text-[#8a8a8a] whitespace-nowrap font-mono">
+                    <tr key={log.id} className="border-b border-border-subtle hover:bg-bg-elevated/50 transition-colors">
+                      <td className="px-6 py-4.5 text-xs text-text-secondary whitespace-nowrap font-mono">
                         {(() => { const d = new Date(log.created_at + (log.created_at.endsWith('Z') ? '' : 'Z')); return d.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai', hour12: false }); })()}
                       </td>
                       <td className="px-6 py-4.5 text-xs text-white">
-                        {log.admin_username || <span className="text-[#4a4a4a]">System</span>}
+                        {log.admin_username || <span className="text-text-placeholder">System</span>}
                       </td>
                       <td className="px-6 py-4.5">
                         <ActionBadge action={log.action} />
                       </td>
-                      <td className="px-6 py-4.5 text-xs text-[#8a8a8a]">
+                      <td className="px-6 py-4.5 text-xs text-text-secondary">
                         {log.target_type && (
                           <span>
-                            <span className="text-[#6a6a6a]">{log.target_type}</span>
+                            <span className="text-text-muted">{log.target_type}</span>
                             {log.target_id != null && (
                               <span className="text-white ml-1 font-mono">#{log.target_id}</span>
                             )}
                           </span>
                         )}
-                        {!log.target_type && <span className="text-[#4a4a4a]">--</span>}
+                        {!log.target_type && <span className="text-text-placeholder">--</span>}
                       </td>
                       <td className="px-6 py-4.5">
                         <DetailsCell details={log.details} />
                       </td>
-                      <td className="px-6 py-4.5 text-xs text-[#6a6a6a] font-mono">
+                      <td className="px-6 py-4.5 text-xs text-text-muted font-mono">
                         {log.ip_address || '--'}
                       </td>
                     </tr>
@@ -307,15 +307,15 @@ export default function AuditLog() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between px-4 py-3 border-t border-[#1A1A1A]">
-              <span className="text-xs text-[#6a6a6a]">
+            <div className="flex items-center justify-between px-4 py-3 border-t border-border-subtle">
+              <span className="text-xs text-text-muted">
                 Page {page} of {totalPages}
               </span>
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page <= 1}
-                  className="flex items-center justify-center w-8 h-8 rounded-md text-[#8a8a8a] hover:text-white hover:bg-[#141414] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  className="flex items-center justify-center w-8 h-8 rounded-md text-text-secondary hover:text-white hover:bg-bg-elevated disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 >
                   <ChevronLeft size={16} />
                 </button>
@@ -337,8 +337,8 @@ export default function AuditLog() {
                       onClick={() => setPage(pageNum)}
                       className={`flex items-center justify-center w-8 h-8 rounded-md text-xs transition-colors ${
                         pageNum === page
-                          ? 'bg-[#00D9FF] text-black font-semibold'
-                          : 'border border-[#2f2f2f] text-[#8a8a8a] hover:bg-[#141414]'
+                          ? 'bg-accent text-black font-semibold'
+                          : 'border border-border text-text-secondary hover:bg-bg-elevated'
                       }`}
                     >
                       {pageNum}
@@ -348,7 +348,7 @@ export default function AuditLog() {
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page >= totalPages}
-                  className="flex items-center justify-center w-8 h-8 rounded-md text-[#8a8a8a] hover:text-white hover:bg-[#141414] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  className="flex items-center justify-center w-8 h-8 rounded-md text-text-secondary hover:text-white hover:bg-bg-elevated disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 >
                   <ChevronRight size={16} />
                 </button>

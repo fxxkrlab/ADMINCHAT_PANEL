@@ -140,10 +140,10 @@ export default function MessageInput({ botName, conversationId, sourceType }: Me
     : botName;
 
   return (
-    <div className="border-t border-[#1A1A1A] bg-[#0A0A0A]">
+    <div className="border-t border-border-subtle bg-bg-card">
       {/* Input area */}
       <div className="px-6 py-4">
-        <div className="flex items-end gap-2 bg-[#141414] border border-[#2f2f2f] rounded-[10px] px-3 py-2">
+        <div className="flex items-end gap-2 bg-bg-elevated border border-border rounded-[10px] px-3 py-2">
           <textarea
             ref={textareaRef}
             value={text}
@@ -152,7 +152,7 @@ export default function MessageInput({ botName, conversationId, sourceType }: Me
             onPaste={handlePaste}
             placeholder="Type a message... (Markdown supported)"
             rows={1}
-            className="flex-1 bg-transparent text-sm text-white placeholder:text-[#4a4a4a] focus:outline-none resize-none leading-relaxed py-1"
+            className="flex-1 bg-transparent text-sm text-white placeholder:text-text-placeholder focus:outline-none resize-none leading-relaxed py-1"
             style={{ minHeight: '28px', maxHeight: '160px' }}
           />
 
@@ -164,7 +164,7 @@ export default function MessageInput({ botName, conversationId, sourceType }: Me
               className={`flex items-center justify-center w-8 h-8 rounded-md transition-colors ${
                 useMarkdown
                   ? 'text-accent bg-accent/10'
-                  : 'text-[#6a6a6a] hover:text-[#8a8a8a] hover:bg-[#1A1A1A]'
+                  : 'text-text-muted hover:text-text-secondary hover:bg-[#1A1A1A]'
               }`}
               title={useMarkdown ? 'Markdown enabled' : 'Markdown disabled'}
             >
@@ -174,7 +174,7 @@ export default function MessageInput({ botName, conversationId, sourceType }: Me
             {/* Attach file */}
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="flex items-center justify-center w-8 h-8 rounded-md text-[#6a6a6a] hover:text-[#8a8a8a] hover:bg-[#1A1A1A] transition-colors"
+              className="flex items-center justify-center w-8 h-8 rounded-md text-text-muted hover:text-text-secondary hover:bg-[#1A1A1A] transition-colors"
               title="Attach file"
             >
               <Paperclip size={16} />
@@ -189,7 +189,7 @@ export default function MessageInput({ botName, conversationId, sourceType }: Me
             {/* Image upload */}
             <button
               onClick={() => imageInputRef.current?.click()}
-              className="flex items-center justify-center w-8 h-8 rounded-md text-[#6a6a6a] hover:text-[#8a8a8a] hover:bg-[#1A1A1A] transition-colors"
+              className="flex items-center justify-center w-8 h-8 rounded-md text-text-muted hover:text-text-secondary hover:bg-[#1A1A1A] transition-colors"
               title="Upload image"
             >
               <Image size={16} />
@@ -216,7 +216,7 @@ export default function MessageInput({ botName, conversationId, sourceType }: Me
       </div>
 
       {/* Bottom hint */}
-      <div className="flex items-center justify-between px-6 pb-3 text-[11px] text-[#4a4a4a]">
+      <div className="flex items-center justify-between px-6 pb-3 text-[11px] text-text-placeholder">
         <span>Ctrl+Enter to send | Markdown & media supported</span>
         {displayBotName && (
           <div className="relative" ref={botPickerRef}>
@@ -238,7 +238,7 @@ export default function MessageInput({ botName, conversationId, sourceType }: Me
 
             {/* Bot picker dropdown */}
             {showBotPicker && availableBots.length > 1 && (
-              <div className="absolute bottom-full right-0 mb-1 w-52 bg-[#141414] border border-[#2f2f2f] rounded-lg shadow-lg py-1 z-50">
+              <div className="absolute bottom-full right-0 mb-1 w-52 bg-bg-elevated border border-border rounded-lg shadow-lg py-1 z-50">
                 {availableBots.map((bot) => (
                   <button
                     key={bot.id}
@@ -247,7 +247,7 @@ export default function MessageInput({ botName, conversationId, sourceType }: Me
                       setShowBotPicker(false);
                     }}
                     className={`w-full text-left px-3 py-1.5 text-xs hover:bg-[#1A1A1A] transition-colors flex items-center justify-between ${
-                      selectedBot?.id === bot.id ? 'text-accent' : 'text-[#8a8a8a]'
+                      selectedBot?.id === bot.id ? 'text-accent' : 'text-text-secondary'
                     }`}
                   >
                     <span>@{bot.bot_username || bot.display_name || `Bot#${bot.id}`}</span>

@@ -59,13 +59,13 @@ function Pagination({ page, totalPages, onPageChange }: {
       <button
         onClick={() => onPageChange(Math.max(1, page - 1))}
         disabled={page === 1}
-        className="w-8 h-8 flex items-center justify-center rounded-md text-[#6a6a6a] hover:text-white hover:bg-[#141414] border border-[#2f2f2f] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+        className="w-8 h-8 flex items-center justify-center rounded-md text-text-muted hover:text-white hover:bg-bg-elevated border border-border disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
       >
         <ChevronLeft size={16} />
       </button>
       {pages.map((p, i) =>
         p === '...' ? (
-          <span key={`dots-${i}`} className="px-2 text-[#6a6a6a] text-sm">...</span>
+          <span key={`dots-${i}`} className="px-2 text-text-muted text-sm">...</span>
         ) : (
           <button
             key={p}
@@ -73,7 +73,7 @@ function Pagination({ page, totalPages, onPageChange }: {
             className={`w-8 h-8 flex items-center justify-center rounded-md text-sm transition-colors ${
               p === page
                 ? 'bg-accent text-black font-semibold'
-                : 'border border-[#2f2f2f] text-[#8a8a8a] hover:bg-[#141414]'
+                : 'border border-border text-text-secondary hover:bg-bg-elevated'
             }`}
           >
             {p}
@@ -83,7 +83,7 @@ function Pagination({ page, totalPages, onPageChange }: {
       <button
         onClick={() => onPageChange(Math.min(totalPages, page + 1))}
         disabled={page === totalPages}
-        className="w-8 h-8 flex items-center justify-center rounded-md text-[#6a6a6a] hover:text-white hover:bg-[#141414] border border-[#2f2f2f] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+        className="w-8 h-8 flex items-center justify-center rounded-md text-text-muted hover:text-white hover:bg-bg-elevated border border-border disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
       >
         <ChevronRight size={16} />
       </button>
@@ -140,25 +140,25 @@ export default function UsersGrid() {
         {/* Filters */}
         <div className="flex items-center gap-3 mb-6">
           <div className="relative flex-1 max-w-md">
-            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4a4a4a]" />
+            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-placeholder" />
             <input
               type="text"
               placeholder="Search by TGUID, username, or tag..."
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-              className="w-full h-10 pl-10 pr-4 bg-[#141414] border border-[#2f2f2f] rounded-lg text-sm text-white placeholder:text-[#4a4a4a] focus:outline-none focus:border-accent transition-colors"
+              className="w-full h-10 pl-10 pr-4 bg-bg-elevated border border-border rounded-lg text-sm text-white placeholder:text-text-placeholder focus:outline-none focus:border-accent transition-colors"
             />
           </div>
 
           <button
-            className="inline-flex items-center gap-2 h-10 px-4 border border-[#2f2f2f] rounded-lg text-sm text-[#8a8a8a] hover:text-white hover:bg-[#141414] transition-colors"
+            className="inline-flex items-center gap-2 h-10 px-4 border border-border rounded-lg text-sm text-text-secondary hover:text-white hover:bg-bg-elevated transition-colors"
           >
             <Tag size={14} />
             Tags
           </button>
 
           <button
-            className="inline-flex items-center gap-2 h-10 px-4 border border-[#2f2f2f] rounded-lg text-sm text-[#8a8a8a] hover:text-white hover:bg-[#141414] transition-colors"
+            className="inline-flex items-center gap-2 h-10 px-4 border border-border rounded-lg text-sm text-text-secondary hover:text-white hover:bg-bg-elevated transition-colors"
           >
             <Users size={14} />
             Groups
@@ -173,7 +173,7 @@ export default function UsersGrid() {
             ))}
           </div>
         ) : users.length === 0 ? (
-          <div className="bg-[#0A0A0A] border border-[#2f2f2f] rounded-[10px] p-12 text-center text-[#6a6a6a] text-sm">
+          <div className="bg-bg-card border border-border rounded-[10px] p-12 text-center text-text-muted text-sm">
             No users found.
           </div>
         ) : (
@@ -183,7 +183,7 @@ export default function UsersGrid() {
                 <div
                   key={user.id}
                   onClick={() => navigate(`/users/${user.id}`)}
-                  className="bg-[#0A0A0A] border border-[#2f2f2f] rounded-[10px] p-5 cursor-pointer hover:border-accent/30 hover:bg-[#141414] transition-all text-center"
+                  className="bg-bg-card border border-border rounded-[10px] p-5 cursor-pointer hover:border-accent/30 hover:bg-bg-elevated transition-all text-center"
                 >
                   <UserAvatar user={user} />
 
@@ -211,21 +211,21 @@ export default function UsersGrid() {
                   {/* Info rows */}
                   <div className="space-y-1.5 mt-3 text-left">
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] text-[#6a6a6a]">TGUID</span>
-                      <span className="text-[11px] text-[#8a8a8a] font-['JetBrains_Mono']">{user.tg_uid}</span>
+                      <span className="text-[11px] text-text-muted">TGUID</span>
+                      <span className="text-[11px] text-text-secondary font-['JetBrains_Mono']">{user.tg_uid}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] text-[#6a6a6a]">DC</span>
-                      <span className="text-[11px] text-[#8a8a8a] font-['JetBrains_Mono']">{user.dc_id ?? '--'}</span>
+                      <span className="text-[11px] text-text-muted">DC</span>
+                      <span className="text-[11px] text-text-secondary font-['JetBrains_Mono']">{user.dc_id ?? '--'}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] text-[#6a6a6a]">Region</span>
-                      <span className="text-[11px] text-[#8a8a8a] font-['JetBrains_Mono']">{user.phone_region ?? '--'}</span>
+                      <span className="text-[11px] text-text-muted">Region</span>
+                      <span className="text-[11px] text-text-secondary font-['JetBrains_Mono']">{user.phone_region ?? '--'}</span>
                     </div>
                   </div>
 
                   {/* Message count */}
-                  <div className="flex items-center justify-center gap-1 mt-3 text-[#6a6a6a]">
+                  <div className="flex items-center justify-center gap-1 mt-3 text-text-muted">
                     <MessageSquare size={12} />
                     <span className="text-[11px] font-['JetBrains_Mono']">{user.message_count}</span>
                   </div>
