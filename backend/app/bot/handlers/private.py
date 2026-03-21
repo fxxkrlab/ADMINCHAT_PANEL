@@ -181,6 +181,9 @@ async def handle_private_message(message: TgMessage, bot_db_id: int) -> None:
             # ---- 4. Store Message ----
             content_type, text_content, media_file_id = _extract_content(message)
 
+            # Use Telegram's message.date as the actual send time
+            msg_time = message.date.replace(tzinfo=None) if message.date else datetime.utcnow()
+
             db_msg = Message(
                 conversation_id=conv.id,
                 tg_message_id=message.message_id,
@@ -194,6 +197,7 @@ async def handle_private_message(message: TgMessage, bot_db_id: int) -> None:
                 if message.reply_to_message
                 else None,
                 raw_data=_raw_data(message),
+                created_at=msg_time,
             )
             session.add(db_msg)
             await session.flush()

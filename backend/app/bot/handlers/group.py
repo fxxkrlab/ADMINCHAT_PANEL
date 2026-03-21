@@ -214,6 +214,8 @@ async def handle_group_message(
             if content_type == "text":
                 text_content = mentioned_text
 
+            msg_time = message.date.replace(tzinfo=None) if message.date else datetime.utcnow()
+
             db_msg = Message(
                 conversation_id=conv.id,
                 tg_message_id=message.message_id,
@@ -227,6 +229,7 @@ async def handle_group_message(
                 if message.reply_to_message
                 else None,
                 raw_data={},
+                created_at=msg_time,
             )
             session.add(db_msg)
             await session.commit()
