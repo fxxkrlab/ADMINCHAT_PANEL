@@ -75,6 +75,12 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=raw,value=latest,enable={{is_default_branch}}
 
+      - name: Read version files
+        id: versions
+        run: |
+          echo "app_version=$(cat VERSION)" >> $GITHUB_OUTPUT
+          echo "build_version=$(cat BUILD_VERSION)" >> $GITHUB_OUTPUT
+
       - uses: docker/build-push-action@v5
         with:
           context: ./frontend
@@ -82,5 +88,8 @@ jobs:
           platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            APP_VERSION=${{ steps.versions.outputs.app_version }}
+            BUILD_VERSION_ARG=${{ steps.versions.outputs.build_version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

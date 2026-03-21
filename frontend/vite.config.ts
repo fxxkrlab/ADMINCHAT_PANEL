@@ -4,13 +4,14 @@ import tailwindcss from '@tailwindcss/vite'
 import fs from 'fs'
 import path from 'path'
 
-// Read version files from project root
+// Read version files - try current dir first (Docker), then parent (local dev)
 const readVersion = (file: string) => {
-  try {
-    return fs.readFileSync(path.resolve(__dirname, '..', file), 'utf-8').trim()
-  } catch {
-    return 'dev'
+  for (const dir of [__dirname, path.resolve(__dirname, '..')]) {
+    try {
+      return fs.readFileSync(path.resolve(dir, file), 'utf-8').trim()
+    } catch { /* continue */ }
   }
+  return 'dev'
 }
 
 // https://vite.dev/config/
