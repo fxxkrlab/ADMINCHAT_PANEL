@@ -251,7 +251,7 @@ async def get_bot_status(
     rate_limited = await is_rate_limited(bot_id)
 
     # Count messages sent today by this bot
-    today_start = datetime.now(timezone.utc).replace(
+    today_start = datetime.utcnow().replace(
         hour=0, minute=0, second=0, microsecond=0
     )
     msg_count_result = await db.execute(

@@ -23,7 +23,7 @@ async def get_dashboard_stats(
     current_user: Annotated[Admin, Depends(get_current_user)],
 ) -> APIResponse:
     """Get dashboard statistics with real DB queries."""
-    now = datetime.now(timezone.utc)
+    now = datetime.utcnow()
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     yesterday_start = today_start - timedelta(days=1)
     last_period_start = today_start - timedelta(days=7)

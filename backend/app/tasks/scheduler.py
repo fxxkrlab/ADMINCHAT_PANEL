@@ -80,7 +80,7 @@ async def analyze_missed_knowledge() -> None:
 
     async with async_session_factory() as session:
         try:
-            now = datetime.now(timezone.utc)
+            now = datetime.utcnow()
             yesterday = now - timedelta(hours=24)
 
             # 1. Fetch recent unmatched messages

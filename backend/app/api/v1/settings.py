@@ -55,7 +55,7 @@ async def update_settings(
     _current_user: Annotated[Admin, Depends(require_super_admin)],
 ) -> APIResponse:
     """Batch update system settings. Requires super_admin."""
-    now = datetime.now(timezone.utc)
+    now = datetime.utcnow()
 
     for key, value in body.settings.items():
         result = await db.execute(

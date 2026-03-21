@@ -631,5 +631,5 @@ async def delete_missed_keyword(
         raise HTTPException(status_code=404, detail="Keyword not found")
 
     keyword.is_resolved = True
-    keyword.updated_at = datetime.now(timezone.utc)
+    keyword.updated_at = datetime.utcnow()
     return APIResponse(message="Keyword marked as resolved")

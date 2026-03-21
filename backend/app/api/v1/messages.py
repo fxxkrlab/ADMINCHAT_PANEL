@@ -181,12 +181,12 @@ async def send_message(
         text_content=text_content,
         media_file_id=media_file_id,
         raw_data={"parse_mode": parse_mode} if parse_mode else {},
-        created_at=datetime.now(timezone.utc),
+        created_at=datetime.utcnow(),
     )
     db.add(message)
 
     # Update conversation last_message_at
-    conv.last_message_at = datetime.now(timezone.utc)
+    conv.last_message_at = datetime.utcnow()
 
     # If conversation was resolved, reopen it
     if conv.status == "resolved":

@@ -137,7 +137,7 @@ async def verify_turnstile(
         )
         user = result.scalar_one_or_none()
         if user:
-            now = datetime.now(timezone.utc)
+            now = datetime.utcnow()
             user.turnstile_verified_at = now
             user.turnstile_expires_at = now + timedelta(
                 days=settings.TURNSTILE_TTL_DAYS
@@ -192,7 +192,7 @@ async def check_turnstile_status(
             data={"verified": False, "expired": False},
         )
 
-    now = datetime.now(timezone.utc)
+    now = datetime.utcnow()
     verified = user.turnstile_verified_at is not None
     expired = (
         user.turnstile_expires_at is not None

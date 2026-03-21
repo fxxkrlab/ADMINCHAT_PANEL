@@ -213,7 +213,7 @@ async def get_ai_usage(
     days: int = 30,
 ) -> APIResponse:
     """Get AI usage statistics. Requires admin+."""
-    cutoff = datetime.now(timezone.utc) - timedelta(days=days)
+    cutoff = datetime.utcnow() - timedelta(days=days)
 
     # Total stats
     total_result = await db.execute(

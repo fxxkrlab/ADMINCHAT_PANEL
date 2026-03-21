@@ -128,7 +128,7 @@ async def handle_group_message(
                 db_user.username = tg_user.username
                 db_user.first_name = tg_user.first_name
                 db_user.last_name = tg_user.last_name
-                db_user.last_active_at = datetime.now(timezone.utc)
+                db_user.last_active_at = datetime.utcnow()
 
             # Block check
             if db_user.is_blocked:
@@ -178,7 +178,7 @@ async def handle_group_message(
             )
             conv = result.scalar_one_or_none()
 
-            now = datetime.now(timezone.utc)
+            now = datetime.utcnow()
             if conv is None:
                 conv = Conversation(
                     tg_user_id=db_user.id,

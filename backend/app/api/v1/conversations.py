@@ -288,7 +288,7 @@ async def update_conversation_status(
     conv.status = body.status
 
     if body.status == "resolved":
-        conv.resolved_at = datetime.now(timezone.utc)
+        conv.resolved_at = datetime.utcnow()
         conv.resolved_by = current_user.id
     elif body.status == "open" and old_status == "resolved":
         # Reopening - clear resolved info

@@ -4,7 +4,7 @@ Handler for private (DM) messages sent to any bot in the pool.
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from aiogram import Router, F
 from aiogram.types import Message as TgMessage, InlineKeyboardMarkup, InlineKeyboardButton
@@ -108,7 +108,7 @@ async def handle_private_message(message: TgMessage, bot_db_id: int) -> None:
                 db_user.last_name = tg_user.last_name
                 db_user.language_code = tg_user.language_code
                 db_user.is_premium = tg_user.is_premium or False
-                db_user.last_active_at = datetime.now(timezone.utc)
+                db_user.last_active_at = datetime.utcnow()
 
             # ---- 2. Block check ----
             if db_user.is_blocked:
@@ -117,7 +117,7 @@ async def handle_private_message(message: TgMessage, bot_db_id: int) -> None:
 
             # ---- 2b. Turnstile verification check ----
             if settings.TURNSTILE_SECRET_KEY:
-                now = datetime.now(timezone.utc)
+                now = datetime.utcnow()
                 if (
                     db_user.turnstile_verified_at is None
                     or (
@@ -159,7 +159,7 @@ async def handle_private_message(message: TgMessage, bot_db_id: int) -> None:
             )
             conv = result.scalar_one_or_none()
 
-            now = datetime.now(timezone.utc)
+            now = datetime.utcnow()
             if conv is None:
                 conv = Conversation(
                     tg_user_id=db_user.id,
