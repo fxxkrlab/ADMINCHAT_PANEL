@@ -18,28 +18,31 @@ async def create_initial_admin() -> None:
     from app.models.admin import Admin
     from app.utils.security import hash_password
 
-    async with async_session_factory() as session:
-        result = await session.execute(select(Admin).limit(1))
-        existing = result.scalar_one_or_none()
+    try:
+        async with async_session_factory() as session:
+            result = await session.execute(select(Admin).limit(1))
+            existing = result.scalar_one_or_none()
 
-        if existing is not None:
-            logger.info("Admin accounts already exist, skipping initial creation.")
-            return
+            if existing is not None:
+                logger.info("Admin accounts already exist, skipping initial creation.")
+                return
 
-        admin = Admin(
-            username=settings.INIT_ADMIN_USERNAME,
-            password_hash=hash_password(settings.INIT_ADMIN_PASSWORD),
-            display_name="Administrator",
-            role="super_admin",
-            is_active=True,
-            permissions={},
-        )
-        session.add(admin)
-        await session.commit()
-        logger.info(
-            "Initial super_admin created: username=%s",
-            settings.INIT_ADMIN_USERNAME,
-        )
+            admin = Admin(
+                username=settings.INIT_ADMIN_USERNAME,
+                password_hash=hash_password(settings.INIT_ADMIN_PASSWORD),
+                display_name="Administrator",
+                role="super_admin",
+                is_active=True,
+                permissions={},
+            )
+            session.add(admin)
+            await session.commit()
+            logger.info(
+                "Initial super_admin created: username=%s",
+                settings.INIT_ADMIN_USERNAME,
+            )
+    except Exception:
+        logger.info("Initial admin creation skipped (already exists or error).")
 
 
 @asynccontextmanager
