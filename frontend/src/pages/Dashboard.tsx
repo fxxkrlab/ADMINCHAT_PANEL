@@ -24,7 +24,7 @@ function StatCard({ label, value, icon: Icon, color, trend }: {
   trend?: number;
 }) {
   return (
-    <div className="bg-bg-card border border-border-subtle rounded-lg p-5 flex flex-col gap-2">
+    <div className="bg-bg-card border border-border-subtle rounded-xl p-6 flex flex-col gap-2">
       <div className="flex items-center justify-between">
         <p className="text-xs text-text-secondary font-['Inter'] flex items-center gap-2">{label}</p>
         <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${color} bg-opacity-10`}
@@ -95,27 +95,27 @@ export default function Dashboard() {
   return (
     <div className="flex flex-col h-full">
       <Header title="Dashboard" />
-      <div className="flex-1 p-6 overflow-y-auto">
+      <div className="flex-1 p-8 overflow-y-auto">
         {/* Stat cards */}
         {isLoading ? (
           <>
-            <div className="grid grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-4 gap-6 mb-8">
               {Array.from({ length: 4 }).map((_, i) => (
                 <StatCardSkeleton key={i} />
               ))}
             </div>
-            <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-2 gap-6 mb-8">
               <DashboardPanelSkeleton />
               <DashboardPanelSkeleton />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-6">
               <DashboardPanelSkeleton />
               <DashboardPanelSkeleton />
             </div>
           </>
         ) : (
         <>
-        <div className="grid grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-4 gap-6 mb-8">
           <StatCard
             label="Total Received"
             value={stats?.total_conversations ?? 0}
@@ -144,9 +144,9 @@ export default function Dashboard() {
         </div>
 
         {/* Two-column panels */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-2 gap-6 mb-8">
           {/* Bot Pool Status */}
-          <div className="bg-bg-card border border-border-subtle rounded-lg p-5">
+          <div className="bg-bg-card border border-border-subtle rounded-xl p-6">
             <div className="flex items-center gap-2 mb-4">
               <Bot size={16} className="text-accent" />
               <h3 className="text-sm font-semibold text-text-primary font-['Space_Grotesk']">Bot Pool Status</h3>
@@ -177,7 +177,7 @@ export default function Dashboard() {
           </div>
 
           {/* FAQ Performance */}
-          <div className="bg-bg-card border border-border-subtle rounded-lg p-5">
+          <div className="bg-bg-card border border-border-subtle rounded-xl p-6">
             <div className="flex items-center gap-2 mb-4">
               <HelpCircle size={16} className="text-accent" />
               <h3 className="text-sm font-semibold text-text-primary font-['Space_Grotesk']">FAQ Performance</h3>
@@ -203,9 +203,9 @@ export default function Dashboard() {
         </div>
 
         {/* Missed Knowledge + Today Messages */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-6">
           {/* Missed Knowledge */}
-          <div className="bg-bg-card border border-border-subtle rounded-lg p-5">
+          <div className="bg-bg-card border border-border-subtle rounded-xl p-6">
             <div className="flex items-center gap-2 mb-4">
               <AlertCircle size={16} className="text-orange" />
               <h3 className="text-sm font-semibold text-text-primary font-['Space_Grotesk']">Missed Knowledge</h3>
@@ -229,7 +229,7 @@ export default function Dashboard() {
           </div>
 
           {/* Quick Stats */}
-          <div className="bg-bg-card border border-border-subtle rounded-lg p-5">
+          <div className="bg-bg-card border border-border-subtle rounded-xl p-6">
             <div className="flex items-center gap-2 mb-4">
               <MessageSquare size={16} className="text-accent" />
               <h3 className="text-sm font-semibold text-text-primary font-['Space_Grotesk']">Today's Activity</h3>

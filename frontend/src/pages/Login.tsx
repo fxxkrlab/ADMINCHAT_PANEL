@@ -116,17 +116,17 @@ export default function Login() {
           {/* Form */}
           <form
             onSubmit={handleSubmit}
-            className="bg-[#0A0A0A] border border-[#1A1A1A] rounded-xl p-6 space-y-5"
+            className="bg-[#0A0A0A] border border-[#1A1A1A] rounded-xl p-8 space-y-5"
           >
             <div>
-              <label className="block text-xs font-medium text-[#8a8a8a] mb-1.5 font-['Inter']">
+              <label className="block text-xs font-medium text-[#8a8a8a] mb-2 font-['Inter']">
                 Username
               </label>
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full h-10 px-3.5 bg-[#141414] border border-[#2f2f2f] rounded-lg text-white text-sm placeholder:text-[#4a4a4a] focus:outline-none focus:border-[#00D9FF] transition-colors"
+                className="w-full h-11 px-4 bg-[#141414] border border-[#2f2f2f] rounded-lg text-white text-sm placeholder:text-[#4a4a4a] focus:outline-none focus:border-[#00D9FF] transition-colors"
                 placeholder="Enter username"
                 autoComplete="username"
                 required
@@ -134,7 +134,7 @@ export default function Login() {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-[#8a8a8a] mb-1.5 font-['Inter']">
+              <label className="block text-xs font-medium text-[#8a8a8a] mb-2 font-['Inter']">
                 Password
               </label>
               <div className="relative">
@@ -142,7 +142,7 @@ export default function Login() {
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full h-10 px-3.5 pr-10 bg-[#141414] border border-[#2f2f2f] rounded-lg text-white text-sm placeholder:text-[#4a4a4a] focus:outline-none focus:border-[#00D9FF] transition-colors"
+                  className="w-full h-11 px-4 pr-10 bg-[#141414] border border-[#2f2f2f] rounded-lg text-white text-sm placeholder:text-[#4a4a4a] focus:outline-none focus:border-[#00D9FF] transition-colors"
                   placeholder="Enter password"
                   autoComplete="current-password"
                   required

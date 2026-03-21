@@ -37,7 +37,7 @@ function SettingCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex items-start justify-between gap-8 px-5 py-4 border-b border-border-subtle/50 last:border-0">
+    <div className="flex items-start justify-between gap-8 px-6 py-4 border-b border-border-subtle/50 last:border-0">
       <div className="flex-1 min-w-0">
         <h4 className="text-sm font-medium text-text-primary">{label}</h4>
         {description && <p className="text-xs text-text-muted mt-0.5">{description}</p>}
@@ -115,9 +115,9 @@ export default function Settings() {
   return (
     <div className="flex flex-col h-full">
       <Header title="System Settings" />
-      <div className="flex-1 p-6 overflow-auto">
+      <div className="flex-1 p-8 overflow-auto">
         {/* Tab navigation */}
-        <div className="flex items-center gap-1 mb-6 border-b border-border-subtle w-fit">
+        <div className="flex items-center gap-1 mb-8 border-b border-border-subtle w-fit">
           {TABS.map(({ key, label, icon: Icon }) => (
             <button
               key={key}
@@ -145,8 +145,8 @@ export default function Settings() {
           <>
             {/* System tab */}
             {activeTab === 'system' && (
-              <div className="bg-bg-card border border-border-subtle rounded-lg overflow-hidden">
-                <div className="px-5 py-3 border-b border-border-subtle">
+              <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden">
+                <div className="px-6 py-4 border-b border-border-subtle">
                   <h3 className="text-sm font-semibold text-text-primary">General System Settings</h3>
                 </div>
                 <SettingCard
@@ -190,8 +190,8 @@ export default function Settings() {
 
             {/* Turnstile tab */}
             {activeTab === 'turnstile' && (
-              <div className="bg-bg-card border border-border-subtle rounded-lg overflow-hidden">
-                <div className="px-5 py-3 border-b border-border-subtle">
+              <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden">
+                <div className="px-6 py-4 border-b border-border-subtle">
                   <h3 className="text-sm font-semibold text-text-primary">Cloudflare Turnstile Configuration</h3>
                 </div>
                 <SettingCard
@@ -245,8 +245,8 @@ export default function Settings() {
 
             {/* Media Cache tab */}
             {activeTab === 'media' && (
-              <div className="bg-bg-card border border-border-subtle rounded-lg overflow-hidden">
-                <div className="px-5 py-3 border-b border-border-subtle">
+              <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden">
+                <div className="px-6 py-4 border-b border-border-subtle">
                   <h3 className="text-sm font-semibold text-text-primary">Media Cache Settings</h3>
                 </div>
                 <SettingCard
@@ -279,8 +279,8 @@ export default function Settings() {
 
             {/* Schedules tab */}
             {activeTab === 'schedule' && (
-              <div className="bg-bg-card border border-border-subtle rounded-lg overflow-hidden">
-                <div className="px-5 py-3 border-b border-border-subtle">
+              <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden">
+                <div className="px-6 py-4 border-b border-border-subtle">
                   <h3 className="text-sm font-semibold text-text-primary">Scheduled Tasks</h3>
                 </div>
                 <SettingCard

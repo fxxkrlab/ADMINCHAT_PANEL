@@ -80,7 +80,7 @@ const ConversationItem = memo(function ConversationItem({
   return (
     <button
       onClick={onClick}
-      className={`w-full text-left px-4 py-3 border-b border-border-subtle transition-colors hover:bg-bg-elevated/50 ${
+      className={`w-full text-left px-4 py-3.5 border-b border-border-subtle transition-colors hover:bg-bg-elevated/50 ${
         isActive ? 'bg-bg-elevated' : ''
       }`}
     >
@@ -249,7 +249,7 @@ export default function ConversationList() {
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
             placeholder="Search by name, TGUID, or tag..."
-            className="w-full h-10 pl-9 pr-3 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent transition-colors"
+            className="w-full h-11 pl-9 pr-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent transition-colors"
           />
         </div>
       </div>

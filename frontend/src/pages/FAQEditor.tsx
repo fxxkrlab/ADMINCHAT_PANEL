@@ -190,9 +190,9 @@ export default function FAQEditor() {
   return (
     <div className="flex flex-col h-full">
       <Header title={isNew ? 'New FAQ Rule' : `Edit FAQ Rule #${id}`} />
-      <div className="flex-1 p-6 overflow-auto">
+      <div className="flex-1 p-8 overflow-auto">
         {/* Top bar: Name + modes */}
-        <div className="flex items-center gap-4 mb-6 flex-wrap">
+        <div className="flex items-center gap-4 mb-8 flex-wrap">
           <button
             onClick={() => navigate('/faq')}
             className="p-2 rounded hover:bg-bg-elevated text-text-secondary hover:text-text-primary transition-colors"
@@ -205,12 +205,12 @@ export default function FAQEditor() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Rule name..."
-            className="flex-1 min-w-[200px] h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent transition-colors"
+            className="flex-1 min-w-[200px] h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent transition-colors"
           />
           <select
             value={replyMode}
             onChange={(e) => setReplyMode(e.target.value as ReplyMode)}
-            className="h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
+            className="h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
           >
             {REPLY_MODES.map((m) => (
               <option key={m.value} value={m.value}>
@@ -221,9 +221,9 @@ export default function FAQEditor() {
         </div>
 
         {/* Split panel */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* LEFT - Questions (blue border) */}
-          <div className="bg-bg-card border-2 border-[#2563EB]/40 rounded-lg overflow-hidden">
+          <div className="bg-bg-card border-2 border-[#2563EB]/40 rounded-xl overflow-hidden">
             <div className="px-4 py-3 border-b border-[#2563EB]/20 flex items-center justify-between">
               <h3 className="text-sm font-medium text-[#2563EB]">
                 Questions / Keywords
@@ -323,7 +323,7 @@ export default function FAQEditor() {
           </div>
 
           {/* RIGHT - Answers (green border) */}
-          <div className="bg-bg-card border-2 border-green/40 rounded-lg overflow-hidden">
+          <div className="bg-bg-card border-2 border-green/40 rounded-xl overflow-hidden">
             <div className="px-4 py-3 border-b border-green/20 flex items-center justify-between">
               <h3 className="text-sm font-medium text-green">Answers</h3>
               <span className="text-xs text-text-muted">
@@ -408,7 +408,7 @@ export default function FAQEditor() {
         </div>
 
         {/* Bottom settings */}
-        <div className="bg-bg-card border border-border-subtle rounded-lg p-4">
+        <div className="bg-bg-card border border-border-subtle rounded-xl p-6">
           <h3 className="text-sm font-medium text-text-secondary mb-4">
             Rule Settings
           </h3>
@@ -418,7 +418,7 @@ export default function FAQEditor() {
               <select
                 value={responseMode}
                 onChange={(e) => setResponseMode(e.target.value as ResponseMode)}
-                className="h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
+                className="h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
               >
                 {RESPONSE_MODES.map((m) => (
                   <option key={m.value} value={m.value}>
@@ -434,7 +434,7 @@ export default function FAQEditor() {
                 value={priority}
                 onChange={(e) => setPriority(Number(e.target.value))}
                 min={0}
-                className="w-24 h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary font-mono focus:outline-none focus:border-accent transition-colors"
+                className="w-24 h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary font-mono focus:outline-none focus:border-accent transition-colors"
               />
             </div>
             <div className="flex flex-col gap-1">
@@ -451,7 +451,7 @@ export default function FAQEditor() {
                 }
                 min={0}
                 placeholder="No limit"
-                className="w-32 h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary font-mono placeholder:text-text-placeholder focus:outline-none focus:border-accent transition-colors"
+                className="w-32 h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary font-mono placeholder:text-text-placeholder focus:outline-none focus:border-accent transition-colors"
               />
             </div>
           </div>

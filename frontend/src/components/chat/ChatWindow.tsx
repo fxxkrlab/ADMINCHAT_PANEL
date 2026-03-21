@@ -120,7 +120,7 @@ export default function ChatWindow() {
   return (
     <div className="flex-1 flex flex-col h-full min-w-0">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border-subtle bg-bg-card shrink-0">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-border-subtle bg-bg-card shrink-0">
         <div className="flex items-center gap-3 min-w-0">
           <div
             className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold text-white shrink-0"
@@ -214,7 +214,7 @@ export default function ChatWindow() {
       {/* Messages area with virtual scrolling */}
       <div
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto px-4 py-4"
+        className="flex-1 overflow-y-auto px-6 py-4"
       >
         {/* Load more button */}
         {hasMoreMessages && (

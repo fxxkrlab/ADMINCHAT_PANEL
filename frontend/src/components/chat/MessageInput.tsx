@@ -142,7 +142,7 @@ export default function MessageInput({ botName, conversationId, sourceType }: Me
   return (
     <div className="border-t border-border-subtle bg-bg-card">
       {/* Input area */}
-      <div className="p-4">
+      <div className="p-5">
         <div className="flex items-end gap-2">
           <div className="flex-1 relative">
             <textarea
@@ -218,7 +218,7 @@ export default function MessageInput({ botName, conversationId, sourceType }: Me
       </div>
 
       {/* Bottom hint */}
-      <div className="flex items-center justify-between px-4 pb-2 text-[11px] text-text-muted">
+      <div className="flex items-center justify-between px-5 pb-2.5 text-[11px] text-text-muted">
         <span>Ctrl+Enter to send | Markdown & media supported</span>
         {displayBotName && (
           <div className="relative" ref={botPickerRef}>

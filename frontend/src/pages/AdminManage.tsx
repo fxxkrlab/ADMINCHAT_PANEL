@@ -146,8 +146,8 @@ export default function AdminManage() {
   return (
     <div className="flex flex-col h-full">
       <Header title="Admin Management" />
-      <div className="flex-1 p-6 overflow-auto">
-        <div className="flex items-center justify-between mb-6">
+      <div className="flex-1 p-8 overflow-auto">
+        <div className="flex items-center justify-between mb-8">
           <p className="text-text-secondary text-sm">
             Manage admin accounts and permissions &middot; {admins.length} admin{admins.length !== 1 ? 's' : ''}
           </p>
@@ -160,16 +160,16 @@ export default function AdminManage() {
         </div>
 
         {/* Admin table */}
-        <div className="bg-bg-card border border-border-subtle rounded-lg overflow-hidden">
+        <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden">
           <table className="w-full">
             <thead>
               <tr className="border-b border-border-subtle">
-                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Username</th>
-                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Display Name</th>
-                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Role</th>
-                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Status</th>
-                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Created</th>
-                <th className="text-right text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Actions</th>
+                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Username</th>
+                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Display Name</th>
+                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Role</th>
+                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Status</th>
+                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Created</th>
+                <th className="text-right text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -184,27 +184,27 @@ export default function AdminManage() {
               ) : (
                 admins.map((admin) => (
                   <tr key={admin.id} className="border-b border-border-subtle/50 hover:bg-bg-elevated/30 transition-colors">
-                    <td className="px-5 py-3.5">
+                    <td className="px-6 py-4.5">
                       <span className="text-sm text-text-primary font-medium font-mono">{admin.username}</span>
                     </td>
-                    <td className="px-5 py-3.5">
+                    <td className="px-6 py-4.5">
                       <span className="text-sm text-text-secondary">{admin.display_name || '-'}</span>
                     </td>
-                    <td className="px-5 py-3.5">
+                    <td className="px-6 py-4.5">
                       <RoleBadge role={admin.role} />
                     </td>
-                    <td className="px-5 py-3.5">
+                    <td className="px-6 py-4.5">
                       <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${admin.is_active ? 'text-green' : 'text-text-muted'}`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${admin.is_active ? 'bg-green' : 'bg-text-muted'}`} />
                         {admin.is_active ? 'Active' : 'Disabled'}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5">
+                    <td className="px-6 py-4.5">
                       <span className="text-xs text-text-muted font-mono">
                         {new Date(admin.created_at).toLocaleDateString()}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5">
+                    <td className="px-6 py-4.5">
                       <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => startEdit(admin)}
@@ -251,50 +251,50 @@ export default function AdminManage() {
               </div>
               <form onSubmit={handleCreateSubmit} className="flex flex-col gap-4">
                 <div>
-                  <label className="block text-xs text-text-secondary mb-1.5">Username *</label>
+                  <label className="block text-xs text-text-secondary mb-2">Username *</label>
                   <input
                     type="text"
                     value={formUsername}
                     onChange={(e) => setFormUsername(e.target.value)}
-                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
+                    className="w-full h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-text-secondary mb-1.5">Password *</label>
+                  <label className="block text-xs text-text-secondary mb-2">Password *</label>
                   <input
                     type="password"
                     value={formPassword}
                     onChange={(e) => setFormPassword(e.target.value)}
-                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
+                    className="w-full h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
                     required
                     minLength={6}
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-text-secondary mb-1.5">Display Name</label>
+                  <label className="block text-xs text-text-secondary mb-2">Display Name</label>
                   <input
                     type="text"
                     value={formDisplayName}
                     onChange={(e) => setFormDisplayName(e.target.value)}
-                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
+                    className="w-full h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-text-secondary mb-1.5">Email</label>
+                  <label className="block text-xs text-text-secondary mb-2">Email</label>
                   <input
                     type="email"
                     value={formEmail}
                     onChange={(e) => setFormEmail(e.target.value)}
-                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
+                    className="w-full h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-text-secondary mb-1.5">Role</label>
+                  <label className="block text-xs text-text-secondary mb-2">Role</label>
                   <select
                     value={formRole}
                     onChange={(e) => setFormRole(e.target.value)}
-                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
+                    className="w-full h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
                   >
                     <option value="agent">Agent</option>
                     <option value="admin">Admin</option>
@@ -339,30 +339,30 @@ export default function AdminManage() {
               </div>
               <form onSubmit={handleEditSubmit} className="flex flex-col gap-4">
                 <div>
-                  <label className="block text-xs text-text-secondary mb-1.5">Display Name</label>
+                  <label className="block text-xs text-text-secondary mb-2">Display Name</label>
                   <input
                     type="text"
                     value={editDisplayName}
                     onChange={(e) => setEditDisplayName(e.target.value)}
-                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
+                    className="w-full h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-text-secondary mb-1.5">Email</label>
+                  <label className="block text-xs text-text-secondary mb-2">Email</label>
                   <input
                     type="email"
                     value={editEmail}
                     onChange={(e) => setEditEmail(e.target.value)}
                     placeholder="Leave blank to keep current"
-                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent transition-colors"
+                    className="w-full h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-text-secondary mb-1.5">Role</label>
+                  <label className="block text-xs text-text-secondary mb-2">Role</label>
                   <select
                     value={editRole}
                     onChange={(e) => setEditRole(e.target.value)}
-                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
+                    className="w-full h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
                   >
                     <option value="agent">Agent</option>
                     <option value="admin">Admin</option>
@@ -370,13 +370,13 @@ export default function AdminManage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs text-text-secondary mb-1.5">New Password</label>
+                  <label className="block text-xs text-text-secondary mb-2">New Password</label>
                   <input
                     type="password"
                     value={editPassword}
                     onChange={(e) => setEditPassword(e.target.value)}
                     placeholder="Leave blank to keep current"
-                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent transition-colors"
+                    className="w-full h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent transition-colors"
                   />
                 </div>
                 <div className="flex justify-end gap-3 mt-2">

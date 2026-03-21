@@ -54,9 +54,9 @@ export default function MissedKnowledge() {
   return (
     <div className="flex flex-col h-full">
       <Header title="Missed Knowledge" />
-      <div className="flex-1 p-6 overflow-auto">
+      <div className="flex-1 p-8 overflow-auto">
         {/* Header info */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-2">
             <AlertTriangle size={18} className="text-orange" />
             <p className="text-text-secondary text-sm">
@@ -73,21 +73,21 @@ export default function MissedKnowledge() {
         </div>
 
         {/* Table */}
-        <div className="bg-bg-card border border-border-subtle rounded-lg overflow-hidden">
+        <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border-subtle">
-                <th className="text-left px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Keyword</th>
-                <th className="text-center px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">
+                <th className="text-left px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Keyword</th>
+                <th className="text-center px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">
                   Occurrences
                 </th>
-                <th className="text-left px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">
+                <th className="text-left px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">
                   Sample Messages
                 </th>
-                <th className="text-center px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">
+                <th className="text-center px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">
                   Last Seen
                 </th>
-                <th className="text-right px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Actions</th>
+                <th className="text-right px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -115,17 +115,17 @@ export default function MissedKnowledge() {
                     key={kw.id}
                     className="border-b border-border-subtle/50 last:border-0 hover:bg-bg-elevated/50 transition-colors"
                   >
-                    <td className="px-5 py-3.5">
+                    <td className="px-6 py-4.5">
                       <span className="inline-block px-2 py-1 rounded-md bg-orange/10 text-orange text-sm font-medium">
                         {kw.keyword}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5 text-center">
+                    <td className="px-6 py-4.5 text-center">
                       <span className="font-mono text-accent font-medium">
                         {kw.occurrence_count}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5 text-text-secondary text-xs max-w-[300px]">
+                    <td className="px-6 py-4.5 text-text-secondary text-xs max-w-[300px]">
                       {kw.sample_messages && kw.sample_messages.length > 0 ? (
                         <div className="space-y-1">
                           {kw.sample_messages.slice(0, 3).map((msg, idx) => (
@@ -147,10 +147,10 @@ export default function MissedKnowledge() {
                         <span className="text-text-placeholder">-</span>
                       )}
                     </td>
-                    <td className="px-5 py-3.5 text-center text-text-secondary text-xs">
+                    <td className="px-6 py-4.5 text-center text-text-secondary text-xs">
                       {formatDate(kw.last_seen_at)}
                     </td>
-                    <td className="px-5 py-3.5 text-right">
+                    <td className="px-6 py-4.5 text-right">
                       <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => handleCreateFAQ(kw.keyword)}

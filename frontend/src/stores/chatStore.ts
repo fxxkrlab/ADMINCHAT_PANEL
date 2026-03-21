@@ -43,6 +43,7 @@ interface ChatState {
   // WebSocket handlers
   handleNewMessage: (message: Message) => void;
   handleConversationUpdated: (conversation: Partial<Conversation> & { id: number }) => void;
+  handleNewConversation: (conversation: Conversation) => void;
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({
@@ -200,7 +201,12 @@ export const useChatStore = create<ChatState>((set, get) => ({
     // Update conversation in list - bump to top with new message
     set((state) => {
       const convIndex = state.conversations.findIndex((c) => c.id === message.conversation_id);
-      if (convIndex === -1) return state;
+
+      // If conversation not in list, refetch to pick up new conversations
+      if (convIndex === -1) {
+        get().fetchConversations();
+        return state;
+      }
 
       const updated = [...state.conversations];
       const conv = {
@@ -219,15 +225,38 @@ export const useChatStore = create<ChatState>((set, get) => ({
   },
 
   handleConversationUpdated: (data: Partial<Conversation> & { id: number }) => {
-    set((state) => ({
-      conversations: state.conversations.map((c) =>
-        c.id === data.id ? { ...c, ...data } : c
-      ),
-      selectedConversation:
-        state.selectedConversation?.id === data.id
-          ? { ...state.selectedConversation, ...data }
-          : state.selectedConversation,
-    }));
+    set((state) => {
+      const exists = state.conversations.some((c) => c.id === data.id);
+
+      // If conversation doesn't exist in the list, refetch
+      if (!exists) {
+        get().fetchConversations();
+        return state;
+      }
+
+      return {
+        conversations: state.conversations.map((c) =>
+          c.id === data.id ? { ...c, ...data } : c
+        ),
+        selectedConversation:
+          state.selectedConversation?.id === data.id
+            ? { ...state.selectedConversation, ...data }
+            : state.selectedConversation,
+      };
+    });
+  },
+
+  handleNewConversation: (conversation: Conversation) => {
+    set((state) => {
+      // Avoid duplicates
+      const exists = state.conversations.some((c) => c.id === conversation.id);
+      if (exists) return state;
+
+      return {
+        conversations: [conversation, ...state.conversations],
+        conversationsTotal: state.conversationsTotal + 1,
+      };
+    });
   },
 }));
 

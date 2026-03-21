@@ -127,8 +127,8 @@ export default function BotPool() {
   return (
     <div className="flex flex-col h-full">
       <Header title="Bot Pool" />
-      <div className="flex-1 p-6 overflow-auto">
-        <div className="flex items-center justify-between mb-6">
+      <div className="flex-1 p-8 overflow-auto">
+        <div className="flex items-center justify-between mb-8">
           <p className="text-text-secondary text-sm">
             Manage your Telegram bots &middot; {bots.length} bot{bots.length !== 1 ? 's' : ''}
           </p>
@@ -141,16 +141,16 @@ export default function BotPool() {
         </div>
 
         {/* Bot table */}
-        <div className="bg-bg-card border border-border-subtle rounded-lg overflow-hidden">
+        <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden">
           <table className="w-full">
             <thead>
               <tr className="border-b border-border-subtle">
-                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Status</th>
-                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Bot Name</th>
-                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Username</th>
-                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Priority</th>
-                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Messages Today</th>
-                <th className="text-right text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Actions</th>
+                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Status</th>
+                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Bot Name</th>
+                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Username</th>
+                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Priority</th>
+                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Messages Today</th>
+                <th className="text-right text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -169,7 +169,7 @@ export default function BotPool() {
               ) : (
                 bots.map((bot) => (
                   <tr key={bot.id} className="border-b border-border-subtle/50 hover:bg-bg-elevated/30 transition-colors">
-                    <td className="px-5 py-3.5">
+                    <td className="px-6 py-4">
                       <StatusBadge status={bot.status} />
                       {bot.status === 'rate_limited' && bot.rate_limit_until && (
                         <div className="text-[10px] text-orange mt-1 font-mono">
@@ -177,19 +177,19 @@ export default function BotPool() {
                         </div>
                       )}
                     </td>
-                    <td className="px-5 py-3.5">
+                    <td className="px-6 py-4">
                       <span className="text-sm text-text-primary font-medium">{bot.name}</span>
                     </td>
-                    <td className="px-5 py-3.5">
+                    <td className="px-6 py-4">
                       <span className="text-sm text-accent font-mono">{bot.username}</span>
                     </td>
-                    <td className="px-5 py-3.5">
+                    <td className="px-6 py-4">
                       <PriorityBar value={bot.priority} />
                     </td>
-                    <td className="px-5 py-3.5">
+                    <td className="px-6 py-4">
                       <span className="text-sm text-text-secondary font-mono">{bot.message_count}</span>
                     </td>
-                    <td className="px-5 py-3.5">
+                    <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => startEdit(bot)}
@@ -231,7 +231,7 @@ export default function BotPool() {
 
         {/* Add Bot form */}
         {showAddForm && (
-          <div className="mt-6 bg-bg-card border border-border-subtle rounded-lg p-6">
+          <div className="mt-8 bg-bg-card border border-border-subtle rounded-xl p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold text-text-primary">Add New Bot</h3>
               <button onClick={() => setShowAddForm(false)} className="text-text-muted hover:text-text-primary">
@@ -240,36 +240,36 @@ export default function BotPool() {
             </div>
             <form onSubmit={handleAddSubmit} className="flex flex-col gap-4">
               <div>
-                <label className="block text-xs text-text-secondary mb-1.5">Bot Token *</label>
+                <label className="block text-xs text-text-secondary mb-2">Bot Token *</label>
                 <input
                   type="text"
                   value={formToken}
                   onChange={(e) => setFormToken(e.target.value)}
                   placeholder="123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11"
-                  className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent transition-colors font-mono"
+                  className="w-full h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent transition-colors font-mono"
                   required
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs text-text-secondary mb-1.5">Display Name</label>
+                  <label className="block text-xs text-text-secondary mb-2">Display Name</label>
                   <input
                     type="text"
                     value={formName}
                     onChange={(e) => setFormName(e.target.value)}
                     placeholder="My Support Bot"
-                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent transition-colors"
+                    className="w-full h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-text-secondary mb-1.5">Priority (0-10)</label>
+                  <label className="block text-xs text-text-secondary mb-2">Priority (0-10)</label>
                   <input
                     type="number"
                     value={formPriority}
                     onChange={(e) => setFormPriority(Number(e.target.value))}
                     min={0}
                     max={10}
-                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors font-mono"
+                    className="w-full h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors font-mono"
                   />
                 </div>
               </div>
@@ -311,23 +311,23 @@ export default function BotPool() {
               </div>
               <form onSubmit={handleEditSubmit} className="flex flex-col gap-4">
                 <div>
-                  <label className="block text-xs text-text-secondary mb-1.5">Display Name</label>
+                  <label className="block text-xs text-text-secondary mb-2">Display Name</label>
                   <input
                     type="text"
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
-                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
+                    className="w-full h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-text-secondary mb-1.5">Priority (0-10)</label>
+                  <label className="block text-xs text-text-secondary mb-2">Priority (0-10)</label>
                   <input
                     type="number"
                     value={editPriority}
                     onChange={(e) => setEditPriority(Number(e.target.value))}
                     min={0}
                     max={10}
-                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors font-mono"
+                    className="w-full h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors font-mono"
                   />
                 </div>
                 <div className="flex justify-end gap-3 mt-2">

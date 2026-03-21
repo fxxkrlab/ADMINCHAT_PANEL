@@ -92,6 +92,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       wsRef.current = ws;
 
       ws.onopen = () => {
+        console.log('[WS] Connected to', wsUrl.replace(/token=.*/, 'token=***'));
         setIsConnected(true);
         retriesRef.current = 0;
         startHeartbeat();
@@ -113,7 +114,8 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
         }
       };
 
-      ws.onclose = () => {
+      ws.onclose = (event) => {
+        console.log('[WS] Disconnected, code:', event.code, 'reason:', event.reason);
         setIsConnected(false);
         wsRef.current = null;
         stopHeartbeat();
@@ -129,7 +131,8 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
         }
       };
 
-      ws.onerror = () => {
+      ws.onerror = (err) => {
+        console.error('[WS] Error:', err);
         ws.close();
       };
     };

@@ -61,9 +61,9 @@ export default function FAQList() {
   return (
     <div className="flex flex-col h-full">
       <Header title="FAQ Rules" />
-      <div className="flex-1 p-6 overflow-auto">
+      <div className="flex-1 p-8 overflow-auto">
         {/* Toolbar */}
-        <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
+        <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
           <div className="flex items-center gap-3">
             <p className="text-text-secondary text-sm">
               Manage FAQ rules and auto-replies
@@ -72,7 +72,7 @@ export default function FAQList() {
             <select
               value={filterReplyMode}
               onChange={(e) => setFilterReplyMode(e.target.value)}
-              className="h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors appearance-none cursor-pointer"
+              className="h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors appearance-none cursor-pointer"
             >
               <option value="">All Modes</option>
               {Object.entries(REPLY_MODE_LABELS).map(([value, label]) => (
@@ -84,7 +84,7 @@ export default function FAQList() {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors appearance-none cursor-pointer"
+              className="h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors appearance-none cursor-pointer"
             >
               <option value="">All Status</option>
               <option value="active">Active</option>
@@ -100,19 +100,19 @@ export default function FAQList() {
         </div>
 
         {/* Table */}
-        <div className="bg-bg-card border border-border-subtle rounded-lg overflow-hidden">
+        <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border-subtle">
-                <th className="text-left px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Rule Name</th>
-                <th className="text-center px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Questions</th>
-                <th className="text-center px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Answers</th>
-                <th className="text-center px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Response</th>
-                <th className="text-center px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Reply Mode</th>
-                <th className="text-center px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Priority</th>
-                <th className="text-center px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Hits</th>
-                <th className="text-center px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Status</th>
-                <th className="text-right px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Actions</th>
+                <th className="text-left px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Rule Name</th>
+                <th className="text-center px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Questions</th>
+                <th className="text-center px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Answers</th>
+                <th className="text-center px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Response</th>
+                <th className="text-center px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Reply Mode</th>
+                <th className="text-center px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Priority</th>
+                <th className="text-center px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Hits</th>
+                <th className="text-center px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Status</th>
+                <th className="text-right px-6 py-4 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -134,43 +134,43 @@ export default function FAQList() {
                     key={rule.id}
                     className="border-b border-border-subtle/50 last:border-0 hover:bg-bg-elevated/50 transition-colors"
                   >
-                    <td className="px-5 py-3.5 text-text-primary font-medium">
+                    <td className="px-6 py-4.5 text-text-primary font-medium">
                       {rule.name || `Rule #${rule.id}`}
                     </td>
-                    <td className="px-5 py-3.5 text-center text-text-secondary">
+                    <td className="px-6 py-4.5 text-center text-text-secondary">
                       <span className="inline-flex items-center justify-center min-w-[24px] h-6 px-2 rounded-full bg-[#2563EB]/15 text-[#2563EB] text-xs font-medium">
                         {rule.questions.length}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5 text-center text-text-secondary">
+                    <td className="px-6 py-4.5 text-center text-text-secondary">
                       <span className="inline-flex items-center justify-center min-w-[24px] h-6 px-2 rounded-full bg-green/15 text-green text-xs font-medium">
                         {rule.answers.length}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5 text-center text-text-secondary text-xs">
+                    <td className="px-6 py-4.5 text-center text-text-secondary text-xs">
                       {RESPONSE_MODE_LABELS[rule.response_mode] || rule.response_mode}
                     </td>
-                    <td className="px-5 py-3.5 text-center">
+                    <td className="px-6 py-4.5 text-center">
                       <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-purple/15 text-purple font-mono">
                         {REPLY_MODE_LABELS[rule.reply_mode] || rule.reply_mode}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5 text-center text-text-secondary font-mono text-xs">
+                    <td className="px-6 py-4.5 text-center text-text-secondary font-mono text-xs">
                       {rule.priority}
                     </td>
-                    <td className="px-5 py-3.5 text-center">
+                    <td className="px-6 py-4.5 text-center">
                       <span className="font-mono text-accent text-xs">
                         {rule.hit_count}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5 text-center">
+                    <td className="px-6 py-4.5 text-center">
                       <span
                         className={`inline-block w-2 h-2 rounded-full ${
                           rule.is_active ? 'bg-green' : 'bg-text-muted'
                         }`}
                       />
                     </td>
-                    <td className="px-5 py-3.5 text-right">
+                    <td className="px-6 py-4.5 text-right">
                       <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => navigate(`/faq/${rule.id}/edit`)}

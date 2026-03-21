@@ -45,14 +45,16 @@ export default function AppLayout() {
   return (
     <div className="flex h-screen overflow-hidden bg-[#0C0C0C]">
       <Sidebar />
+      {/* Spacer for fixed sidebar - always 64px (w-16) */}
+      <div className="w-16 shrink-0" />
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top header bar */}
-        <header className="flex items-center justify-end h-12 px-4 border-b border-[#1A1A1A] bg-[#0C0C0C] shrink-0">
+        <header className="flex items-center justify-end h-12 px-8 border-b border-[#1A1A1A] bg-[#0C0C0C] shrink-0">
           <div className="flex items-center gap-3">
             {user && (
               <>
                 <span
-                  className={`inline-flex items-center px-2 py-0.5 text-[10px] font-medium rounded border ${roleBadgeColor(user.role)}`}
+                  className={`inline-flex items-center px-2.5 py-1 text-[10px] font-medium rounded border ${roleBadgeColor(user.role)}`}
                 >
                   {formatRole(user.role)}
                 </span>
@@ -82,7 +84,7 @@ export default function AppLayout() {
         </main>
 
         {/* Footer */}
-        <footer className="flex flex-col items-center justify-center py-1.5 px-4 border-t border-[#1A1A1A] bg-[#080808] shrink-0">
+        <footer className="flex flex-col items-center justify-center py-2 px-8 border-t border-[#1A1A1A] bg-[#080808] shrink-0">
           <span className="text-[10px] text-[#4a4a4a] font-mono leading-tight">
             Powered By ADMINCHAT PANEL v{__APP_VERSION__} ({__BUILD_VERSION__})
           </span>

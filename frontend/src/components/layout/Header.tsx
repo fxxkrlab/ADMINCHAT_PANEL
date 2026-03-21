@@ -10,7 +10,7 @@ function HeaderInner({ title }: HeaderProps) {
   const user = useAuthStore((s) => s.user);
 
   return (
-    <header className="flex items-center justify-between h-14 px-6 border-b border-border-subtle bg-bg-page shrink-0">
+    <header className="flex items-center justify-between h-14 px-8 border-b border-border-subtle bg-bg-page shrink-0">
       <div>
         {title && (
           <h1 className="text-xl font-bold text-text-primary font-['Space_Grotesk']">{title}</h1>

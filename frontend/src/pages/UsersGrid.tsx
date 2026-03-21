@@ -136,9 +136,9 @@ export default function UsersGrid() {
   return (
     <div className="flex flex-col h-full">
       <Header title="Users" />
-      <div className="flex-1 p-6 overflow-y-auto">
+      <div className="flex-1 p-8 overflow-y-auto">
         {/* Filters */}
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center gap-3 mb-8">
           <div className="relative flex-1 max-w-md">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-placeholder" />
             <input
@@ -146,14 +146,14 @@ export default function UsersGrid() {
               placeholder="Search by TGUID, username, or tag..."
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-              className="w-full h-10 pl-9 pr-3 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent transition-colors"
+              className="w-full h-11 pl-9 pr-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent transition-colors"
             />
           </div>
 
           <select
             value={selectedTag}
             onChange={(e) => { setSelectedTag(e.target.value); setPage(1); }}
-            className="h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-secondary focus:outline-none focus:border-accent transition-colors appearance-none cursor-pointer"
+            className="h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-secondary focus:outline-none focus:border-accent transition-colors appearance-none cursor-pointer"
           >
             <option value="">All Tags</option>
             {tagsData?.map((tag: TagItem) => (
@@ -164,7 +164,7 @@ export default function UsersGrid() {
           <select
             value={selectedGroup ?? ''}
             onChange={(e) => { setSelectedGroup(e.target.value ? Number(e.target.value) : undefined); setPage(1); }}
-            className="h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-secondary focus:outline-none focus:border-accent transition-colors appearance-none cursor-pointer"
+            className="h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-secondary focus:outline-none focus:border-accent transition-colors appearance-none cursor-pointer"
           >
             <option value="">All Groups</option>
             {groupsData?.map((group: UserGroupItem) => (
@@ -175,23 +175,23 @@ export default function UsersGrid() {
 
         {/* Grid */}
         {isLoading ? (
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-4 gap-6">
             {Array.from({ length: 8 }).map((_, i) => (
               <UserCardSkeleton key={i} />
             ))}
           </div>
         ) : users.length === 0 ? (
-          <div className="bg-bg-card border border-border-subtle rounded-lg p-12 text-center text-text-muted text-sm">
+          <div className="bg-bg-card border border-border-subtle rounded-xl p-12 text-center text-text-muted text-sm">
             No users found.
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-4 gap-6">
               {users.map((user: UserListItem) => (
                 <div
                   key={user.id}
                   onClick={() => navigate(`/users/${user.id}`)}
-                  className="bg-bg-card border border-border-subtle rounded-lg p-5 cursor-pointer hover:border-accent/30 hover:bg-bg-elevated transition-all group"
+                  className="bg-bg-card border border-border-subtle rounded-xl p-6 cursor-pointer hover:border-accent/30 hover:bg-bg-elevated transition-all group"
                 >
                   <div className="flex items-start gap-3 mb-3">
                     <UserAvatar user={user} />

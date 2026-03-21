@@ -36,8 +36,8 @@ export default function Blacklist() {
   return (
     <div className="flex flex-col h-full">
       <Header title="Blacklist" />
-      <div className="flex-1 p-6 overflow-y-auto">
-        <div className="flex items-center justify-between mb-4">
+      <div className="flex-1 p-8 overflow-y-auto">
+        <div className="flex items-center justify-between mb-8">
           <p className="text-sm text-text-muted">
             {total} blocked user{total !== 1 ? 's' : ''}
           </p>
@@ -48,14 +48,14 @@ export default function Blacklist() {
             Loading...
           </div>
         ) : users.length === 0 ? (
-          <div className="bg-bg-card border border-border-subtle rounded-lg p-12 text-center text-text-muted text-sm">
+          <div className="bg-bg-card border border-border-subtle rounded-xl p-12 text-center text-text-muted text-sm">
             No blocked users.
           </div>
         ) : (
           <>
-            <div className="bg-bg-card border border-border-subtle rounded-lg overflow-hidden">
+            <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden">
               {/* Table header */}
-              <div className="grid grid-cols-[48px_1fr_120px_1fr_160px_160px_100px] gap-4 px-5 py-3 border-b border-border-subtle text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">
+              <div className="grid grid-cols-[48px_1fr_120px_1fr_160px_160px_100px] gap-4 px-6 py-4 border-b border-border-subtle text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">
                 <span />
                 <span>Name</span>
                 <span>TGUID</span>
@@ -73,7 +73,7 @@ export default function Blacklist() {
                 return (
                   <div
                     key={user.id}
-                    className="grid grid-cols-[48px_1fr_120px_1fr_160px_160px_100px] gap-4 px-5 py-3.5 border-b border-border-subtle last:border-b-0 items-center hover:bg-bg-elevated/50 transition-colors"
+                    className="grid grid-cols-[48px_1fr_120px_1fr_160px_160px_100px] gap-4 px-6 py-4 border-b border-border-subtle last:border-b-0 items-center hover:bg-bg-elevated/50 transition-colors"
                   >
                     {/* Avatar */}
                     <div

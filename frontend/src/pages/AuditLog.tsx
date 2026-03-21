@@ -140,9 +140,9 @@ export default function AuditLog() {
     <div className="h-full flex flex-col">
       <Header title="Audit Log" />
 
-      <div className="flex-1 overflow-auto p-6">
+      <div className="flex-1 overflow-auto p-8">
         {/* Toolbar */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
             <FileText size={20} className="text-[#00D9FF]" />
             <span className="text-sm text-[#8a8a8a]">
@@ -176,7 +176,7 @@ export default function AuditLog() {
 
         {/* Filters panel */}
         {showFilters && (
-          <div className="mb-4 p-4 bg-[#0A0A0A] border border-[#2f2f2f] rounded-lg grid grid-cols-2 md:grid-cols-5 gap-3">
+          <div className="mb-8 p-4 bg-[#0A0A0A] border border-[#2f2f2f] rounded-xl grid grid-cols-2 md:grid-cols-5 gap-3">
             {/* Admin filter */}
             <div>
               <label className="block text-[10px] text-[#6a6a6a] uppercase tracking-wider mb-1">Admin</label>
@@ -247,17 +247,17 @@ export default function AuditLog() {
         )}
 
         {/* Table */}
-        <div className="bg-[#0A0A0A] border border-[#2f2f2f] rounded-lg overflow-hidden">
+        <div className="bg-[#0A0A0A] border border-[#2f2f2f] rounded-xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-[#2f2f2f]">
-                  <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Timestamp</th>
-                  <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Admin</th>
-                  <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Action</th>
-                  <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Target</th>
-                  <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Details</th>
-                  <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">IP Address</th>
+                  <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Timestamp</th>
+                  <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Admin</th>
+                  <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Action</th>
+                  <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Target</th>
+                  <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Details</th>
+                  <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">IP Address</th>
                 </tr>
               </thead>
               <tbody>
@@ -272,16 +272,16 @@ export default function AuditLog() {
                 ) : (
                   logs.map((log: AuditLogEntry) => (
                     <tr key={log.id} className="border-b border-[#1A1A1A] hover:bg-[#141414]/50 transition-colors">
-                      <td className="px-5 py-3.5 text-xs text-[#8a8a8a] whitespace-nowrap font-mono">
+                      <td className="px-6 py-4.5 text-xs text-[#8a8a8a] whitespace-nowrap font-mono">
                         {(() => { const d = new Date(log.created_at + (log.created_at.endsWith('Z') ? '' : 'Z')); return d.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai', hour12: false }); })()}
                       </td>
-                      <td className="px-5 py-3.5 text-xs text-white">
+                      <td className="px-6 py-4.5 text-xs text-white">
                         {log.admin_username || <span className="text-[#4a4a4a]">System</span>}
                       </td>
-                      <td className="px-5 py-3.5">
+                      <td className="px-6 py-4.5">
                         <ActionBadge action={log.action} />
                       </td>
-                      <td className="px-5 py-3.5 text-xs text-[#8a8a8a]">
+                      <td className="px-6 py-4.5 text-xs text-[#8a8a8a]">
                         {log.target_type && (
                           <span>
                             <span className="text-[#6a6a6a]">{log.target_type}</span>
@@ -292,10 +292,10 @@ export default function AuditLog() {
                         )}
                         {!log.target_type && <span className="text-[#4a4a4a]">--</span>}
                       </td>
-                      <td className="px-5 py-3.5">
+                      <td className="px-6 py-4.5">
                         <DetailsCell details={log.details} />
                       </td>
-                      <td className="px-5 py-3.5 text-xs text-[#6a6a6a] font-mono">
+                      <td className="px-6 py-4.5 text-xs text-[#6a6a6a] font-mono">
                         {log.ip_address || '--'}
                       </td>
                     </tr>
