@@ -73,7 +73,15 @@ class AIHandler:
         """
         client = await self._get_client()
 
-        url = config.base_url.rstrip("/") + "/chat/completions"
+        # If base_url already contains a full path (e.g. /v1/responses),
+        # use it directly. Otherwise append /chat/completions for standard OpenAI.
+        base = config.base_url.rstrip("/")
+        if base.endswith("/v1") or base.endswith("/v1/chat") or base.endswith("/chat"):
+            url = base + "/completions"
+        elif "/chat/completions" in base or "/responses" in base or "/completions" in base:
+            url = base
+        else:
+            url = base + "/chat/completions"
         headers = {
             "Authorization": f"Bearer {config.api_key}",
             "Content-Type": "application/json",
