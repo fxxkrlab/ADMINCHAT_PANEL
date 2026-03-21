@@ -241,7 +241,41 @@ async def handle_private_message(message: TgMessage, bot_db_id: int) -> None:
                         # Send auto-reply if reply_mode is 'direct'
                         if faq_result.reply_mode == "direct" and faq_result.answers:
                             for answer_text in faq_result.answers:
-                                await message.answer(answer_text)
+                                # Prepend FAQ prefix for user-facing message
+                                tg_reply = f"基于FAQ自动回复\n\n{answer_text}"
+                                await message.answer(tg_reply)
+
+                                # Store FAQ reply in DB so it shows in web panel
+                                faq_msg = Message(
+                                    conversation_id=conv.id,
+                                    direction="outbound",
+                                    sender_type="faq",
+                                    via_bot_id=bot_db_id,
+                                    content_type="text",
+                                    text_content=answer_text,
+                                    faq_matched=True,
+                                    faq_rule_id=faq_result.rule_id,
+                                    created_at=datetime.utcnow(),
+                                )
+                                session.add(faq_msg)
+                                await session.flush()
+
+                                # Push to WebSocket
+                                await publish_new_message(
+                                    conversation_id=conv.id,
+                                    message_data={
+                                        "id": faq_msg.id,
+                                        "conversation_id": conv.id,
+                                        "direction": "outbound",
+                                        "sender_type": "faq",
+                                        "content_type": "text",
+                                        "text_content": answer_text,
+                                        "faq_matched": True,
+                                        "faq_rule_id": faq_result.rule_id,
+                                        "created_at": faq_msg.created_at.isoformat(),
+                                    },
+                                )
+
                             faq_replied = True
                             logger.info(
                                 "FAQ auto-reply sent for rule_id=%s to tg_uid=%s",

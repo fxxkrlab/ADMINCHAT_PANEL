@@ -274,7 +274,38 @@ async def handle_group_message(
                         if faq_result.reply_mode == "direct" and faq_result.answers:
                             for answer in faq_result.answers:
                                 try:
-                                    await message.reply(answer)
+                                    tg_reply = f"基于FAQ自动回复\n\n{answer}"
+                                    await message.reply(tg_reply)
+
+                                    # Store in DB for web panel
+                                    faq_msg = Message(
+                                        conversation_id=conv.id,
+                                        direction="outbound",
+                                        sender_type="faq",
+                                        via_bot_id=bot_db_id,
+                                        content_type="text",
+                                        text_content=answer,
+                                        faq_matched=True,
+                                        faq_rule_id=faq_result.rule_id,
+                                        created_at=datetime.utcnow(),
+                                    )
+                                    session.add(faq_msg)
+                                    await session.flush()
+
+                                    await publish_new_message(
+                                        conversation_id=conv.id,
+                                        message_data={
+                                            "id": faq_msg.id,
+                                            "conversation_id": conv.id,
+                                            "direction": "outbound",
+                                            "sender_type": "faq",
+                                            "content_type": "text",
+                                            "text_content": answer,
+                                            "faq_matched": True,
+                                            "faq_rule_id": faq_result.rule_id,
+                                            "created_at": faq_msg.created_at.isoformat(),
+                                        },
+                                    )
                                 except Exception:
                                     logger.warning("Failed to send FAQ reply in group")
                             logger.info("FAQ matched in group: rule=%s", faq_result.rule_id)
