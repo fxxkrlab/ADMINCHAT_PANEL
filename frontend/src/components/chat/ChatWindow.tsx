@@ -4,7 +4,6 @@ import {
   CheckCircle2,
   ChevronUp,
   Loader2,
-  MapPin,
   RotateCcw,
   User,
 } from 'lucide-react';
@@ -102,7 +101,7 @@ export default function ChatWindow() {
 
   if (!conv) {
     return (
-      <div className="flex-1 flex items-center justify-center text-text-muted text-sm">
+      <div className="flex-1 flex items-center justify-center text-[#6a6a6a] text-sm">
         Select a conversation to start chatting.
       </div>
     );
@@ -120,7 +119,7 @@ export default function ChatWindow() {
   return (
     <div className="flex-1 flex flex-col h-full min-w-0">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-border-subtle bg-bg-card shrink-0">
+      <div className="flex items-center justify-between h-[60px] px-6 border-b border-[#1A1A1A] bg-[#0A0A0A] shrink-0">
         <div className="flex items-center gap-3 min-w-0">
           <div
             className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold text-white shrink-0"
@@ -130,58 +129,44 @@ export default function ChatWindow() {
           </div>
 
           <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-text-primary truncate">
-                {getDisplayName(conv)}
-              </span>
-              {user.is_premium && (
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple/10 text-purple font-medium">
-                  Premium
-                </span>
-              )}
-            </div>
-            <div className="flex items-center gap-3 text-[11px] text-text-muted">
-              <span className="font-mono">{tgUid}</span>
-              {user.dc_id && (
-                <span className="flex items-center gap-0.5">
-                  <MapPin size={9} />
-                  DC{user.dc_id}
-                </span>
-              )}
-              {user.phone_region && <span>{user.phone_region}</span>}
-              {(conv.source === 'group' || conv.source_type === 'group') && (
-                <span className="text-accent">
-                  # {conv.group_name || conv.source_group?.title || 'Group'}
-                </span>
-              )}
+            <span className="text-[15px] font-bold text-white">
+              {getDisplayName(conv)}
+            </span>
+            <div className="flex items-center gap-2 text-[11px] text-[#6a6a6a] font-['JetBrains_Mono']">
+              <span className="text-accent">ID: {tgUid}</span>
+              <span>&middot;</span>
+              {user.dc_id && <span>DC{user.dc_id}</span>}
             </div>
           </div>
-
-          {tags.length > 0 && (
-            <div className="flex gap-1 ml-2">
-              {tags.map((tag, i) => {
-                const tagName = typeof tag === 'string' ? tag : tag.name;
-                const tagColor = typeof tag === 'string' ? '#3B82F6' : tag.color;
-                return (
-                  <span
-                    key={i}
-                    className="text-[10px] px-1.5 py-0.5 rounded"
-                    style={{
-                      backgroundColor: tagColor + '20',
-                      color: tagColor,
-                    }}
-                  >
-                    {tagName}
-                  </span>
-                );
-              })}
-            </div>
-          )}
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
+          {/* Tags */}
+          {tags.map((tag, i) => {
+            const tagName = typeof tag === 'string' ? tag : tag.name;
+            const tagColor = typeof tag === 'string' ? '#3B82F6' : tag.color;
+            return (
+              <span
+                key={i}
+                className="text-[10px] font-semibold px-2 py-0.5 rounded"
+                style={{
+                  backgroundColor: tagColor + '20',
+                  color: tagColor,
+                }}
+              >
+                {tagName}
+              </span>
+            );
+          })}
+
+          {user.is_premium && (
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-[#FF4444]/10 text-[#FF4444]">
+              VIP
+            </span>
+          )}
+
           <button
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-red hover:bg-red/10 border border-red/20 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium text-[#8a8a8a] border border-[#2f2f2f] hover:bg-[#141414] transition-colors"
             title="Block user"
           >
             <Ban size={13} />
@@ -190,10 +175,10 @@ export default function ChatWindow() {
 
           <button
             onClick={handleToggleStatus}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
               isResolved
-                ? 'text-orange hover:bg-orange/10 border border-orange/20'
-                : 'text-green hover:bg-green/10 border border-green/20'
+                ? 'text-orange bg-orange/10 hover:bg-orange/20'
+                : 'text-black bg-accent hover:bg-accent/90'
             }`}
           >
             {isResolved ? (
@@ -222,7 +207,7 @@ export default function ChatWindow() {
             <button
               onClick={handleLoadMore}
               disabled={messagesLoading}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-text-muted hover:text-text-secondary bg-bg-elevated rounded-full border border-border-subtle transition-colors disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-[#6a6a6a] hover:text-[#8a8a8a] bg-[#141414] rounded-full border border-[#2f2f2f] transition-colors disabled:opacity-50"
             >
               {messagesLoading ? (
                 <Loader2 size={12} className="animate-spin" />
@@ -237,13 +222,13 @@ export default function ChatWindow() {
         {/* Loading state */}
         {messagesLoading && messages.length === 0 && (
           <div className="flex items-center justify-center py-8">
-            <Loader2 size={20} className="animate-spin text-text-muted" />
+            <Loader2 size={20} className="animate-spin text-[#6a6a6a]" />
           </div>
         )}
 
         {/* Empty state */}
         {!messagesLoading && messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-12 text-text-muted text-sm">
+          <div className="flex flex-col items-center justify-center py-12 text-[#6a6a6a] text-sm">
             <User size={32} className="mb-2 opacity-50" />
             No messages yet.
           </div>

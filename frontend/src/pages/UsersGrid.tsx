@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { Search, ChevronLeft, ChevronRight, Crown, MessageSquare } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, Crown, MessageSquare, Tag, Users } from 'lucide-react';
 import Header from '../components/layout/Header';
 import { useDebounceValue } from '../hooks/useDebounce';
 import { UserCardSkeleton } from '../components/ui/Skeleton';
@@ -15,7 +15,7 @@ function UserAvatar({ user }: { user: UserListItem }) {
   const initials = (user.first_name?.[0] ?? user.username?.[0] ?? '?').toUpperCase();
   return (
     <div
-      className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-semibold font-['Space_Grotesk'] shrink-0"
+      className="w-14 h-14 rounded-full flex items-center justify-center text-white text-lg font-semibold font-['Space_Grotesk'] mx-auto"
       style={{ backgroundColor: color }}
     >
       {initials}
@@ -26,7 +26,7 @@ function UserAvatar({ user }: { user: UserListItem }) {
 function TagBadge({ tag }: { tag: TagItem }) {
   return (
     <span
-      className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium"
+      className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold font-['JetBrains_Mono']"
       style={{
         backgroundColor: `${tag.color}20`,
         color: tag.color,
@@ -59,13 +59,13 @@ function Pagination({ page, totalPages, onPageChange }: {
       <button
         onClick={() => onPageChange(Math.max(1, page - 1))}
         disabled={page === 1}
-        className="p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-bg-elevated disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+        className="w-8 h-8 flex items-center justify-center rounded-md text-[#6a6a6a] hover:text-white hover:bg-[#141414] border border-[#2f2f2f] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
       >
         <ChevronLeft size={16} />
       </button>
       {pages.map((p, i) =>
         p === '...' ? (
-          <span key={`dots-${i}`} className="px-2 text-text-muted text-sm">...</span>
+          <span key={`dots-${i}`} className="px-2 text-[#6a6a6a] text-sm">...</span>
         ) : (
           <button
             key={p}
@@ -73,7 +73,7 @@ function Pagination({ page, totalPages, onPageChange }: {
             className={`w-8 h-8 flex items-center justify-center rounded-md text-sm transition-colors ${
               p === page
                 ? 'bg-accent text-black font-semibold'
-                : 'border border-border text-text-secondary hover:bg-bg-elevated'
+                : 'border border-[#2f2f2f] text-[#8a8a8a] hover:bg-[#141414]'
             }`}
           >
             {p}
@@ -83,7 +83,7 @@ function Pagination({ page, totalPages, onPageChange }: {
       <button
         onClick={() => onPageChange(Math.min(totalPages, page + 1))}
         disabled={page === totalPages}
-        className="p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-bg-elevated disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+        className="w-8 h-8 flex items-center justify-center rounded-md text-[#6a6a6a] hover:text-white hover:bg-[#141414] border border-[#2f2f2f] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
       >
         <ChevronRight size={16} />
       </button>
@@ -125,7 +125,7 @@ export default function UsersGrid() {
         group_id: selectedGroup,
       }),
     staleTime: 30_000,
-    placeholderData: keepPreviousData, // Keep previous page data while loading next page
+    placeholderData: keepPreviousData,
   });
 
   const users = useMemo(() => usersData?.items ?? [], [usersData]);
@@ -136,106 +136,98 @@ export default function UsersGrid() {
   return (
     <div className="flex flex-col h-full">
       <Header title="Users" />
-      <div className="flex-1 p-8 overflow-y-auto">
+      <div className="flex-1 px-8 py-6 overflow-y-auto">
         {/* Filters */}
-        <div className="flex items-center gap-3 mb-8">
+        <div className="flex items-center gap-3 mb-6">
           <div className="relative flex-1 max-w-md">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-placeholder" />
+            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4a4a4a]" />
             <input
               type="text"
               placeholder="Search by TGUID, username, or tag..."
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-              className="w-full h-11 pl-9 pr-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent transition-colors"
+              className="w-full h-10 pl-10 pr-4 bg-[#141414] border border-[#2f2f2f] rounded-lg text-sm text-white placeholder:text-[#4a4a4a] focus:outline-none focus:border-accent transition-colors"
             />
           </div>
 
-          <select
-            value={selectedTag}
-            onChange={(e) => { setSelectedTag(e.target.value); setPage(1); }}
-            className="h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-secondary focus:outline-none focus:border-accent transition-colors appearance-none cursor-pointer"
+          <button
+            className="inline-flex items-center gap-2 h-10 px-4 border border-[#2f2f2f] rounded-lg text-sm text-[#8a8a8a] hover:text-white hover:bg-[#141414] transition-colors"
           >
-            <option value="">All Tags</option>
-            {tagsData?.map((tag: TagItem) => (
-              <option key={tag.id} value={tag.name}>{tag.name}</option>
-            ))}
-          </select>
+            <Tag size={14} />
+            Tags
+          </button>
 
-          <select
-            value={selectedGroup ?? ''}
-            onChange={(e) => { setSelectedGroup(e.target.value ? Number(e.target.value) : undefined); setPage(1); }}
-            className="h-11 px-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-secondary focus:outline-none focus:border-accent transition-colors appearance-none cursor-pointer"
+          <button
+            className="inline-flex items-center gap-2 h-10 px-4 border border-[#2f2f2f] rounded-lg text-sm text-[#8a8a8a] hover:text-white hover:bg-[#141414] transition-colors"
           >
-            <option value="">All Groups</option>
-            {groupsData?.map((group: UserGroupItem) => (
-              <option key={group.id} value={group.id}>{group.name}</option>
-            ))}
-          </select>
+            <Users size={14} />
+            Groups
+          </button>
         </div>
 
         {/* Grid */}
         {isLoading ? (
-          <div className="grid grid-cols-4 gap-6">
+          <div className="grid grid-cols-4 gap-4">
             {Array.from({ length: 8 }).map((_, i) => (
               <UserCardSkeleton key={i} />
             ))}
           </div>
         ) : users.length === 0 ? (
-          <div className="bg-bg-card border border-border-subtle rounded-xl p-12 text-center text-text-muted text-sm">
+          <div className="bg-[#0A0A0A] border border-[#2f2f2f] rounded-[10px] p-12 text-center text-[#6a6a6a] text-sm">
             No users found.
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-4 gap-6">
+            <div className="grid grid-cols-4 gap-4">
               {users.map((user: UserListItem) => (
                 <div
                   key={user.id}
                   onClick={() => navigate(`/users/${user.id}`)}
-                  className="bg-bg-card border border-border-subtle rounded-xl p-6 cursor-pointer hover:border-accent/30 hover:bg-bg-elevated transition-all group"
+                  className="bg-[#0A0A0A] border border-[#2f2f2f] rounded-[10px] p-5 cursor-pointer hover:border-accent/30 hover:bg-[#141414] transition-all text-center"
                 >
-                  <div className="flex items-start gap-3 mb-3">
-                    <UserAvatar user={user} />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <p className="text-sm font-medium text-text-primary truncate">
-                          {user.first_name ?? 'Unknown'} {user.last_name ?? ''}
-                        </p>
-                        {user.is_premium && <Crown size={12} className="text-[#FFD700] shrink-0" />}
-                      </div>
-                      {user.username && (
-                        <p className="text-xs text-accent font-mono">@{user.username}</p>
-                      )}
-                    </div>
-                  </div>
+                  <UserAvatar user={user} />
 
-                  <div className="space-y-1.5 mb-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] text-text-muted uppercase tracking-wide">TGUID</span>
-                      <span className="text-xs text-text-secondary font-['JetBrains_Mono']">{user.tg_uid}</span>
+                  <div className="mt-3 mb-1">
+                    <div className="flex items-center justify-center gap-1.5">
+                      <p className="text-[15px] font-semibold text-white truncate">
+                        {user.first_name ?? 'Unknown'} {user.last_name ?? ''}
+                      </p>
+                      {user.is_premium && <Crown size={12} className="text-[#FFD700] shrink-0" />}
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] text-text-muted uppercase tracking-wide">DC</span>
-                      <span className="text-xs text-text-secondary font-['JetBrains_Mono']">{user.dc_id ?? '--'}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] text-text-muted uppercase tracking-wide">Region</span>
-                      <span className="text-xs text-text-secondary font-['JetBrains_Mono']">{user.phone_region ?? '--'}</span>
-                    </div>
+                    {user.username && (
+                      <p className="text-[12px] text-accent font-['JetBrains_Mono'] mt-0.5">@{user.username}</p>
+                    )}
                   </div>
 
                   {/* Tags */}
                   {user.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mb-2">
+                    <div className="flex flex-wrap justify-center gap-1 my-2">
                       {user.tags.map((tag) => (
                         <TagBadge key={tag.id} tag={tag} />
                       ))}
                     </div>
                   )}
 
+                  {/* Info rows */}
+                  <div className="space-y-1.5 mt-3 text-left">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] text-[#6a6a6a]">TGUID</span>
+                      <span className="text-[11px] text-[#8a8a8a] font-['JetBrains_Mono']">{user.tg_uid}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] text-[#6a6a6a]">DC</span>
+                      <span className="text-[11px] text-[#8a8a8a] font-['JetBrains_Mono']">{user.dc_id ?? '--'}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] text-[#6a6a6a]">Region</span>
+                      <span className="text-[11px] text-[#8a8a8a] font-['JetBrains_Mono']">{user.phone_region ?? '--'}</span>
+                    </div>
+                  </div>
+
                   {/* Message count */}
-                  <div className="flex items-center gap-1 text-text-muted">
+                  <div className="flex items-center justify-center gap-1 mt-3 text-[#6a6a6a]">
                     <MessageSquare size={12} />
-                    <span className="text-xs font-['JetBrains_Mono']">{user.message_count}</span>
+                    <span className="text-[11px] font-['JetBrains_Mono']">{user.message_count}</span>
                   </div>
                 </div>
               ))}

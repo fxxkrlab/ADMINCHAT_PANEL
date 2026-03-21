@@ -7,10 +7,10 @@ import type { SettingItem } from '../types';
 
 // ---- Tab definitions ----
 const TABS = [
-  { key: 'system', label: 'System', icon: SettingsIcon },
-  { key: 'turnstile', label: 'Turnstile', icon: Shield },
-  { key: 'media', label: 'Media Cache', icon: Database },
-  { key: 'schedule', label: 'Schedules', icon: Clock },
+  { key: 'admins', label: 'Admins' },
+  { key: 'system', label: 'System' },
+  { key: 'ai', label: 'AI Config' },
+  { key: 'permissions', label: 'Permissions' },
 ] as const;
 
 type TabKey = typeof TABS[number]['key'];
@@ -37,10 +37,10 @@ function SettingCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex items-start justify-between gap-8 px-6 py-4 border-b border-border-subtle/50 last:border-0">
+    <div className="flex items-start justify-between gap-8 px-5 py-4 border-b border-[#1A1A1A] last:border-0">
       <div className="flex-1 min-w-0">
-        <h4 className="text-sm font-medium text-text-primary">{label}</h4>
-        {description && <p className="text-xs text-text-muted mt-0.5">{description}</p>}
+        <h4 className="text-sm font-medium text-white">{label}</h4>
+        {description && <p className="text-xs text-[#6a6a6a] mt-0.5">{description}</p>}
       </div>
       <div className="flex-shrink-0">{children}</div>
     </div>
@@ -54,7 +54,7 @@ function Toggle({ value, onChange }: { value: boolean; onChange: (v: boolean) =>
       type="button"
       onClick={() => onChange(!value)}
       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-        value ? 'bg-accent' : 'bg-bg-elevated border border-border'
+        value ? 'bg-accent' : 'bg-[#141414] border border-[#2f2f2f]'
       }`}
     >
       <span
@@ -68,7 +68,7 @@ function Toggle({ value, onChange }: { value: boolean; onChange: (v: boolean) =>
 
 export default function Settings() {
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<TabKey>('system');
+  const [activeTab, setActiveTab] = useState<TabKey>('admins');
   const [localSettings, setLocalSettings] = useState<Record<string, unknown>>({});
   const [hasChanges, setHasChanges] = useState(false);
 
@@ -115,23 +115,22 @@ export default function Settings() {
   return (
     <div className="flex flex-col h-full">
       <Header title="System Settings" />
-      <div className="flex-1 p-8 overflow-auto">
+      <div className="flex-1 px-8 py-6 overflow-auto">
         {/* Tab navigation */}
-        <div className="flex items-center gap-1 mb-8 border-b border-border-subtle w-fit">
-          {TABS.map(({ key, label, icon: Icon }) => (
+        <div className="flex items-center gap-6 mb-8 border-b border-[#1A1A1A]">
+          {TABS.map(({ key, label }) => (
             <button
               key={key}
               onClick={() => setActiveTab(key)}
-              className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors relative ${
+              className={`pb-3 text-sm font-medium transition-colors relative ${
                 activeTab === key
                   ? 'text-accent'
-                  : 'text-text-secondary hover:text-text-primary'
+                  : 'text-[#6a6a6a] hover:text-white'
               }`}
             >
-              <Icon className="w-4 h-4" />
               {label}
               {activeTab === key && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent rounded-t-full" />
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent" />
               )}
             </button>
           ))}
@@ -139,15 +138,88 @@ export default function Settings() {
 
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-6 h-6 text-text-muted animate-spin" />
+            <Loader2 className="w-6 h-6 text-[#6a6a6a] animate-spin" />
           </div>
         ) : (
           <>
+            {/* Admins tab - admin table placeholder */}
+            {activeTab === 'admins' && (
+              <div className="space-y-6">
+                {/* Admin table */}
+                <div className="bg-[#0A0A0A] border border-[#2f2f2f] rounded-[10px] overflow-hidden">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-[#2f2f2f]">
+                        <th className="text-left text-[11px] font-semibold text-[#6a6a6a] uppercase tracking-[0.5px] font-['JetBrains_Mono'] px-5 py-3">Username</th>
+                        <th className="text-left text-[11px] font-semibold text-[#6a6a6a] uppercase tracking-[0.5px] font-['JetBrains_Mono'] px-5 py-3">Role</th>
+                        <th className="text-left text-[11px] font-semibold text-[#6a6a6a] uppercase tracking-[0.5px] font-['JetBrains_Mono'] px-5 py-3">Status</th>
+                        <th className="text-right text-[11px] font-semibold text-[#6a6a6a] uppercase tracking-[0.5px] font-['JetBrains_Mono'] px-5 py-3">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-b border-[#1A1A1A]">
+                        <td className="px-5 py-3.5 text-sm text-white">admin</td>
+                        <td className="px-5 py-3.5">
+                          <span className="text-[10px] font-semibold font-['JetBrains_Mono'] px-2 py-0.5 rounded bg-accent/10 text-accent">SUPER ADMIN</span>
+                        </td>
+                        <td className="px-5 py-3.5">
+                          <span className="text-[10px] font-semibold font-['JetBrains_Mono'] px-2 py-0.5 rounded bg-green/10 text-green">ACTIVE</span>
+                        </td>
+                        <td className="px-5 py-3.5 text-right">
+                          <button className="px-3 py-1 rounded-md text-xs font-medium text-[#8a8a8a] border border-[#2f2f2f] hover:bg-[#141414] transition-colors">
+                            Edit
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Bottom settings cards row */}
+                <div className="grid grid-cols-4 gap-4">
+                  <div className="bg-[#0A0A0A] border border-[#2f2f2f] rounded-[10px] p-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Shield size={16} className="text-accent" />
+                      <span className="text-[13px] font-medium text-white">Turnstile</span>
+                    </div>
+                    <Toggle
+                      value={!!getLocal('turnstile_enabled', false)}
+                      onChange={(v) => updateLocal('turnstile_enabled', v)}
+                    />
+                  </div>
+                  <div className="bg-[#0A0A0A] border border-[#2f2f2f] rounded-[10px] p-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Database size={16} className="text-accent" />
+                      <span className="text-[13px] font-medium text-white">Media Cache</span>
+                    </div>
+                    <span className="text-sm text-[#8a8a8a] font-['JetBrains_Mono']">{String(getLocal('media_cache_days', 7))} days</span>
+                  </div>
+                  <div className="bg-[#0A0A0A] border border-[#2f2f2f] rounded-[10px] p-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <SettingsIcon size={16} className="text-accent" />
+                      <span className="text-[13px] font-medium text-white">Sessions</span>
+                    </div>
+                    <Toggle
+                      value={!!getLocal('auto_assign_enabled', false)}
+                      onChange={(v) => updateLocal('auto_assign_enabled', v)}
+                    />
+                  </div>
+                  <div className="bg-[#0A0A0A] border border-[#2f2f2f] rounded-[10px] p-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Clock size={16} className="text-accent" />
+                      <span className="text-[13px] font-medium text-white">Knowledge</span>
+                    </div>
+                    <span className="text-sm text-[#8a8a8a] font-['JetBrains_Mono']">{String(getLocal('missed_knowledge_update_hour', 3))}:00 UTC</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* System tab */}
             {activeTab === 'system' && (
-              <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden">
-                <div className="px-6 py-4 border-b border-border-subtle">
-                  <h3 className="text-sm font-semibold text-text-primary">General System Settings</h3>
+              <div className="bg-[#0A0A0A] border border-[#2f2f2f] rounded-[10px] overflow-hidden">
+                <div className="px-5 py-4 border-b border-[#2f2f2f]">
+                  <h3 className="text-[18px] font-semibold text-white font-['Space_Grotesk']">General System Settings</h3>
                 </div>
                 <SettingCard
                   label="Auto-Assign Conversations"
@@ -168,7 +240,7 @@ export default function Settings() {
                     onChange={(e) => updateLocal('session_timeout_minutes', Number(e.target.value))}
                     min={5}
                     max={1440}
-                    className="w-24 h-9 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary text-right font-mono focus:outline-none focus:border-accent transition-colors"
+                    className="w-24 h-10 px-3.5 bg-[#141414] border border-[#2f2f2f] rounded-lg text-sm text-white text-right font-['JetBrains_Mono'] focus:outline-none focus:border-accent transition-colors"
                   />
                 </SettingCard>
                 <SettingCard
@@ -178,7 +250,7 @@ export default function Settings() {
                   <select
                     value={String(getLocal('default_language', 'zh-CN'))}
                     onChange={(e) => updateLocal('default_language', e.target.value)}
-                    className="h-9 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
+                    className="h-10 px-3.5 bg-[#141414] border border-[#2f2f2f] rounded-lg text-sm text-white focus:outline-none focus:border-accent transition-colors"
                   >
                     <option value="zh-CN">Chinese (Simplified)</option>
                     <option value="en">English</option>
@@ -188,11 +260,11 @@ export default function Settings() {
               </div>
             )}
 
-            {/* Turnstile tab */}
-            {activeTab === 'turnstile' && (
-              <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden">
-                <div className="px-6 py-4 border-b border-border-subtle">
-                  <h3 className="text-sm font-semibold text-text-primary">Cloudflare Turnstile Configuration</h3>
+            {/* AI Config tab */}
+            {activeTab === 'ai' && (
+              <div className="bg-[#0A0A0A] border border-[#2f2f2f] rounded-[10px] overflow-hidden">
+                <div className="px-5 py-4 border-b border-[#2f2f2f]">
+                  <h3 className="text-[18px] font-semibold text-white font-['Space_Grotesk']">AI Configuration</h3>
                 </div>
                 <SettingCard
                   label="Turnstile Enabled"
@@ -212,45 +284,20 @@ export default function Settings() {
                     value={String(getLocal('turnstile_site_key', ''))}
                     onChange={(e) => updateLocal('turnstile_site_key', e.target.value)}
                     placeholder="0x..."
-                    className="w-64 h-9 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder font-mono focus:outline-none focus:border-accent transition-colors"
-                  />
-                </SettingCard>
-                <SettingCard
-                  label="Turnstile Secret Key"
-                  description="Server-side secret key (will be encrypted)"
-                >
-                  <input
-                    type="password"
-                    value={String(getLocal('turnstile_secret_key', ''))}
-                    onChange={(e) => updateLocal('turnstile_secret_key', e.target.value)}
-                    placeholder="0x..."
-                    className="w-64 h-9 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder font-mono focus:outline-none focus:border-accent transition-colors"
-                  />
-                </SettingCard>
-                <SettingCard
-                  label="Verification Valid Days"
-                  description="How many days a Turnstile verification remains valid"
-                >
-                  <input
-                    type="number"
-                    value={String(getLocal('turnstile_valid_days', 30))}
-                    onChange={(e) => updateLocal('turnstile_valid_days', Number(e.target.value))}
-                    min={1}
-                    max={365}
-                    className="w-24 h-9 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary text-right font-mono focus:outline-none focus:border-accent transition-colors"
+                    className="w-64 h-10 px-3.5 bg-[#141414] border border-[#2f2f2f] rounded-lg text-sm text-white placeholder:text-[#4a4a4a] font-['JetBrains_Mono'] focus:outline-none focus:border-accent transition-colors"
                   />
                 </SettingCard>
               </div>
             )}
 
-            {/* Media Cache tab */}
-            {activeTab === 'media' && (
-              <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden">
-                <div className="px-6 py-4 border-b border-border-subtle">
-                  <h3 className="text-sm font-semibold text-text-primary">Media Cache Settings</h3>
+            {/* Permissions tab */}
+            {activeTab === 'permissions' && (
+              <div className="bg-[#0A0A0A] border border-[#2f2f2f] rounded-[10px] overflow-hidden">
+                <div className="px-5 py-4 border-b border-[#2f2f2f]">
+                  <h3 className="text-[18px] font-semibold text-white font-['Space_Grotesk']">Permissions</h3>
                 </div>
                 <SettingCard
-                  label="Cache TTL (days)"
+                  label="Media Cache TTL (days)"
                   description="How long media files are cached before automatic cleanup"
                 >
                   <input
@@ -259,30 +306,9 @@ export default function Settings() {
                     onChange={(e) => updateLocal('media_cache_days', Number(e.target.value))}
                     min={1}
                     max={90}
-                    className="w-24 h-9 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary text-right font-mono focus:outline-none focus:border-accent transition-colors"
+                    className="w-24 h-10 px-3.5 bg-[#141414] border border-[#2f2f2f] rounded-lg text-sm text-white text-right font-['JetBrains_Mono'] focus:outline-none focus:border-accent transition-colors"
                   />
                 </SettingCard>
-                <SettingCard
-                  label="Max Cache Size (MB)"
-                  description="Maximum total cache directory size. 0 = unlimited."
-                >
-                  <input
-                    type="number"
-                    value={String(getLocal('media_cache_max_mb', 0))}
-                    onChange={(e) => updateLocal('media_cache_max_mb', Number(e.target.value))}
-                    min={0}
-                    className="w-24 h-9 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary text-right font-mono focus:outline-none focus:border-accent transition-colors"
-                  />
-                </SettingCard>
-              </div>
-            )}
-
-            {/* Schedules tab */}
-            {activeTab === 'schedule' && (
-              <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden">
-                <div className="px-6 py-4 border-b border-border-subtle">
-                  <h3 className="text-sm font-semibold text-text-primary">Scheduled Tasks</h3>
-                </div>
                 <SettingCard
                   label="Missed Knowledge Update Hour"
                   description="Hour of day (0-23 UTC) to run the missed knowledge analysis"
@@ -293,20 +319,7 @@ export default function Settings() {
                     onChange={(e) => updateLocal('missed_knowledge_update_hour', Number(e.target.value))}
                     min={0}
                     max={23}
-                    className="w-24 h-9 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary text-right font-mono focus:outline-none focus:border-accent transition-colors"
-                  />
-                </SettingCard>
-                <SettingCard
-                  label="Media Cache Cleanup Hour"
-                  description="Hour of day (0-23 UTC) to run expired media cleanup"
-                >
-                  <input
-                    type="number"
-                    value={String(getLocal('media_cleanup_hour', 4))}
-                    onChange={(e) => updateLocal('media_cleanup_hour', Number(e.target.value))}
-                    min={0}
-                    max={23}
-                    className="w-24 h-9 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary text-right font-mono focus:outline-none focus:border-accent transition-colors"
+                    className="w-24 h-10 px-3.5 bg-[#141414] border border-[#2f2f2f] rounded-lg text-sm text-white text-right font-['JetBrains_Mono'] focus:outline-none focus:border-accent transition-colors"
                   />
                 </SettingCard>
               </div>

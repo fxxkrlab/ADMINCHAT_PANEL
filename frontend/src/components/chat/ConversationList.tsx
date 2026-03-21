@@ -73,15 +73,14 @@ const ConversationItem = memo(function ConversationItem({
   onClick,
 }: ConversationItemProps) {
   const unread = conversation.unread_count || 0;
-  const status = conversation.status;
   const tags = conversation.user.tags || [];
   const lastMsgTime = conversation.last_message?.created_at || conversation.updated_at;
 
   return (
     <button
       onClick={onClick}
-      className={`w-full text-left px-4 py-3.5 border-b border-border-subtle transition-colors hover:bg-bg-elevated/50 ${
-        isActive ? 'bg-bg-elevated' : ''
+      className={`w-full text-left px-4 py-3 border-b border-[#1A1A1A] transition-colors hover:bg-[#141414]/50 ${
+        isActive ? 'bg-[#141414]' : ''
       }`}
     >
       <div className="flex items-start gap-3">
@@ -94,40 +93,28 @@ const ConversationItem = memo(function ConversationItem({
             {getInitials(conversation)}
           </div>
           {unread > 0 && (
-            <div className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-accent border-2 border-bg-card" />
+            <div className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-accent" />
           )}
         </div>
 
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-sm font-medium text-text-primary truncate">
+            <span className="text-[14px] font-bold text-white truncate">
               {getDisplayName(conversation)}
             </span>
-            <span className="text-[10px] text-text-muted shrink-0">
+            <span className="text-[11px] text-[#6a6a6a] font-['JetBrains_Mono'] shrink-0">
               {lastMsgTime ? formatRelativeTime(lastMsgTime) : ''}
             </span>
           </div>
 
-          <div className="text-[11px] text-accent font-mono mt-0.5">
-            {getTgUid(conversation)}
+          <div className="text-[11px] text-accent font-['JetBrains_Mono'] mt-0.5">
+            ID: {getTgUid(conversation)}
           </div>
 
-          <div className="flex items-center justify-between gap-2 mt-1">
-            <span className="text-xs text-text-secondary truncate">
-              {getLastMessagePreview(conversation)}
-            </span>
-            <div
-              className={`w-2 h-2 rounded-full shrink-0 ${
-                status === 'open' || status === 'pending' || status === 'active'
-                  ? 'bg-orange'
-                  : status === 'resolved'
-                    ? 'bg-green'
-                    : 'bg-red'
-              }`}
-              title={status}
-            />
-          </div>
+          <p className="text-[13px] text-[#8a8a8a] truncate mt-1">
+            {getLastMessagePreview(conversation)}
+          </p>
 
           {tags.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-1.5">
@@ -137,7 +124,7 @@ const ConversationItem = memo(function ConversationItem({
                 return (
                   <span
                     key={i}
-                    className="text-[10px] px-1.5 py-0.5 rounded"
+                    className="text-[10px] font-semibold px-1.5 py-0.5 rounded"
                     style={{
                       backgroundColor: tagColor + '20',
                       color: tagColor,
@@ -236,34 +223,42 @@ export default function ConversationList() {
   ];
 
   return (
-    <div className="flex flex-col h-full w-80 border-r border-border-subtle bg-bg-card shrink-0">
-      {/* Search bar */}
-      <div className="p-4 border-b border-border-subtle">
+    <div className="flex flex-col h-full w-80 border-r border-[#1A1A1A] bg-[#0A0A0A] shrink-0">
+      {/* Header */}
+      <div className="px-4 pt-4 pb-3">
+        <div className="flex items-center gap-2 mb-3">
+          <h2 className="text-[18px] font-semibold text-white font-['Space_Grotesk']">Conversations</h2>
+          <span className="text-[10px] font-semibold font-['JetBrains_Mono'] px-2 py-0.5 rounded-full bg-accent/10 text-accent">
+            {conversationList.length}
+          </span>
+        </div>
+
+        {/* Search */}
         <div className="relative">
           <Search
             size={14}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-text-placeholder"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-[#4a4a4a]"
           />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
-            placeholder="Search by name, TGUID, or tag..."
-            className="w-full h-11 pl-9 pr-4 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent transition-colors"
+            placeholder="Search conversations..."
+            className="w-full h-9 pl-9 pr-4 bg-[#141414] border border-[#2f2f2f] rounded-lg text-sm text-white placeholder:text-[#4a4a4a] focus:outline-none focus:border-accent transition-colors"
           />
         </div>
       </div>
 
       {/* Filter tabs */}
-      <div className="flex border-b border-border-subtle">
+      <div className="flex gap-2 px-4 pb-3">
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => handleTabChange(tab.key)}
-            className={`flex-1 py-2 text-xs font-medium transition-colors ${
+            className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${
               activeTab === tab.key
-                ? 'text-accent border-b-2 border-accent'
-                : 'text-text-muted hover:text-text-secondary'
+                ? 'bg-accent text-black'
+                : 'bg-[#141414] border border-[#2f2f2f] text-[#8a8a8a] hover:text-white'
             }`}
           >
             {tab.label}
@@ -280,7 +275,7 @@ export default function ConversationList() {
             ))}
           </div>
         ) : conversations.length === 0 ? (
-          <div className="px-3 py-8 text-center text-text-muted text-sm">
+          <div className="px-3 py-8 text-center text-[#6a6a6a] text-sm">
             No conversations found.
           </div>
         ) : (

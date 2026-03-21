@@ -16,14 +16,14 @@ function MessageBubbleInner({ message }: MessageBubbleProps) {
   const isAdmin = message.sender_type === 'admin';
   const token = useAuthStore((s) => s.token);
 
-  const bubbleStyle = useMemo(() => {
+  const bubbleClasses = useMemo(() => {
     if (isInbound) {
-      return 'bg-[#141414] border-[#2f2f2f]';
+      return 'bg-[#141414] border-[#2f2f2f] rounded-[12px_12px_12px_2px]';
     }
     if (isFaq) {
-      return 'bg-[#05966910] border-[#05966930]';
+      return 'bg-[#05966910] border-[#05966930] rounded-[12px_12px_2px_12px]';
     }
-    return 'bg-[#00D9FF15] border-[#00D9FF30]';
+    return 'bg-[#00D9FF15] border-[#00D9FF30] rounded-[12px_12px_2px_12px]';
   }, [isInbound, isFaq]);
 
   const senderLabel = useMemo(() => {
@@ -50,7 +50,7 @@ function MessageBubbleInner({ message }: MessageBubbleProps) {
   return (
     <div className={`flex ${isInbound ? 'justify-start' : 'justify-end'} mb-3`}>
       <div
-        className={`max-w-[70%] rounded-xl border px-4 py-3 ${bubbleStyle}`}
+        className={`max-w-[70%] border px-3.5 py-2.5 ${bubbleClasses}`}
       >
         {/* Sender label */}
         {senderLabel && (
@@ -61,12 +61,17 @@ function MessageBubbleInner({ message }: MessageBubbleProps) {
               <User size={12} className="text-accent" />
             ) : null}
             <span
-              className={`text-xs font-medium ${
+              className={`text-[10px] font-semibold font-['JetBrains_Mono'] ${
                 isFaq ? 'text-green' : 'text-accent'
               }`}
             >
               {senderLabel}
             </span>
+            {botTag && (
+              <span className="text-[10px] text-[#6a6a6a] font-['JetBrains_Mono']">
+                via {botTag}
+              </span>
+            )}
           </div>
         )}
 
@@ -98,7 +103,7 @@ function MessageBubbleInner({ message }: MessageBubbleProps) {
             href={mediaUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 mb-2 px-3 py-2 bg-bg-elevated rounded border border-border-subtle text-sm text-accent hover:text-accent/80 transition-colors"
+            className="flex items-center gap-2 mb-2 px-3 py-2 bg-[#141414] rounded border border-[#2f2f2f] text-sm text-accent hover:text-accent/80 transition-colors"
           >
             <Download size={14} />
             <span>Download file</span>
@@ -107,24 +112,19 @@ function MessageBubbleInner({ message }: MessageBubbleProps) {
 
         {/* Text content with Markdown */}
         {textContent && (
-          <div className="text-sm text-text-primary leading-relaxed prose prose-invert prose-sm max-w-none [&_p]:my-0.5 [&_code]:text-accent [&_code]:bg-bg-elevated [&_code]:px-1 [&_code]:rounded [&_pre]:bg-bg-elevated [&_pre]:rounded [&_pre]:p-2 [&_a]:text-accent">
+          <div className="text-[14px] text-white leading-relaxed prose prose-invert prose-sm max-w-none [&_p]:my-0.5 [&_code]:text-accent [&_code]:bg-[#141414] [&_code]:px-1 [&_code]:rounded [&_pre]:bg-[#141414] [&_pre]:rounded [&_pre]:p-2 [&_a]:text-accent">
             <ReactMarkdown>{textContent}</ReactMarkdown>
           </div>
         )}
 
-        {/* Footer: timestamp + bot tag */}
+        {/* Footer: timestamp + faq rule */}
         <div className="flex items-center gap-2 mt-1.5 justify-end">
-          {botTag && (
-            <span className="text-[10px] text-text-muted bg-bg-elevated px-1.5 py-0.5 rounded">
-              via {botTag}
-            </span>
-          )}
           {message.faq_rule_name && (
-            <span className="text-[10px] text-green bg-green/10 px-1.5 py-0.5 rounded">
+            <span className="text-[10px] text-green font-['JetBrains_Mono'] bg-green/10 px-1.5 py-0.5 rounded">
               FAQ: {message.faq_rule_name}
             </span>
           )}
-          <span className="text-[10px] text-text-muted">
+          <span className="text-[10px] text-[#6a6a6a] font-['JetBrains_Mono']">
             {formatTime(message.created_at)}
           </span>
         </div>

@@ -1,9 +1,11 @@
 import { useCallback, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import ConversationList from '../components/chat/ConversationList';
 import ChatWindow from '../components/chat/ChatWindow';
 import { useChatStore } from '../stores/chatStore';
 import { useWebSocket } from '../hooks/useWebSocket';
+import { getConversations } from '../services/chatApi';
 import type { WSEvent, Message, Conversation } from '../types';
 
 export default function Chat() {
@@ -12,6 +14,9 @@ export default function Chat() {
   const handleNewMessage = useChatStore((s) => s.handleNewMessage);
   const handleConversationUpdated = useChatStore((s) => s.handleConversationUpdated);
   const handleNewConversation = useChatStore((s) => s.handleNewConversation);
+  const fetchConversations = useChatStore((s) => s.fetchConversations);
+  const selectedConversationId = useChatStore((s) => s.selectedConversationId);
+  const fetchMessages = useChatStore((s) => s.fetchMessages);
 
   // Select conversation from URL param
   useEffect(() => {
@@ -22,6 +27,24 @@ export default function Chat() {
       }
     }
   }, [conversationId, selectConversation]);
+
+  // Polling fallback: refetch conversations every 5s
+  useQuery({
+    queryKey: ['chat-conversations-poll'],
+    queryFn: async () => {
+      await fetchConversations();
+      return null;
+    },
+    refetchInterval: 5000,
+    staleTime: 3000,
+  });
+
+  // Refetch messages when selectedConversation changes
+  useEffect(() => {
+    if (selectedConversationId) {
+      fetchMessages(selectedConversationId, 1);
+    }
+  }, [selectedConversationId, fetchMessages]);
 
   // WebSocket integration
   const onWSMessage = useCallback(

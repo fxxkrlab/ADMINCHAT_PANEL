@@ -140,33 +140,31 @@ export default function MessageInput({ botName, conversationId, sourceType }: Me
     : botName;
 
   return (
-    <div className="border-t border-border-subtle bg-bg-card">
+    <div className="border-t border-[#1A1A1A] bg-[#0A0A0A]">
       {/* Input area */}
-      <div className="p-5">
-        <div className="flex items-end gap-2">
-          <div className="flex-1 relative">
-            <textarea
-              ref={textareaRef}
-              value={text}
-              onChange={handleInput}
-              onKeyDown={handleKeyDown}
-              onPaste={handlePaste}
-              placeholder="Type a message... (Markdown supported)"
-              rows={1}
-              className="w-full px-3 py-2.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent transition-colors resize-none leading-relaxed"
-              style={{ minHeight: '40px', maxHeight: '160px' }}
-            />
-          </div>
+      <div className="px-6 py-4">
+        <div className="flex items-end gap-2 bg-[#141414] border border-[#2f2f2f] rounded-[10px] px-3 py-2">
+          <textarea
+            ref={textareaRef}
+            value={text}
+            onChange={handleInput}
+            onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
+            placeholder="Type a message... (Markdown supported)"
+            rows={1}
+            className="flex-1 bg-transparent text-sm text-white placeholder:text-[#4a4a4a] focus:outline-none resize-none leading-relaxed py-1"
+            style={{ minHeight: '28px', maxHeight: '160px' }}
+          />
 
           {/* Toolbar */}
-          <div className="flex items-center gap-1 shrink-0">
+          <div className="flex items-center gap-0.5 shrink-0">
             {/* Markdown toggle */}
             <button
               onClick={() => setUseMarkdown(!useMarkdown)}
-              className={`flex items-center justify-center w-9 h-9 rounded-lg transition-colors ${
+              className={`flex items-center justify-center w-8 h-8 rounded-md transition-colors ${
                 useMarkdown
-                  ? 'text-accent bg-accent-10'
-                  : 'text-text-muted hover:text-text-secondary hover:bg-bg-elevated'
+                  ? 'text-accent bg-accent/10'
+                  : 'text-[#6a6a6a] hover:text-[#8a8a8a] hover:bg-[#1A1A1A]'
               }`}
               title={useMarkdown ? 'Markdown enabled' : 'Markdown disabled'}
             >
@@ -176,7 +174,7 @@ export default function MessageInput({ botName, conversationId, sourceType }: Me
             {/* Attach file */}
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="flex items-center justify-center w-9 h-9 rounded-lg text-text-muted hover:text-text-secondary hover:bg-bg-elevated transition-colors"
+              className="flex items-center justify-center w-8 h-8 rounded-md text-[#6a6a6a] hover:text-[#8a8a8a] hover:bg-[#1A1A1A] transition-colors"
               title="Attach file"
             >
               <Paperclip size={16} />
@@ -191,7 +189,7 @@ export default function MessageInput({ botName, conversationId, sourceType }: Me
             {/* Image upload */}
             <button
               onClick={() => imageInputRef.current?.click()}
-              className="flex items-center justify-center w-9 h-9 rounded-lg text-text-muted hover:text-text-secondary hover:bg-bg-elevated transition-colors"
+              className="flex items-center justify-center w-8 h-8 rounded-md text-[#6a6a6a] hover:text-[#8a8a8a] hover:bg-[#1A1A1A] transition-colors"
               title="Upload image"
             >
               <Image size={16} />
@@ -208,7 +206,7 @@ export default function MessageInput({ botName, conversationId, sourceType }: Me
             <button
               onClick={handleSend}
               disabled={!text.trim() || sending}
-              className="flex items-center justify-center w-9 h-9 rounded-lg bg-accent text-bg-page hover:bg-accent/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center justify-center w-8 h-8 rounded-md bg-accent text-black hover:bg-accent/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               title="Send (Ctrl+Enter)"
             >
               <Send size={16} />
@@ -218,7 +216,7 @@ export default function MessageInput({ botName, conversationId, sourceType }: Me
       </div>
 
       {/* Bottom hint */}
-      <div className="flex items-center justify-between px-5 pb-2.5 text-[11px] text-text-muted">
+      <div className="flex items-center justify-between px-6 pb-3 text-[11px] text-[#4a4a4a]">
         <span>Ctrl+Enter to send | Markdown & media supported</span>
         {displayBotName && (
           <div className="relative" ref={botPickerRef}>
@@ -227,20 +225,20 @@ export default function MessageInput({ botName, conversationId, sourceType }: Me
                 onClick={() => setShowBotPicker(!showBotPicker)}
                 className="flex items-center gap-1 hover:text-accent transition-colors cursor-pointer"
               >
-                <span>
-                  Replying via <span className="text-text-secondary">{displayBotName}</span>
+                <span className="font-['JetBrains_Mono'] text-[11px]">
+                  Replying via <span className="text-accent">{displayBotName}</span>
                 </span>
                 <ChevronDown size={10} />
               </button>
             ) : (
-              <span>
-                Replying via <span className="text-text-secondary">{displayBotName}</span>
+              <span className="font-['JetBrains_Mono'] text-[11px]">
+                Replying via <span className="text-accent">{displayBotName}</span>
               </span>
             )}
 
             {/* Bot picker dropdown */}
             {showBotPicker && availableBots.length > 1 && (
-              <div className="absolute bottom-full right-0 mb-1 w-52 bg-bg-elevated border border-border-subtle rounded-lg shadow-lg py-1 z-50">
+              <div className="absolute bottom-full right-0 mb-1 w-52 bg-[#141414] border border-[#2f2f2f] rounded-lg shadow-lg py-1 z-50">
                 {availableBots.map((bot) => (
                   <button
                     key={bot.id}
@@ -248,8 +246,8 @@ export default function MessageInput({ botName, conversationId, sourceType }: Me
                       setSelectedBot(bot);
                       setShowBotPicker(false);
                     }}
-                    className={`w-full text-left px-3 py-1.5 text-xs hover:bg-bg-card transition-colors flex items-center justify-between ${
-                      selectedBot?.id === bot.id ? 'text-accent' : 'text-text-secondary'
+                    className={`w-full text-left px-3 py-1.5 text-xs hover:bg-[#1A1A1A] transition-colors flex items-center justify-between ${
+                      selectedBot?.id === bot.id ? 'text-accent' : 'text-[#8a8a8a]'
                     }`}
                   >
                     <span>@{bot.bot_username || bot.display_name || `Bot#${bot.id}`}</span>
