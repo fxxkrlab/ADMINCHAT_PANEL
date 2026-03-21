@@ -46,7 +46,7 @@ Telegram bidirectional message forwarding bot with web-based customer service ma
 - **Public version**: `VERSION` file (semver format: MAJOR.MINOR.PATCH, e.g. 0.1.0)
 - **Internal version**: `BUILD_VERSION` file (format: YYYYMMDD.NNNN, e.g. 20260321.0001)
 - Internal version (`BUILD_VERSION`) updates on EVERY code change commit (increment the 4-digit counter)
-- Public version (`VERSION`) updates on each release (follow semver)
+- Public version (`VERSION`) follows semver: major changes 0.3.0, small fixes 0.2.1
 - **Footer display**: "Powered By ADMINCHAT PANEL v{VERSION} ({BUILD_VERSION})"
 - **Copyright**: (R) 2026 NovaHelix & SAKAKIBARA
 - When making commits, always update `BUILD_VERSION` with current date and incremented counter
