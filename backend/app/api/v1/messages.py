@@ -1,5 +1,8 @@
+import logging
 from datetime import datetime, timezone
 from typing import Annotated, Optional
+
+logger = logging.getLogger(__name__)
 
 from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, Form, status
 from sqlalchemy import and_, desc, func, select
@@ -197,9 +200,45 @@ async def send_message(
     await db.flush()
     await db.refresh(message)
 
-    # TODO: In production:
-    # 1. Route through bot dispatcher to send via Telegram
-    # 2. Publish via Redis for WebSocket broadcast
+    # ---- Send via Telegram Bot ----
+    try:
+        from app.bot.dispatcher import get_bot_instance
+        from app.models.user import TgUser
+        from app.models.group import TgGroup
+
+        # Get the TG user's chat_id
+        user_result = await db.execute(
+            select(TgUser).where(TgUser.id == conv.tg_user_id)
+        )
+        tg_user = user_result.scalar_one_or_none()
+
+        if tg_user and conv.primary_bot_id:
+            bot_instance = get_bot_instance(conv.primary_bot_id)
+            if bot_instance:
+                if conv.source_type == "private":
+                    # Private chat: send directly to user
+                    await bot_instance.send_message(
+                        chat_id=tg_user.tg_uid,
+                        text=text_content or "",
+                        parse_mode=parse_mode if parse_mode else None,
+                    )
+                elif conv.source_type == "group" and conv.source_group_id:
+                    # Group chat: send to group, reply to original message
+                    group_result = await db.execute(
+                        select(TgGroup).where(TgGroup.id == conv.source_group_id)
+                    )
+                    group = group_result.scalar_one_or_none()
+                    if group:
+                        await bot_instance.send_message(
+                            chat_id=group.tg_chat_id,
+                            text=text_content or "",
+                            parse_mode=parse_mode if parse_mode else None,
+                        )
+
+                # Update message with TG message id if needed
+                logger.info("Message sent via bot %s to user %s", conv.primary_bot_id, tg_user.tg_uid)
+    except Exception:
+        logger.exception("Failed to send message via Telegram bot (message saved to DB)")
 
     # Get bot name for response
     bot_name = None
