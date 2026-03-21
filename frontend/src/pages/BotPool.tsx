@@ -90,12 +90,6 @@ export default function BotPool() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['bots'] }),
   });
 
-  const _toggleMutation = useMutation({
-    mutationFn: ({ id, active }: { id: number; active: boolean }) =>
-      updateBot(id, { is_active: active }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['bots'] }),
-  });
-
   const bots = data?.items || [];
 
   const handleAddSubmit = (e: React.FormEvent) => {

@@ -5,7 +5,7 @@ import ConversationList from '../components/chat/ConversationList';
 import ChatWindow from '../components/chat/ChatWindow';
 import { useChatStore } from '../stores/chatStore';
 import { useWebSocket } from '../hooks/useWebSocket';
-import { getConversations } from '../services/chatApi';
+import { getConversations as _getConversations } from '../services/chatApi';
 import type { WSEvent, Message, Conversation } from '../types';
 
 export default function Chat() {

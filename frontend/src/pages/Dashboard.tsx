@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { TrendingUp, TrendingDown, MessageSquare, CheckCircle, AlertCircle, ShieldBan, Bot, Wifi, WifiOff, Clock, HelpCircle } from 'lucide-react';
+import { TrendingUp, TrendingDown, MessageSquare, CheckCircle, AlertCircle, ShieldBan } from 'lucide-react';
 import Header from '../components/layout/Header';
 import { StatCardSkeleton, DashboardPanelSkeleton } from '../components/ui/Skeleton';
 import { getDashboardStats } from '../services/usersApi';
@@ -154,7 +154,7 @@ export default function Dashboard() {
                       <p className="text-sm text-text-primary truncate">{bot.name}</p>
                     </div>
                     {bot.username && (
-                      <span className="text-[11px] text-[#8a8a8a] font-['JetBrains_Mono']">{bot.message_count ?? 0} msgs</span>
+                      <span className="text-[11px] text-[#8a8a8a] font-['JetBrains_Mono']">{bot.rate_limit_remaining ?? 0} msgs</span>
                     )}
                     <BotStatusBadge status={bot.status} remaining={bot.rate_limit_remaining} />
                   </div>

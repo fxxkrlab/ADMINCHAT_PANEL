@@ -6,7 +6,7 @@ import Header from '../components/layout/Header';
 import { useDebounceValue } from '../hooks/useDebounce';
 import { UserCardSkeleton } from '../components/ui/Skeleton';
 import { getUsers, getTags, getUserGroups } from '../services/usersApi';
-import type { UserListItem, TagItem, UserGroupItem } from '../services/usersApi';
+import type { UserListItem, TagItem } from '../services/usersApi';
 
 const AVATAR_COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F'];
 
@@ -94,21 +94,21 @@ function Pagination({ page, totalPages, onPageChange }: {
 export default function UsersGrid() {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
-  const [selectedTag, setSelectedTag] = useState('');
-  const [selectedGroup, setSelectedGroup] = useState<number | undefined>();
+  const [selectedTag, _setSelectedTag] = useState('');
+  const [selectedGroup, _setSelectedGroup] = useState<number | undefined>();
   const [page, setPage] = useState(1);
   const pageSize = 20;
 
   // Debounce search input by 300ms so API isn't hit on every keystroke
   const debouncedSearch = useDebounceValue(search, 300);
 
-  const { data: tagsData } = useQuery({
+  const { data: _tagsData } = useQuery({
     queryKey: ['tags'],
     queryFn: getTags,
     staleTime: 60_000,
   });
 
-  const { data: groupsData } = useQuery({
+  const { data: _groupsData } = useQuery({
     queryKey: ['user-groups'],
     queryFn: getUserGroups,
     staleTime: 60_000,
