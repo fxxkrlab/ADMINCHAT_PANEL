@@ -223,16 +223,30 @@ async def send_message(
                         parse_mode=parse_mode if parse_mode else None,
                     )
                 elif conv.source_type == "group" and conv.source_group_id:
-                    # Group chat: send to group, reply to original message
+                    # Group chat: send to group, reply to user's last message
                     group_result = await db.execute(
                         select(TgGroup).where(TgGroup.id == conv.source_group_id)
                     )
                     group = group_result.scalar_one_or_none()
                     if group:
+                        # Find the latest inbound message's tg_message_id to reply to
+                        last_inbound = await db.execute(
+                            select(Message.tg_message_id)
+                            .where(
+                                Message.conversation_id == conversation_id,
+                                Message.direction == "inbound",
+                                Message.tg_message_id.is_not(None),
+                            )
+                            .order_by(Message.created_at.desc())
+                            .limit(1)
+                        )
+                        reply_to_id = last_inbound.scalar_one_or_none()
+
                         await bot_instance.send_message(
                             chat_id=group.tg_chat_id,
                             text=text_content or "",
                             parse_mode=parse_mode if parse_mode else None,
+                            reply_to_message_id=reply_to_id,
                         )
 
                 # Update message with TG message id if needed
