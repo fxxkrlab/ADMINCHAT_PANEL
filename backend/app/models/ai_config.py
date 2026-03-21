@@ -19,6 +19,9 @@ class AiConfig(Base, TimestampMixin):
     base_url: Mapped[str] = mapped_column(String(500), nullable=False)
     api_key: Mapped[str] = mapped_column(String(500), nullable=False)  # encrypted
     model: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    api_format: Mapped[str] = mapped_column(
+        String(30), server_default="openai_chat",
+    )  # 'openai_chat' or 'anthropic_responses'
     default_params: Mapped[dict] = mapped_column(JSONB, server_default="{}")
     is_active: Mapped[bool] = mapped_column(Boolean, server_default="true")
 

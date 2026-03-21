@@ -39,6 +39,7 @@ class AIConfig:
     temperature: float = 0.7
     system_prompt: str = ""
     timeout: float = 30.0
+    api_format: str = "openai_chat"  # 'openai_chat' or 'anthropic_responses'
 
 
 class AIHandler:
@@ -73,20 +74,25 @@ class AIHandler:
         """
         client = await self._get_client()
 
-        # Smart URL construction:
-        # - If base_url ends with /v1 or /v1/chat → append /completions
-        # - If base_url already has full path (/responses, /completions) → use as-is
-        # - Otherwise → append /chat/completions (standard OpenAI)
         base = config.base_url.rstrip("/")
-        if base.endswith("/v1") or base.endswith("/v1/chat") or base.endswith("/chat"):
-            url = base + "/completions"
-        elif "/chat/completions" in base or "/responses" in base or "/completions" in base:
-            url = base
+
+        # Build URL based on api_format
+        if config.api_format == "anthropic_responses":
+            # Anthropic Responses format (CRS: /openai/v1/responses)
+            if "/responses" in base:
+                url = base
+            else:
+                url = base + "/v1/responses"
         else:
-            url = base + "/chat/completions"
+            # OpenAI Chat Completions format (default)
+            if "/chat/completions" in base or "/completions" in base:
+                url = base
+            elif base.endswith("/v1") or base.endswith("/v1/chat") or base.endswith("/chat"):
+                url = base + "/completions"
+            else:
+                url = base + "/chat/completions"
 
         # Send API key in multiple headers for maximum compatibility
-        # (OpenAI uses Authorization, CRS/Google use x-api-key)
         headers = {
             "Authorization": f"Bearer {config.api_key}",
             "x-api-key": config.api_key,

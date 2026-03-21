@@ -17,6 +17,7 @@ class AIConfigCreate(BaseModel):
     base_url: str = Field(..., min_length=1, max_length=500)
     api_key: str = Field(..., min_length=1, max_length=500)
     model: Optional[str] = Field(None, max_length=100)
+    api_format: str = Field(default="openai_chat", pattern=r"^(openai_chat|anthropic_responses)$")
     default_params: Dict[str, Any] = Field(default_factory=lambda: {
         "temperature": 0.7,
         "max_tokens": 500,
@@ -30,6 +31,7 @@ class AIConfigUpdate(BaseModel):
     base_url: Optional[str] = Field(None, min_length=1, max_length=500)
     api_key: Optional[str] = Field(None, min_length=1, max_length=500)
     model: Optional[str] = Field(None, max_length=100)
+    api_format: Optional[str] = Field(None, pattern=r"^(openai_chat|anthropic_responses)$")
     default_params: Optional[Dict[str, Any]] = None
     is_active: Optional[bool] = None
 
@@ -48,6 +50,7 @@ class AIConfigResponse(BaseModel):
     base_url: str
     api_key_masked: str = ""  # Only show last 4 chars
     model: Optional[str] = None
+    api_format: str = "openai_chat"
     default_params: Dict[str, Any] = {}
     is_active: bool = True
     created_at: datetime

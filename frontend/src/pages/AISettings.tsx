@@ -39,6 +39,7 @@ export default function AISettings() {
   // Form state
   const [formName, setFormName] = useState('');
   const [formProvider, setFormProvider] = useState('openai');
+  const [formApiFormat, setFormApiFormat] = useState('openai_chat');
   const [formBaseUrl, setFormBaseUrl] = useState('https://api.openai.com/v1');
   const [formApiKey, setFormApiKey] = useState('');
   const [formModel, setFormModel] = useState('gpt-3.5-turbo');
@@ -88,6 +89,7 @@ export default function AISettings() {
   const resetForm = () => {
     setFormName('');
     setFormProvider('openai');
+    setFormApiFormat('openai_chat');
     setFormBaseUrl('https://api.openai.com/v1');
     setFormApiKey('');
     setFormModel('gpt-3.5-turbo');
@@ -99,6 +101,7 @@ export default function AISettings() {
     setEditingConfig(config);
     setFormName(config.name);
     setFormProvider(config.provider);
+    setFormApiFormat((config as any).api_format || 'openai_chat');
     setFormBaseUrl(config.base_url);
     setFormApiKey(''); // Don't prefill API key
     setFormModel(config.model || '');
@@ -112,6 +115,7 @@ export default function AISettings() {
     const body = {
       name: formName.trim(),
       provider: formProvider,
+      api_format: formApiFormat,
       base_url: formBaseUrl.trim(),
       model: formModel.trim() || undefined,
       default_params: {
@@ -443,12 +447,28 @@ export default function AISettings() {
                   </select>
                 </div>
                 <div>
+                  <label className="block text-xs text-text-secondary mb-1.5">API Format</label>
+                  <select
+                    value={formApiFormat}
+                    onChange={(e) => setFormApiFormat(e.target.value)}
+                    className="w-full px-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent"
+                  >
+                    <option value="openai_chat">OpenAI Chat Completions</option>
+                    <option value="anthropic_responses">Anthropic Responses (CRS)</option>
+                  </select>
+                  <p className="text-[10px] text-text-muted mt-1">
+                    {formApiFormat === 'openai_chat'
+                      ? 'Standard /v1/chat/completions endpoint'
+                      : 'CRS /v1/responses endpoint (Claude Relay Service)'}
+                  </p>
+                </div>
+                <div>
                   <label className="block text-xs text-text-secondary mb-1.5">Base URL *</label>
                   <input
                     type="url"
                     value={formBaseUrl}
                     onChange={(e) => setFormBaseUrl(e.target.value)}
-                    placeholder="https://api.openai.com/v1"
+                    placeholder={formApiFormat === 'openai_chat' ? 'https://api.openai.com/v1' : 'https://crs.bcx.im/openai'}
                     className="w-full px-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder font-mono focus:outline-none focus:border-accent"
                     required
                   />
