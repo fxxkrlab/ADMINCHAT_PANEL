@@ -92,49 +92,125 @@ class AIHandler:
             else:
                 url = base + "/chat/completions"
 
-        # Send API key in multiple headers for maximum compatibility
         headers = {
             "Authorization": f"Bearer {config.api_key}",
             "x-api-key": config.api_key,
             "Content-Type": "application/json",
         }
-        payload: Dict[str, Any] = {
-            "model": config.model,
-            "messages": messages,
-            "max_tokens": config.max_tokens,
-            "temperature": config.temperature,
-        }
+
+        # Build payload based on api_format
+        if config.api_format == "anthropic_responses":
+            # CRS GPT Responses format: uses "input" + stream=true
+            input_items = []
+            for msg in messages:
+                role = msg.get("role", "user")
+                text = msg.get("content", "")
+                if role == "system":
+                    input_items.append({
+                        "role": "developer",
+                        "content": [{"type": "input_text", "text": text}],
+                    })
+                else:
+                    input_items.append({
+                        "role": role,
+                        "content": [{"type": "input_text", "text": text}],
+                    })
+            payload: Dict[str, Any] = {
+                "model": config.model,
+                "input": input_items,
+                "stream": True,  # CRS requires streaming
+            }
+            if config.max_tokens:
+                payload["max_output_tokens"] = config.max_tokens
+        else:
+            # Standard OpenAI Chat Completions format
+            payload = {
+                "model": config.model,
+                "messages": messages,
+                "max_tokens": config.max_tokens,
+                "temperature": config.temperature,
+            }
 
         start = time.monotonic()
-        try:
-            resp = await client.post(
-                url,
-                headers=headers,
-                json=payload,
-                timeout=config.timeout,
-            )
-            resp.raise_for_status()
-            data = resp.json()
-        except httpx.HTTPStatusError as exc:
-            logger.error("AI API HTTP error %s: %s", exc.response.status_code, exc.response.text)
-            raise
-        except Exception:
-            logger.exception("AI API call failed")
-            raise
+
+        if config.api_format == "anthropic_responses":
+            # Handle SSE streaming response from CRS
+            try:
+                content = ""
+                tokens_used = 0
+                prompt_tokens = 0
+                completion_tokens = 0
+                model_name = config.model
+
+                async with client.stream(
+                    "POST", url, headers=headers, json=payload, timeout=config.timeout,
+                ) as resp:
+                    resp.raise_for_status()
+                    async for line in resp.aiter_lines():
+                        if not line.startswith("data: "):
+                            continue
+                        data_str = line[6:]
+                        if not data_str.strip():
+                            continue
+                        try:
+                            event_data = json.loads(data_str)
+                        except json.JSONDecodeError:
+                            continue
+
+                        event_type = event_data.get("type", "")
+
+                        # Collect text deltas
+                        if event_type == "response.output_text.delta":
+                            content += event_data.get("delta", "")
+
+                        # Get usage from completed response
+                        elif event_type == "response.completed":
+                            resp_obj = event_data.get("response", {})
+                            usage = resp_obj.get("usage", {})
+                            tokens_used = usage.get("total_tokens", 0)
+                            prompt_tokens = usage.get("input_tokens", 0)
+                            completion_tokens = usage.get("output_tokens", 0)
+                            model_name = resp_obj.get("model", config.model)
+
+                content = content.strip()
+
+            except httpx.HTTPStatusError as exc:
+                logger.error("AI API HTTP error %s: %s", exc.response.status_code, exc.response.text)
+                raise
+            except Exception:
+                logger.exception("AI API (CRS streaming) call failed")
+                raise
+        else:
+            # Standard non-streaming request
+            try:
+                resp = await client.post(
+                    url, headers=headers, json=payload, timeout=config.timeout,
+                )
+                resp.raise_for_status()
+                data = resp.json()
+            except httpx.HTTPStatusError as exc:
+                logger.error("AI API HTTP error %s: %s", exc.response.status_code, exc.response.text)
+                raise
+            except Exception:
+                logger.exception("AI API call failed")
+                raise
+
+            choice = data.get("choices", [{}])[0]
+            content = choice.get("message", {}).get("content", "").strip()
+            usage = data.get("usage", {})
+            tokens_used = usage.get("total_tokens", 0)
+            prompt_tokens = usage.get("prompt_tokens", 0)
+            completion_tokens = usage.get("completion_tokens", 0)
+            model_name = data.get("model", config.model)
 
         latency = (time.monotonic() - start) * 1000
 
-        # Parse OpenAI-format response
-        choice = data.get("choices", [{}])[0]
-        content = choice.get("message", {}).get("content", "").strip()
-        usage = data.get("usage", {})
-
         return AIResponse(
             content=content,
-            tokens_used=usage.get("total_tokens", 0),
-            prompt_tokens=usage.get("prompt_tokens", 0),
-            completion_tokens=usage.get("completion_tokens", 0),
-            model=data.get("model", config.model),
+            tokens_used=tokens_used,
+            prompt_tokens=prompt_tokens,
+            completion_tokens=completion_tokens,
+            model=model_name,
             latency_ms=latency,
         )
 
