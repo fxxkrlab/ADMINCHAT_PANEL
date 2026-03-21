@@ -273,7 +273,7 @@ export default function AuditLog() {
                   logs.map((log: AuditLogEntry) => (
                     <tr key={log.id} className="border-b border-[#1A1A1A] hover:bg-[#141414]/50 transition-colors">
                       <td className="px-4 py-3 text-xs text-[#8a8a8a] whitespace-nowrap font-mono">
-                        {new Date(log.created_at).toLocaleString()}
+                        {(() => { const d = new Date(log.created_at + (log.created_at.endsWith('Z') ? '' : 'Z')); return d.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai', hour12: false }); })()}
                       </td>
                       <td className="px-4 py-3 text-xs text-white">
                         {log.admin_username || <span className="text-[#4a4a4a]">System</span>}

@@ -14,9 +14,11 @@ import type { TagItem, UserGroupItem } from '../services/usersApi';
 
 const AVATAR_COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F'];
 
+import { formatDateTime } from '../utils/time';
+
 function formatDate(iso?: string | null) {
   if (!iso) return '--';
-  return new Date(iso).toLocaleString();
+  return formatDateTime(iso);
 }
 
 export default function UserDetail() {

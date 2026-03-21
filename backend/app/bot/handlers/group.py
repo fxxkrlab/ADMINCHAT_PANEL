@@ -25,30 +25,34 @@ router = Router(name="group")
 
 def _extract_mention_text(msg: TgMessage, bot_username: str) -> str | None:
     """
-    If the message text contains @bot_username, return the text after the
-    mention (stripped). Returns None if the bot was not mentioned.
+    If the message text or caption contains @bot_username, return the text
+    after the mention (stripped). Returns None if the bot was not mentioned.
+    Handles both text messages and media with captions.
     """
-    if not msg.text:
+    # Use text or caption (photos/videos use caption)
+    text = msg.text or msg.caption
+    entities = msg.entities or msg.caption_entities
+
+    if not text:
         return None
 
-    # Check entities for bot_command or mention
-    if msg.entities:
-        for entity in msg.entities:
+    # Check entities for mention
+    if entities:
+        for entity in entities:
             if entity.type == "mention":
-                mentioned = msg.text[entity.offset : entity.offset + entity.length]
+                mentioned = text[entity.offset : entity.offset + entity.length]
                 if mentioned.lower() == f"@{bot_username.lower()}":
-                    # Remove the mention and return the rest
                     remaining = (
-                        msg.text[: entity.offset]
-                        + msg.text[entity.offset + entity.length :]
+                        text[: entity.offset]
+                        + text[entity.offset + entity.length :]
                     ).strip()
                     return remaining if remaining else ""
 
     # Fallback: regex match
     pattern = re.compile(rf"@{re.escape(bot_username)}", re.IGNORECASE)
-    if pattern.search(msg.text):
-        text = pattern.sub("", msg.text).strip()
-        return text if text else ""
+    if pattern.search(text):
+        result = pattern.sub("", text).strip()
+        return result if result else ""
 
     return None
 
