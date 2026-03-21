@@ -42,12 +42,13 @@ def _extract_mention_text(msg: TgMessage, bot_username: str) -> str | None:
                         msg.text[: entity.offset]
                         + msg.text[entity.offset + entity.length :]
                     ).strip()
-                    return remaining or None
+                    return remaining if remaining else ""
 
     # Fallback: regex match
     pattern = re.compile(rf"@{re.escape(bot_username)}", re.IGNORECASE)
     if pattern.search(msg.text):
-        return pattern.sub("", msg.text).strip() or None
+        text = pattern.sub("", msg.text).strip()
+        return text if text else ""
 
     return None
 
@@ -91,6 +92,10 @@ async def handle_group_message(
         return
 
     # Only respond to messages that @mention this bot
+    logger.info(
+        "Group message from user=%s in chat=%s text=%s bot_username=%s",
+        tg_user.id, message.chat.id, (message.text or "")[:50], bot_username,
+    )
     mentioned_text = _extract_mention_text(message, bot_username)
     if mentioned_text is None:
         # Also handle replies to the bot's own messages
