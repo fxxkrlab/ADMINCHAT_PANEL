@@ -2,6 +2,7 @@ import { memo, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Bot, Download, User } from 'lucide-react';
 import type { Message } from '../../types';
+import { useAuthStore } from '../../stores/authStore';
 
 interface MessageBubbleProps {
   message: Message;
@@ -17,6 +18,7 @@ function MessageBubbleInner({ message }: MessageBubbleProps) {
   const isFaq = message.faq_matched || message.sender_type === 'faq';
   const isBot = message.sender_type === 'bot';
   const isAdmin = message.sender_type === 'admin';
+  const token = useAuthStore((s) => s.token);
 
   const bubbleStyle = useMemo(() => {
     if (isInbound) {
@@ -40,7 +42,14 @@ function MessageBubbleInner({ message }: MessageBubbleProps) {
 
   const contentType = message.message_type || message.content_type || 'text';
   const textContent = message.content || message.text_content || '';
-  const mediaUrl = message.media_url;
+  const rawMediaUrl = message.media_url;
+
+  // Append auth token to media URL for img/video/a tags (they can't send Bearer headers)
+  const mediaUrl = useMemo(() => {
+    if (!rawMediaUrl) return undefined;
+    const separator = rawMediaUrl.includes('?') ? '&' : '?';
+    return token ? `${rawMediaUrl}${separator}token=${encodeURIComponent(token)}` : rawMediaUrl;
+  }, [rawMediaUrl, token]);
 
   return (
     <div className={`flex ${isInbound ? 'justify-start' : 'justify-end'} mb-3`}>

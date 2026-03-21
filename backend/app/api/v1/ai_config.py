@@ -94,7 +94,11 @@ async def create_ai_config(
         name=body.name,
         provider=body.provider,
         base_url=body.base_url,
-        api_key=body.api_key,  # TODO: encrypt before storing
+        # NOTE: In production, API keys should be encrypted at rest using a
+        # proper encryption layer (e.g., AWS KMS, HashiCorp Vault, or
+        # Fernet symmetric encryption with a securely managed master key).
+        # This requires a key management system and is not implemented here.
+        api_key=body.api_key,
         model=body.model,
         default_params=body.default_params,
         is_active=body.is_active,

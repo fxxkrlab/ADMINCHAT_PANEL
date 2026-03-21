@@ -1,19 +1,68 @@
-import { useCallback, useRef, useState } from 'react';
-import { Image, Paperclip, Send, Type } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { ChevronDown, Image, Paperclip, Send, Type } from 'lucide-react';
 import { useChatStore } from '../../stores/chatStore';
+import type { AvailableBot } from '../../services/chatApi';
+import { getAvailableBots } from '../../services/chatApi';
 
 interface MessageInputProps {
   botName?: string;
+  conversationId?: number | null;
+  sourceType?: string;
 }
 
-export default function MessageInput({ botName }: MessageInputProps) {
+export default function MessageInput({ botName, conversationId, sourceType }: MessageInputProps) {
   const [text, setText] = useState('');
   const [useMarkdown, setUseMarkdown] = useState(true);
+  const [availableBots, setAvailableBots] = useState<AvailableBot[]>([]);
+  const [selectedBot, setSelectedBot] = useState<AvailableBot | null>(null);
+  const [showBotPicker, setShowBotPicker] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const botPickerRef = useRef<HTMLDivElement>(null);
   const sendMessage = useChatStore((s) => s.sendMessage);
   const sending = useChatStore((s) => s.sending);
+
+  const isGroup = sourceType === 'group';
+
+  // Fetch available bots when conversation changes (for group convos)
+  useEffect(() => {
+    if (!conversationId) {
+      setAvailableBots([]);
+      setSelectedBot(null);
+      return;
+    }
+
+    if (isGroup) {
+      getAvailableBots(conversationId)
+        .then((bots) => {
+          setAvailableBots(bots);
+          // Default to primary bot
+          const primary = bots.find((b) => b.is_primary) || bots[0] || null;
+          setSelectedBot(primary);
+        })
+        .catch(() => {
+          setAvailableBots([]);
+          setSelectedBot(null);
+        });
+    } else {
+      setAvailableBots([]);
+      setSelectedBot(null);
+    }
+  }, [conversationId, isGroup]);
+
+  // Close bot picker on outside click
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (botPickerRef.current && !botPickerRef.current.contains(e.target as Node)) {
+        setShowBotPicker(false);
+      }
+    };
+    if (showBotPicker) {
+      document.addEventListener('mousedown', handleClick);
+      return () => document.removeEventListener('mousedown', handleClick);
+    }
+  }, [showBotPicker]);
 
   const handleSend = useCallback(async () => {
     const trimmed = text.trim();
@@ -24,13 +73,14 @@ export default function MessageInput({ botName }: MessageInputProps) {
         content_type: 'text',
         text_content: trimmed,
         parse_mode: useMarkdown ? 'MarkdownV2' : undefined,
+        via_bot_id: isGroup && selectedBot ? selectedBot.id : undefined,
       });
       setText('');
       textareaRef.current?.focus();
     } catch {
       // Error handled in store
     }
-  }, [text, sending, sendMessage, useMarkdown]);
+  }, [text, sending, sendMessage, useMarkdown, isGroup, selectedBot]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && e.ctrlKey) {
@@ -48,13 +98,14 @@ export default function MessageInput({ botName }: MessageInputProps) {
           content_type: isImage ? 'photo' : 'document',
           text_content: text.trim() || undefined,
           file,
+          via_bot_id: isGroup && selectedBot ? selectedBot.id : undefined,
         });
         setText('');
       } catch {
         // Error handled in store
       }
     },
-    [sending, sendMessage, text]
+    [sending, sendMessage, text, isGroup, selectedBot]
   );
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,6 +134,10 @@ export default function MessageInput({ botName }: MessageInputProps) {
     el.style.height = 'auto';
     el.style.height = Math.min(el.scrollHeight, 160) + 'px';
   };
+
+  const displayBotName = isGroup && selectedBot
+    ? (selectedBot.bot_username || selectedBot.display_name || botName)
+    : botName;
 
   return (
     <div className="border-t border-border-subtle bg-bg-card">
@@ -165,10 +220,49 @@ export default function MessageInput({ botName }: MessageInputProps) {
       {/* Bottom hint */}
       <div className="flex items-center justify-between px-4 pb-2 text-[11px] text-text-muted">
         <span>Ctrl+Enter to send | Markdown & media supported</span>
-        {botName && (
-          <span>
-            Replying via <span className="text-text-secondary">{botName}</span>
-          </span>
+        {displayBotName && (
+          <div className="relative" ref={botPickerRef}>
+            {isGroup && availableBots.length > 1 ? (
+              <button
+                onClick={() => setShowBotPicker(!showBotPicker)}
+                className="flex items-center gap-1 hover:text-accent transition-colors cursor-pointer"
+              >
+                <span>
+                  Replying via <span className="text-text-secondary">{displayBotName}</span>
+                </span>
+                <ChevronDown size={10} />
+              </button>
+            ) : (
+              <span>
+                Replying via <span className="text-text-secondary">{displayBotName}</span>
+              </span>
+            )}
+
+            {/* Bot picker dropdown */}
+            {showBotPicker && availableBots.length > 1 && (
+              <div className="absolute bottom-full right-0 mb-1 w-52 bg-bg-elevated border border-border-subtle rounded-lg shadow-lg py-1 z-50">
+                {availableBots.map((bot) => (
+                  <button
+                    key={bot.id}
+                    onClick={() => {
+                      setSelectedBot(bot);
+                      setShowBotPicker(false);
+                    }}
+                    className={`w-full text-left px-3 py-1.5 text-xs hover:bg-bg-card transition-colors flex items-center justify-between ${
+                      selectedBot?.id === bot.id ? 'text-accent' : 'text-text-secondary'
+                    }`}
+                  >
+                    <span>@{bot.bot_username || bot.display_name || `Bot#${bot.id}`}</span>
+                    {bot.is_primary && (
+                      <span className="text-[9px] px-1 py-0.5 rounded bg-accent/10 text-accent">
+                        primary
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>

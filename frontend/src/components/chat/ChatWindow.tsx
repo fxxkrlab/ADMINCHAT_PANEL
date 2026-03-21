@@ -282,7 +282,11 @@ export default function ChatWindow() {
       </div>
 
       {/* Input */}
-      <MessageInput botName={botName} />
+      <MessageInput
+        botName={botName}
+        conversationId={conv.id}
+        sourceType={conv.source_type || conv.source}
+      />
     </div>
   );
 }

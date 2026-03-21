@@ -261,18 +261,22 @@ export default function UserDetail() {
                 )}
               </div>
 
-              {showTagPicker && availableTags.length > 0 && (
+              {showTagPicker && (
                 <div className="border-t border-border-subtle pt-2 mt-2 space-y-1">
-                  {availableTags.map((tag: TagItem) => (
-                    <button
-                      key={tag.id}
-                      onClick={() => addTagMutation.mutate(tag.id)}
-                      className="flex items-center gap-2 w-full px-2 py-1.5 rounded text-xs hover:bg-bg-elevated transition-colors"
-                    >
-                      <span className="w-3 h-3 rounded-full" style={{ backgroundColor: tag.color }} />
-                      <span className="text-text-secondary">{tag.name}</span>
-                    </button>
-                  ))}
+                  {availableTags.length > 0 ? (
+                    availableTags.map((tag: TagItem) => (
+                      <button
+                        key={tag.id}
+                        onClick={() => addTagMutation.mutate(tag.id)}
+                        className="flex items-center gap-2 w-full px-2 py-1.5 rounded text-xs hover:bg-bg-elevated transition-colors"
+                      >
+                        <span className="w-3 h-3 rounded-full" style={{ backgroundColor: tag.color }} />
+                        <span className="text-text-secondary">{tag.name}</span>
+                      </button>
+                    ))
+                  ) : (
+                    <p className="text-xs text-text-muted py-1">No more tags available</p>
+                  )}
                 </div>
               )}
             </div>
@@ -308,18 +312,22 @@ export default function UserDetail() {
                 )}
               </div>
 
-              {showGroupPicker && availableGroups.length > 0 && (
+              {showGroupPicker && (
                 <div className="border-t border-border-subtle pt-2 mt-2 space-y-1">
-                  {availableGroups.map((group: UserGroupItem) => (
-                    <button
-                      key={group.id}
-                      onClick={() => addGroupMutation.mutate(group.id)}
-                      className="flex items-center gap-2 w-full px-2 py-1.5 rounded text-xs hover:bg-bg-elevated transition-colors"
-                    >
-                      <Users size={12} className="text-text-muted" />
-                      <span className="text-text-secondary">{group.name}</span>
-                    </button>
-                  ))}
+                  {availableGroups.length > 0 ? (
+                    availableGroups.map((group: UserGroupItem) => (
+                      <button
+                        key={group.id}
+                        onClick={() => addGroupMutation.mutate(group.id)}
+                        className="flex items-center gap-2 w-full px-2 py-1.5 rounded text-xs hover:bg-bg-elevated transition-colors"
+                      >
+                        <Users size={12} className="text-text-muted" />
+                        <span className="text-text-secondary">{group.name}</span>
+                      </button>
+                    ))
+                  ) : (
+                    <p className="text-xs text-text-muted py-1">No more groups available</p>
+                  )}
                 </div>
               )}
             </div>

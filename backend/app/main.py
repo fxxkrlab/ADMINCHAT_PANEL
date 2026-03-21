@@ -78,11 +78,21 @@ async def lifespan(app: FastAPI):
     from app.ws.chat import ws_manager
     await ws_manager.start_pubsub_listener()
 
-    # TODO: Start APScheduler
+    # Start APScheduler
+    from app.tasks.scheduler import setup_scheduler
+    scheduler = setup_scheduler()
+    if scheduler is not None:
+        scheduler.start()
+        logger.info("APScheduler started")
 
     yield
 
     # --- Shutdown ---
+    # Stop APScheduler
+    if scheduler is not None:
+        scheduler.shutdown(wait=False)
+        logger.info("APScheduler stopped")
+
     # Stop WebSocket pub/sub listener
     await ws_manager.stop_pubsub_listener()
 
