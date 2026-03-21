@@ -217,6 +217,5 @@ You are free to use, modify, and distribute this software, provided you:
 ---
 
 <p align="center">
-  Powered By ADMINCHAT PANEL v0.1.0 (20260321.0001)<br/>
   <small>&reg; 2026 NovaHelix & SAKAKIBARA</small>
 </p>
