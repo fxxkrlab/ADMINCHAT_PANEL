@@ -70,10 +70,10 @@ function Pagination({ page, totalPages, onPageChange }: {
           <button
             key={p}
             onClick={() => onPageChange(p)}
-            className={`min-w-[32px] h-8 rounded-lg text-sm transition-colors ${
+            className={`w-8 h-8 flex items-center justify-center rounded-md text-sm transition-colors ${
               p === page
-                ? 'bg-accent text-black font-medium'
-                : 'text-text-muted hover:text-text-primary hover:bg-bg-elevated'
+                ? 'bg-accent text-black font-semibold'
+                : 'border border-border text-text-secondary hover:bg-bg-elevated'
             }`}
           >
             {p}
@@ -146,14 +146,14 @@ export default function UsersGrid() {
               placeholder="Search by TGUID, username, or tag..."
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-              className="w-full pl-9 pr-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent transition-colors"
+              className="w-full h-10 pl-9 pr-3 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent transition-colors"
             />
           </div>
 
           <select
             value={selectedTag}
             onChange={(e) => { setSelectedTag(e.target.value); setPage(1); }}
-            className="px-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm text-text-secondary focus:outline-none focus:border-accent transition-colors appearance-none cursor-pointer"
+            className="h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-secondary focus:outline-none focus:border-accent transition-colors appearance-none cursor-pointer"
           >
             <option value="">All Tags</option>
             {tagsData?.map((tag: TagItem) => (
@@ -164,7 +164,7 @@ export default function UsersGrid() {
           <select
             value={selectedGroup ?? ''}
             onChange={(e) => { setSelectedGroup(e.target.value ? Number(e.target.value) : undefined); setPage(1); }}
-            className="px-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm text-text-secondary focus:outline-none focus:border-accent transition-colors appearance-none cursor-pointer"
+            className="h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-secondary focus:outline-none focus:border-accent transition-colors appearance-none cursor-pointer"
           >
             <option value="">All Groups</option>
             {groupsData?.map((group: UserGroupItem) => (
@@ -181,7 +181,7 @@ export default function UsersGrid() {
             ))}
           </div>
         ) : users.length === 0 ? (
-          <div className="bg-bg-card border border-border-subtle rounded-xl p-12 text-center text-text-muted text-sm">
+          <div className="bg-bg-card border border-border-subtle rounded-lg p-12 text-center text-text-muted text-sm">
             No users found.
           </div>
         ) : (
@@ -191,7 +191,7 @@ export default function UsersGrid() {
                 <div
                   key={user.id}
                   onClick={() => navigate(`/users/${user.id}`)}
-                  className="bg-bg-card border border-border-subtle rounded-xl p-4 cursor-pointer hover:border-accent/30 hover:bg-bg-elevated transition-all group"
+                  className="bg-bg-card border border-border-subtle rounded-lg p-5 cursor-pointer hover:border-accent/30 hover:bg-bg-elevated transition-all group"
                 >
                   <div className="flex items-start gap-3 mb-3">
                     <UserAvatar user={user} />

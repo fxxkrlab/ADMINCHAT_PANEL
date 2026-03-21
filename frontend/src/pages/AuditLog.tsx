@@ -25,7 +25,7 @@ function ActionBadge({ action }: { action: string }) {
     bg: 'bg-[#141414]',
   };
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${config.color} ${config.bg}`}>
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold ${config.color} ${config.bg}`}>
       {config.label}
     </span>
   );
@@ -183,7 +183,7 @@ export default function AuditLog() {
               <select
                 value={adminFilter}
                 onChange={(e) => { setAdminFilter(e.target.value); setPage(1); }}
-                className="w-full bg-[#141414] border border-[#2f2f2f] rounded-md px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-[#00D9FF]/50"
+                className="w-full h-9 bg-[#141414] border border-[#2f2f2f] rounded-lg px-3 text-xs text-white focus:outline-none focus:border-[#00D9FF] transition-colors"
               >
                 <option value="">All</option>
                 {adminsData?.items?.map((a) => (
@@ -198,7 +198,7 @@ export default function AuditLog() {
               <select
                 value={actionFilter}
                 onChange={(e) => { setActionFilter(e.target.value); setPage(1); }}
-                className="w-full bg-[#141414] border border-[#2f2f2f] rounded-md px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-[#00D9FF]/50"
+                className="w-full h-9 bg-[#141414] border border-[#2f2f2f] rounded-lg px-3 text-xs text-white focus:outline-none focus:border-[#00D9FF] transition-colors"
               >
                 <option value="">All</option>
                 {ACTION_OPTIONS.map((a) => (
@@ -213,7 +213,7 @@ export default function AuditLog() {
               <select
                 value={targetTypeFilter}
                 onChange={(e) => { setTargetTypeFilter(e.target.value); setPage(1); }}
-                className="w-full bg-[#141414] border border-[#2f2f2f] rounded-md px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-[#00D9FF]/50"
+                className="w-full h-9 bg-[#141414] border border-[#2f2f2f] rounded-lg px-3 text-xs text-white focus:outline-none focus:border-[#00D9FF] transition-colors"
               >
                 <option value="">All</option>
                 {TARGET_TYPE_OPTIONS.map((t) => (
@@ -229,7 +229,7 @@ export default function AuditLog() {
                 type="date"
                 value={dateFrom}
                 onChange={(e) => { setDateFrom(e.target.value); setPage(1); }}
-                className="w-full bg-[#141414] border border-[#2f2f2f] rounded-md px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-[#00D9FF]/50"
+                className="w-full h-9 bg-[#141414] border border-[#2f2f2f] rounded-lg px-3 text-xs text-white focus:outline-none focus:border-[#00D9FF] transition-colors"
               />
             </div>
 
@@ -240,7 +240,7 @@ export default function AuditLog() {
                 type="date"
                 value={dateTo}
                 onChange={(e) => { setDateTo(e.target.value); setPage(1); }}
-                className="w-full bg-[#141414] border border-[#2f2f2f] rounded-md px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-[#00D9FF]/50"
+                className="w-full h-9 bg-[#141414] border border-[#2f2f2f] rounded-lg px-3 text-xs text-white focus:outline-none focus:border-[#00D9FF] transition-colors"
               />
             </div>
           </div>
@@ -251,13 +251,13 @@ export default function AuditLog() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-[#1A1A1A]">
-                  <th className="text-left text-[10px] text-[#6a6a6a] uppercase tracking-wider px-4 py-3 font-medium">Timestamp</th>
-                  <th className="text-left text-[10px] text-[#6a6a6a] uppercase tracking-wider px-4 py-3 font-medium">Admin</th>
-                  <th className="text-left text-[10px] text-[#6a6a6a] uppercase tracking-wider px-4 py-3 font-medium">Action</th>
-                  <th className="text-left text-[10px] text-[#6a6a6a] uppercase tracking-wider px-4 py-3 font-medium">Target</th>
-                  <th className="text-left text-[10px] text-[#6a6a6a] uppercase tracking-wider px-4 py-3 font-medium">Details</th>
-                  <th className="text-left text-[10px] text-[#6a6a6a] uppercase tracking-wider px-4 py-3 font-medium">IP Address</th>
+                <tr className="border-b border-[#2f2f2f]">
+                  <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Timestamp</th>
+                  <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Admin</th>
+                  <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Action</th>
+                  <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Target</th>
+                  <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Details</th>
+                  <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">IP Address</th>
                 </tr>
               </thead>
               <tbody>
@@ -272,16 +272,16 @@ export default function AuditLog() {
                 ) : (
                   logs.map((log: AuditLogEntry) => (
                     <tr key={log.id} className="border-b border-[#1A1A1A] hover:bg-[#141414]/50 transition-colors">
-                      <td className="px-4 py-3 text-xs text-[#8a8a8a] whitespace-nowrap font-mono">
+                      <td className="px-5 py-3.5 text-xs text-[#8a8a8a] whitespace-nowrap font-mono">
                         {(() => { const d = new Date(log.created_at + (log.created_at.endsWith('Z') ? '' : 'Z')); return d.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai', hour12: false }); })()}
                       </td>
-                      <td className="px-4 py-3 text-xs text-white">
+                      <td className="px-5 py-3.5 text-xs text-white">
                         {log.admin_username || <span className="text-[#4a4a4a]">System</span>}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-5 py-3.5">
                         <ActionBadge action={log.action} />
                       </td>
-                      <td className="px-4 py-3 text-xs text-[#8a8a8a]">
+                      <td className="px-5 py-3.5 text-xs text-[#8a8a8a]">
                         {log.target_type && (
                           <span>
                             <span className="text-[#6a6a6a]">{log.target_type}</span>
@@ -292,10 +292,10 @@ export default function AuditLog() {
                         )}
                         {!log.target_type && <span className="text-[#4a4a4a]">--</span>}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-5 py-3.5">
                         <DetailsCell details={log.details} />
                       </td>
-                      <td className="px-4 py-3 text-xs text-[#6a6a6a] font-mono">
+                      <td className="px-5 py-3.5 text-xs text-[#6a6a6a] font-mono">
                         {log.ip_address || '--'}
                       </td>
                     </tr>
@@ -337,8 +337,8 @@ export default function AuditLog() {
                       onClick={() => setPage(pageNum)}
                       className={`flex items-center justify-center w-8 h-8 rounded-md text-xs transition-colors ${
                         pageNum === page
-                          ? 'bg-[#00D9FF]/10 text-[#00D9FF]'
-                          : 'text-[#8a8a8a] hover:text-white hover:bg-[#141414]'
+                          ? 'bg-[#00D9FF] text-black font-semibold'
+                          : 'border border-[#2f2f2f] text-[#8a8a8a] hover:bg-[#141414]'
                       }`}
                     >
                       {pageNum}

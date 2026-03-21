@@ -14,7 +14,7 @@ function ProviderBadge({ provider }: { provider: string }) {
   };
   const s = map[provider] || map.custom;
   return (
-    <span className={`inline-flex items-center px-2.5 py-1 rounded text-xs font-medium uppercase ${s.color} ${s.bg}`}>
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase ${s.color} ${s.bg}`}>
       {provider}
     </span>
   );
@@ -193,7 +193,7 @@ export default function AISettings() {
                 <Loader2 className="w-6 h-6 text-text-muted animate-spin" />
               </div>
             ) : configs.length === 0 ? (
-              <div className="bg-bg-card border border-border-subtle rounded-xl p-12 text-center">
+              <div className="bg-bg-card border border-border-subtle rounded-lg p-12 text-center">
                 <Zap className="w-8 h-8 text-text-muted mx-auto mb-3" />
                 <p className="text-sm text-text-muted">No AI providers configured. Add one to enable AI features.</p>
               </div>
@@ -202,7 +202,7 @@ export default function AISettings() {
                 {configs.map((config) => {
                   const testResult = testResults[config.id];
                   return (
-                    <div key={config.id} className="bg-bg-card border border-border-subtle rounded-xl p-5">
+                    <div key={config.id} className="bg-bg-card border border-border-subtle rounded-lg p-5">
                       <div className="flex items-start justify-between">
                         <div>
                           <div className="flex items-center gap-3 mb-2">
@@ -314,7 +314,7 @@ export default function AISettings() {
                 <Loader2 className="w-6 h-6 text-text-muted animate-spin" />
               </div>
             ) : !usage ? (
-              <div className="bg-bg-card border border-border-subtle rounded-xl p-12 text-center">
+              <div className="bg-bg-card border border-border-subtle rounded-lg p-12 text-center">
                 <BarChart3 className="w-8 h-8 text-text-muted mx-auto mb-3" />
                 <p className="text-sm text-text-muted">No usage data available.</p>
               </div>
@@ -322,15 +322,15 @@ export default function AISettings() {
               <>
                 {/* Summary cards */}
                 <div className="grid grid-cols-3 gap-4 mb-6">
-                  <div className="bg-bg-card border border-border-subtle rounded-xl p-5">
+                  <div className="bg-bg-card border border-border-subtle rounded-lg p-5">
                     <p className="text-xs text-text-muted mb-1">Total Requests (30d)</p>
                     <p className="text-2xl font-bold text-text-primary font-mono">{usage.total_requests.toLocaleString()}</p>
                   </div>
-                  <div className="bg-bg-card border border-border-subtle rounded-xl p-5">
+                  <div className="bg-bg-card border border-border-subtle rounded-lg p-5">
                     <p className="text-xs text-text-muted mb-1">Total Tokens</p>
                     <p className="text-2xl font-bold text-accent font-mono">{usage.total_tokens.toLocaleString()}</p>
                   </div>
-                  <div className="bg-bg-card border border-border-subtle rounded-xl p-5">
+                  <div className="bg-bg-card border border-border-subtle rounded-lg p-5">
                     <p className="text-xs text-text-muted mb-1">Estimated Cost</p>
                     <p className="text-2xl font-bold text-orange font-mono">${usage.total_cost.toFixed(4)}</p>
                   </div>
@@ -338,26 +338,26 @@ export default function AISettings() {
 
                 {/* Per-provider stats */}
                 {usage.per_config_stats.length > 0 && (
-                  <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden mb-6">
+                  <div className="bg-bg-card border border-border-subtle rounded-lg overflow-hidden mb-6">
                     <div className="px-5 py-3 border-b border-border-subtle">
                       <h3 className="text-sm font-semibold text-text-primary">Usage by Provider</h3>
                     </div>
                     <table className="w-full">
                       <thead>
                         <tr className="border-b border-border-subtle">
-                          <th className="text-left text-xs text-text-muted font-medium px-5 py-2.5">Provider</th>
-                          <th className="text-right text-xs text-text-muted font-medium px-5 py-2.5">Requests</th>
-                          <th className="text-right text-xs text-text-muted font-medium px-5 py-2.5">Tokens</th>
-                          <th className="text-right text-xs text-text-muted font-medium px-5 py-2.5">Cost</th>
+                          <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Provider</th>
+                          <th className="text-right text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Requests</th>
+                          <th className="text-right text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Tokens</th>
+                          <th className="text-right text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Cost</th>
                         </tr>
                       </thead>
                       <tbody>
                         {usage.per_config_stats.map((stat, i) => (
                           <tr key={i} className="border-b border-border-subtle/50">
-                            <td className="px-5 py-2.5 text-sm text-text-primary">{stat.config_name}</td>
-                            <td className="px-5 py-2.5 text-sm text-text-secondary text-right font-mono">{stat.requests.toLocaleString()}</td>
-                            <td className="px-5 py-2.5 text-sm text-accent text-right font-mono">{stat.tokens.toLocaleString()}</td>
-                            <td className="px-5 py-2.5 text-sm text-orange text-right font-mono">${stat.cost.toFixed(4)}</td>
+                            <td className="px-5 py-3.5 text-sm text-text-primary">{stat.config_name}</td>
+                            <td className="px-5 py-3.5 text-sm text-text-secondary text-right font-mono">{stat.requests.toLocaleString()}</td>
+                            <td className="px-5 py-3.5 text-sm text-accent text-right font-mono">{stat.tokens.toLocaleString()}</td>
+                            <td className="px-5 py-3.5 text-sm text-orange text-right font-mono">${stat.cost.toFixed(4)}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -367,7 +367,7 @@ export default function AISettings() {
 
                 {/* Daily stats table */}
                 {usage.daily_stats.length > 0 && (
-                  <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden">
+                  <div className="bg-bg-card border border-border-subtle rounded-lg overflow-hidden">
                     <div className="px-5 py-3 border-b border-border-subtle">
                       <h3 className="text-sm font-semibold text-text-primary">Daily Breakdown</h3>
                     </div>
@@ -375,11 +375,11 @@ export default function AISettings() {
                       <table className="w-full">
                         <thead className="sticky top-0 bg-bg-card">
                           <tr className="border-b border-border-subtle">
-                            <th className="text-left text-xs text-text-muted font-medium px-5 py-2.5">Date</th>
-                            <th className="text-right text-xs text-text-muted font-medium px-5 py-2.5">Requests</th>
-                            <th className="text-right text-xs text-text-muted font-medium px-5 py-2.5">Tokens</th>
-                            <th className="text-right text-xs text-text-muted font-medium px-5 py-2.5">Cost</th>
-                            <th className="text-left text-xs text-text-muted font-medium px-5 py-2.5 w-40">Volume</th>
+                            <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Date</th>
+                            <th className="text-right text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Requests</th>
+                            <th className="text-right text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Tokens</th>
+                            <th className="text-right text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Cost</th>
+                            <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3 w-40">Volume</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -388,11 +388,11 @@ export default function AISettings() {
                             const pct = (day.requests / maxReq) * 100;
                             return (
                               <tr key={i} className="border-b border-border-subtle/50">
-                                <td className="px-5 py-2.5 text-sm text-text-primary font-mono">{day.date}</td>
-                                <td className="px-5 py-2.5 text-sm text-text-secondary text-right font-mono">{day.requests}</td>
-                                <td className="px-5 py-2.5 text-sm text-accent text-right font-mono">{day.tokens.toLocaleString()}</td>
-                                <td className="px-5 py-2.5 text-sm text-orange text-right font-mono">${day.cost.toFixed(4)}</td>
-                                <td className="px-5 py-2.5">
+                                <td className="px-5 py-3.5 text-sm text-text-primary font-mono">{day.date}</td>
+                                <td className="px-5 py-3.5 text-sm text-text-secondary text-right font-mono">{day.requests}</td>
+                                <td className="px-5 py-3.5 text-sm text-accent text-right font-mono">{day.tokens.toLocaleString()}</td>
+                                <td className="px-5 py-3.5 text-sm text-orange text-right font-mono">${day.cost.toFixed(4)}</td>
+                                <td className="px-5 py-3.5">
                                   <div className="w-full h-2 rounded-full bg-bg-elevated overflow-hidden">
                                     <div className="h-full rounded-full bg-accent/60" style={{ width: `${pct}%` }} />
                                   </div>
@@ -413,7 +413,7 @@ export default function AISettings() {
         {/* ======== CREATE / EDIT FORM MODAL ======== */}
         {showForm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="bg-bg-card border border-border rounded-xl p-6 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-auto">
+            <div className="bg-[#0C0C0C] border border-border rounded-xl p-6 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-auto">
               <div className="flex items-center justify-between mb-5">
                 <h3 className="text-sm font-semibold text-text-primary">
                   {editingConfig ? `Edit Provider: ${editingConfig.name}` : 'Add AI Provider'}
@@ -430,7 +430,7 @@ export default function AISettings() {
                     value={formName}
                     onChange={(e) => setFormName(e.target.value)}
                     placeholder="My OpenAI Config"
-                    className="w-full px-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent"
+                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent transition-colors"
                     required
                   />
                 </div>
@@ -439,7 +439,7 @@ export default function AISettings() {
                   <select
                     value={formProvider}
                     onChange={(e) => setFormProvider(e.target.value)}
-                    className="w-full px-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent"
+                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
                   >
                     <option value="openai">OpenAI</option>
                     <option value="anthropic">Anthropic</option>
@@ -451,7 +451,7 @@ export default function AISettings() {
                   <select
                     value={formApiFormat}
                     onChange={(e) => setFormApiFormat(e.target.value)}
-                    className="w-full px-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent"
+                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
                   >
                     <option value="openai_chat">OpenAI Chat Completions</option>
                     <option value="anthropic_responses">Anthropic Responses (CRS)</option>
@@ -469,7 +469,7 @@ export default function AISettings() {
                     value={formBaseUrl}
                     onChange={(e) => setFormBaseUrl(e.target.value)}
                     placeholder={formApiFormat === 'openai_chat' ? 'https://api.openai.com/v1' : 'https://crs.bcx.im/openai'}
-                    className="w-full px-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder font-mono focus:outline-none focus:border-accent"
+                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder font-mono focus:outline-none focus:border-accent transition-colors"
                     required
                   />
                 </div>
@@ -482,7 +482,7 @@ export default function AISettings() {
                     value={formApiKey}
                     onChange={(e) => setFormApiKey(e.target.value)}
                     placeholder={editingConfig ? editingConfig.api_key_masked : 'sk-...'}
-                    className="w-full px-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder font-mono focus:outline-none focus:border-accent"
+                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder font-mono focus:outline-none focus:border-accent transition-colors"
                     required={!editingConfig}
                   />
                 </div>
@@ -493,7 +493,7 @@ export default function AISettings() {
                     value={formModel}
                     onChange={(e) => setFormModel(e.target.value)}
                     placeholder="gpt-3.5-turbo"
-                    className="w-full px-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder font-mono focus:outline-none focus:border-accent"
+                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder font-mono focus:outline-none focus:border-accent transition-colors"
                   />
                 </div>
 
@@ -571,7 +571,7 @@ export default function AISettings() {
         {/* Delete confirmation */}
         {deleteConfirm !== null && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="bg-bg-card border border-border rounded-xl p-6 w-full max-w-sm shadow-2xl">
+            <div className="bg-[#0C0C0C] border border-border rounded-xl p-6 w-full max-w-sm shadow-2xl">
               <h3 className="text-sm font-semibold text-text-primary mb-3">Delete AI Provider</h3>
               <p className="text-sm text-text-secondary mb-5">
                 Are you sure? This will remove the AI configuration permanently.

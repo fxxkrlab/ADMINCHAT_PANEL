@@ -142,7 +142,7 @@ export default function MessageInput({ botName, conversationId, sourceType }: Me
   return (
     <div className="border-t border-border-subtle bg-bg-card">
       {/* Input area */}
-      <div className="p-3">
+      <div className="p-4">
         <div className="flex items-end gap-2">
           <div className="flex-1 relative">
             <textarea
@@ -163,7 +163,7 @@ export default function MessageInput({ botName, conversationId, sourceType }: Me
             {/* Markdown toggle */}
             <button
               onClick={() => setUseMarkdown(!useMarkdown)}
-              className={`flex items-center justify-center w-8 h-8 rounded transition-colors ${
+              className={`flex items-center justify-center w-9 h-9 rounded-lg transition-colors ${
                 useMarkdown
                   ? 'text-accent bg-accent-10'
                   : 'text-text-muted hover:text-text-secondary hover:bg-bg-elevated'
@@ -176,7 +176,7 @@ export default function MessageInput({ botName, conversationId, sourceType }: Me
             {/* Attach file */}
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="flex items-center justify-center w-8 h-8 rounded text-text-muted hover:text-text-secondary hover:bg-bg-elevated transition-colors"
+              className="flex items-center justify-center w-9 h-9 rounded-lg text-text-muted hover:text-text-secondary hover:bg-bg-elevated transition-colors"
               title="Attach file"
             >
               <Paperclip size={16} />
@@ -191,7 +191,7 @@ export default function MessageInput({ botName, conversationId, sourceType }: Me
             {/* Image upload */}
             <button
               onClick={() => imageInputRef.current?.click()}
-              className="flex items-center justify-center w-8 h-8 rounded text-text-muted hover:text-text-secondary hover:bg-bg-elevated transition-colors"
+              className="flex items-center justify-center w-9 h-9 rounded-lg text-text-muted hover:text-text-secondary hover:bg-bg-elevated transition-colors"
               title="Upload image"
             >
               <Image size={16} />
@@ -208,7 +208,7 @@ export default function MessageInput({ botName, conversationId, sourceType }: Me
             <button
               onClick={handleSend}
               disabled={!text.trim() || sending}
-              className="flex items-center justify-center w-8 h-8 rounded bg-accent text-bg-page hover:bg-accent/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center justify-center w-9 h-9 rounded-lg bg-accent text-bg-page hover:bg-accent/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               title="Send (Ctrl+Enter)"
             >
               <Send size={16} />

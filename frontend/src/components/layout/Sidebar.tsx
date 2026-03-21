@@ -70,7 +70,7 @@ function SidebarInner() {
             to={item.to}
             end={item.to === '/'}
             className={({ isActive }) =>
-              `flex items-center justify-center w-10 h-10 rounded-lg transition-colors relative group ${
+              `flex items-center justify-center w-11 h-11 rounded-lg transition-colors relative group ${
                 isActive
                   ? 'bg-accent-10 text-accent'
                   : 'text-text-muted hover:text-text-secondary hover:bg-bg-elevated'
@@ -97,7 +97,7 @@ function SidebarInner() {
       <div className="flex flex-col items-center gap-2 py-3 border-t border-border-subtle">
         <button
           onClick={logout}
-          className="flex items-center justify-center w-10 h-10 rounded-lg text-text-muted hover:text-red hover:bg-red/10 transition-colors"
+          className="flex items-center justify-center w-11 h-11 rounded-lg text-text-muted hover:text-red hover:bg-red/10 transition-colors"
           title="Logout"
         >
           <LogOut size={20} />

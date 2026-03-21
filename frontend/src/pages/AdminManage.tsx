@@ -14,7 +14,7 @@ function RoleBadge({ role }: { role: string }) {
   };
   const s = map[role] || map.agent;
   return (
-    <span className={`inline-flex items-center px-2.5 py-1 rounded text-xs font-medium ${s.color} ${s.bg}`}>
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold ${s.color} ${s.bg}`}>
       {s.label}
     </span>
   );
@@ -160,16 +160,16 @@ export default function AdminManage() {
         </div>
 
         {/* Admin table */}
-        <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden">
+        <div className="bg-bg-card border border-border-subtle rounded-lg overflow-hidden">
           <table className="w-full">
             <thead>
               <tr className="border-b border-border-subtle">
-                <th className="text-left text-xs text-text-muted font-medium px-5 py-3">Username</th>
-                <th className="text-left text-xs text-text-muted font-medium px-5 py-3">Display Name</th>
-                <th className="text-left text-xs text-text-muted font-medium px-5 py-3">Role</th>
-                <th className="text-left text-xs text-text-muted font-medium px-5 py-3">Status</th>
-                <th className="text-left text-xs text-text-muted font-medium px-5 py-3">Created</th>
-                <th className="text-right text-xs text-text-muted font-medium px-5 py-3">Actions</th>
+                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Username</th>
+                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Display Name</th>
+                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Role</th>
+                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Status</th>
+                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Created</th>
+                <th className="text-right text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -242,7 +242,7 @@ export default function AdminManage() {
         {/* Create Admin Modal */}
         {showCreateForm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="bg-bg-card border border-border rounded-xl p-6 w-full max-w-md shadow-2xl">
+            <div className="bg-[#0C0C0C] border border-border rounded-xl p-6 w-full max-w-md shadow-2xl">
               <div className="flex items-center justify-between mb-5">
                 <h3 className="text-sm font-semibold text-text-primary">Add New Admin</h3>
                 <button onClick={() => { setShowCreateForm(false); resetCreateForm(); }} className="text-text-muted hover:text-text-primary">
@@ -256,7 +256,7 @@ export default function AdminManage() {
                     type="text"
                     value={formUsername}
                     onChange={(e) => setFormUsername(e.target.value)}
-                    className="w-full px-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent"
+                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
                     required
                   />
                 </div>
@@ -266,7 +266,7 @@ export default function AdminManage() {
                     type="password"
                     value={formPassword}
                     onChange={(e) => setFormPassword(e.target.value)}
-                    className="w-full px-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent"
+                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
                     required
                     minLength={6}
                   />
@@ -277,7 +277,7 @@ export default function AdminManage() {
                     type="text"
                     value={formDisplayName}
                     onChange={(e) => setFormDisplayName(e.target.value)}
-                    className="w-full px-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent"
+                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
                   />
                 </div>
                 <div>
@@ -286,7 +286,7 @@ export default function AdminManage() {
                     type="email"
                     value={formEmail}
                     onChange={(e) => setFormEmail(e.target.value)}
-                    className="w-full px-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent"
+                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
                   />
                 </div>
                 <div>
@@ -294,7 +294,7 @@ export default function AdminManage() {
                   <select
                     value={formRole}
                     onChange={(e) => setFormRole(e.target.value)}
-                    className="w-full px-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent"
+                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
                   >
                     <option value="agent">Agent</option>
                     <option value="admin">Admin</option>
@@ -330,7 +330,7 @@ export default function AdminManage() {
         {/* Edit Admin Modal */}
         {editingAdmin && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="bg-bg-card border border-border rounded-xl p-6 w-full max-w-md shadow-2xl">
+            <div className="bg-[#0C0C0C] border border-border rounded-xl p-6 w-full max-w-md shadow-2xl">
               <div className="flex items-center justify-between mb-5">
                 <h3 className="text-sm font-semibold text-text-primary">Edit Admin: {editingAdmin.username}</h3>
                 <button onClick={() => setEditingAdmin(null)} className="text-text-muted hover:text-text-primary">
@@ -344,7 +344,7 @@ export default function AdminManage() {
                     type="text"
                     value={editDisplayName}
                     onChange={(e) => setEditDisplayName(e.target.value)}
-                    className="w-full px-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent"
+                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
                   />
                 </div>
                 <div>
@@ -354,7 +354,7 @@ export default function AdminManage() {
                     value={editEmail}
                     onChange={(e) => setEditEmail(e.target.value)}
                     placeholder="Leave blank to keep current"
-                    className="w-full px-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent"
+                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent transition-colors"
                   />
                 </div>
                 <div>
@@ -362,7 +362,7 @@ export default function AdminManage() {
                   <select
                     value={editRole}
                     onChange={(e) => setEditRole(e.target.value)}
-                    className="w-full px-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent"
+                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
                   >
                     <option value="agent">Agent</option>
                     <option value="admin">Admin</option>
@@ -376,7 +376,7 @@ export default function AdminManage() {
                     value={editPassword}
                     onChange={(e) => setEditPassword(e.target.value)}
                     placeholder="Leave blank to keep current"
-                    className="w-full px-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent"
+                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent transition-colors"
                   />
                 </div>
                 <div className="flex justify-end gap-3 mt-2">
@@ -399,7 +399,7 @@ export default function AdminManage() {
         {/* Permissions Editor Modal */}
         {permissionsAdmin && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="bg-bg-card border border-border rounded-xl p-6 w-full max-w-md shadow-2xl">
+            <div className="bg-[#0C0C0C] border border-border rounded-xl p-6 w-full max-w-md shadow-2xl">
               <div className="flex items-center justify-between mb-5">
                 <h3 className="text-sm font-semibold text-text-primary">
                   Permissions: {permissionsAdmin.username}

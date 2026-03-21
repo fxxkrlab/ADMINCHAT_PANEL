@@ -72,7 +72,7 @@ export default function FAQList() {
             <select
               value={filterReplyMode}
               onChange={(e) => setFilterReplyMode(e.target.value)}
-              className="px-3 py-1.5 bg-bg-elevated border border-border rounded-md text-sm text-text-primary focus:outline-none focus:border-accent"
+              className="h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors appearance-none cursor-pointer"
             >
               <option value="">All Modes</option>
               {Object.entries(REPLY_MODE_LABELS).map(([value, label]) => (
@@ -84,7 +84,7 @@ export default function FAQList() {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-3 py-1.5 bg-bg-elevated border border-border rounded-md text-sm text-text-primary focus:outline-none focus:border-accent"
+              className="h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors appearance-none cursor-pointer"
             >
               <option value="">All Status</option>
               <option value="active">Active</option>
@@ -100,19 +100,19 @@ export default function FAQList() {
         </div>
 
         {/* Table */}
-        <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden">
+        <div className="bg-bg-card border border-border-subtle rounded-lg overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-border-subtle text-text-secondary">
-                <th className="text-left px-4 py-3 font-medium">Rule Name</th>
-                <th className="text-center px-4 py-3 font-medium">Questions</th>
-                <th className="text-center px-4 py-3 font-medium">Answers</th>
-                <th className="text-center px-4 py-3 font-medium">Response</th>
-                <th className="text-center px-4 py-3 font-medium">Reply Mode</th>
-                <th className="text-center px-4 py-3 font-medium">Priority</th>
-                <th className="text-center px-4 py-3 font-medium">Hits</th>
-                <th className="text-center px-4 py-3 font-medium">Status</th>
-                <th className="text-right px-4 py-3 font-medium">Actions</th>
+              <tr className="border-b border-border-subtle">
+                <th className="text-left px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Rule Name</th>
+                <th className="text-center px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Questions</th>
+                <th className="text-center px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Answers</th>
+                <th className="text-center px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Response</th>
+                <th className="text-center px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Reply Mode</th>
+                <th className="text-center px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Priority</th>
+                <th className="text-center px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Hits</th>
+                <th className="text-center px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Status</th>
+                <th className="text-right px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -132,45 +132,45 @@ export default function FAQList() {
                 rules.map((rule) => (
                   <tr
                     key={rule.id}
-                    className="border-b border-border-subtle last:border-0 hover:bg-bg-elevated/50 transition-colors"
+                    className="border-b border-border-subtle/50 last:border-0 hover:bg-bg-elevated/50 transition-colors"
                   >
-                    <td className="px-4 py-3 text-text-primary font-medium">
+                    <td className="px-5 py-3.5 text-text-primary font-medium">
                       {rule.name || `Rule #${rule.id}`}
                     </td>
-                    <td className="px-4 py-3 text-center text-text-secondary">
+                    <td className="px-5 py-3.5 text-center text-text-secondary">
                       <span className="inline-flex items-center justify-center min-w-[24px] h-6 px-2 rounded-full bg-[#2563EB]/15 text-[#2563EB] text-xs font-medium">
                         {rule.questions.length}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-center text-text-secondary">
+                    <td className="px-5 py-3.5 text-center text-text-secondary">
                       <span className="inline-flex items-center justify-center min-w-[24px] h-6 px-2 rounded-full bg-green/15 text-green text-xs font-medium">
                         {rule.answers.length}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-center text-text-secondary text-xs">
+                    <td className="px-5 py-3.5 text-center text-text-secondary text-xs">
                       {RESPONSE_MODE_LABELS[rule.response_mode] || rule.response_mode}
                     </td>
-                    <td className="px-4 py-3 text-center">
-                      <span className="inline-block px-2 py-0.5 rounded text-xs bg-purple/15 text-purple font-mono">
+                    <td className="px-5 py-3.5 text-center">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-purple/15 text-purple font-mono">
                         {REPLY_MODE_LABELS[rule.reply_mode] || rule.reply_mode}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-center text-text-secondary font-mono text-xs">
+                    <td className="px-5 py-3.5 text-center text-text-secondary font-mono text-xs">
                       {rule.priority}
                     </td>
-                    <td className="px-4 py-3 text-center">
+                    <td className="px-5 py-3.5 text-center">
                       <span className="font-mono text-accent text-xs">
                         {rule.hit_count}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-center">
+                    <td className="px-5 py-3.5 text-center">
                       <span
                         className={`inline-block w-2 h-2 rounded-full ${
                           rule.is_active ? 'bg-green' : 'bg-text-muted'
                         }`}
                       />
                     </td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-5 py-3.5 text-right">
                       <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => navigate(`/faq/${rule.id}/edit`)}

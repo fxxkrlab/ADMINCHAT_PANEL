@@ -24,16 +24,16 @@ function StatCard({ label, value, icon: Icon, color, trend }: {
   trend?: number;
 }) {
   return (
-    <div className="bg-bg-card border border-border-subtle rounded-xl p-5 flex flex-col gap-2">
+    <div className="bg-bg-card border border-border-subtle rounded-lg p-5 flex flex-col gap-2">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-text-muted font-['Inter']">{label}</p>
+        <p className="text-xs text-text-secondary font-['Inter'] flex items-center gap-2">{label}</p>
         <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${color} bg-opacity-10`}
           style={{ backgroundColor: `${color === 'text-accent' ? 'rgba(0,217,255,0.1)' : color === 'text-green' ? 'rgba(5,150,105,0.1)' : color === 'text-orange' ? 'rgba(255,136,0,0.1)' : 'rgba(255,68,68,0.1)'}` }}>
           <Icon size={16} className={color} />
         </div>
       </div>
       <div className="flex items-end gap-2">
-        <span className={`text-3xl font-semibold font-['Space_Grotesk'] ${color}`}>
+        <span className={`text-3xl font-bold font-['Space_Grotesk'] ${color}`}>
           {value.toLocaleString()}
         </span>
         {trend !== undefined && <TrendBadge value={trend} />}
@@ -146,7 +146,7 @@ export default function Dashboard() {
         {/* Two-column panels */}
         <div className="grid grid-cols-2 gap-4 mb-6">
           {/* Bot Pool Status */}
-          <div className="bg-bg-card border border-border-subtle rounded-xl p-5">
+          <div className="bg-bg-card border border-border-subtle rounded-lg p-5">
             <div className="flex items-center gap-2 mb-4">
               <Bot size={16} className="text-accent" />
               <h3 className="text-sm font-semibold text-text-primary font-['Space_Grotesk']">Bot Pool Status</h3>
@@ -177,7 +177,7 @@ export default function Dashboard() {
           </div>
 
           {/* FAQ Performance */}
-          <div className="bg-bg-card border border-border-subtle rounded-xl p-5">
+          <div className="bg-bg-card border border-border-subtle rounded-lg p-5">
             <div className="flex items-center gap-2 mb-4">
               <HelpCircle size={16} className="text-accent" />
               <h3 className="text-sm font-semibold text-text-primary font-['Space_Grotesk']">FAQ Performance</h3>
@@ -205,7 +205,7 @@ export default function Dashboard() {
         {/* Missed Knowledge + Today Messages */}
         <div className="grid grid-cols-2 gap-4">
           {/* Missed Knowledge */}
-          <div className="bg-bg-card border border-border-subtle rounded-xl p-5">
+          <div className="bg-bg-card border border-border-subtle rounded-lg p-5">
             <div className="flex items-center gap-2 mb-4">
               <AlertCircle size={16} className="text-orange" />
               <h3 className="text-sm font-semibold text-text-primary font-['Space_Grotesk']">Missed Knowledge</h3>
@@ -229,7 +229,7 @@ export default function Dashboard() {
           </div>
 
           {/* Quick Stats */}
-          <div className="bg-bg-card border border-border-subtle rounded-xl p-5">
+          <div className="bg-bg-card border border-border-subtle rounded-lg p-5">
             <div className="flex items-center gap-2 mb-4">
               <MessageSquare size={16} className="text-accent" />
               <h3 className="text-sm font-semibold text-text-primary font-['Space_Grotesk']">Today's Activity</h3>

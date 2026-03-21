@@ -15,7 +15,7 @@ function StatusBadge({ status }: { status: string }) {
   };
   const s = map[status] || map.offline;
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium ${s.color} ${s.bg}`}>
+    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-semibold ${s.color} ${s.bg}`}>
       {s.icon} {s.label}
     </span>
   );
@@ -141,16 +141,16 @@ export default function BotPool() {
         </div>
 
         {/* Bot table */}
-        <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden">
+        <div className="bg-bg-card border border-border-subtle rounded-lg overflow-hidden">
           <table className="w-full">
             <thead>
               <tr className="border-b border-border-subtle">
-                <th className="text-left text-xs text-text-muted font-medium px-5 py-3">Status</th>
-                <th className="text-left text-xs text-text-muted font-medium px-5 py-3">Bot Name</th>
-                <th className="text-left text-xs text-text-muted font-medium px-5 py-3">Username</th>
-                <th className="text-left text-xs text-text-muted font-medium px-5 py-3">Priority</th>
-                <th className="text-left text-xs text-text-muted font-medium px-5 py-3">Messages Today</th>
-                <th className="text-right text-xs text-text-muted font-medium px-5 py-3">Actions</th>
+                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Status</th>
+                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Bot Name</th>
+                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Username</th>
+                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Priority</th>
+                <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Messages Today</th>
+                <th className="text-right text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono'] px-5 py-3">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -231,7 +231,7 @@ export default function BotPool() {
 
         {/* Add Bot form */}
         {showAddForm && (
-          <div className="mt-6 bg-bg-card border border-border-subtle rounded-xl p-6">
+          <div className="mt-6 bg-bg-card border border-border-subtle rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold text-text-primary">Add New Bot</h3>
               <button onClick={() => setShowAddForm(false)} className="text-text-muted hover:text-text-primary">
@@ -246,7 +246,7 @@ export default function BotPool() {
                   value={formToken}
                   onChange={(e) => setFormToken(e.target.value)}
                   placeholder="123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11"
-                  className="w-full px-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent font-mono"
+                  className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent transition-colors font-mono"
                   required
                 />
               </div>
@@ -258,7 +258,7 @@ export default function BotPool() {
                     value={formName}
                     onChange={(e) => setFormName(e.target.value)}
                     placeholder="My Support Bot"
-                    className="w-full px-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent"
+                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-accent transition-colors"
                   />
                 </div>
                 <div>
@@ -269,7 +269,7 @@ export default function BotPool() {
                     onChange={(e) => setFormPriority(Number(e.target.value))}
                     min={0}
                     max={10}
-                    className="w-full px-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent font-mono"
+                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors font-mono"
                   />
                 </div>
               </div>
@@ -302,7 +302,7 @@ export default function BotPool() {
         {/* Edit modal */}
         {editingBot && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="bg-bg-card border border-border rounded-xl p-6 w-full max-w-md shadow-2xl">
+            <div className="bg-[#0C0C0C] border border-border rounded-xl p-6 w-full max-w-md shadow-2xl">
               <div className="flex items-center justify-between mb-5">
                 <h3 className="text-sm font-semibold text-text-primary">Edit Bot</h3>
                 <button onClick={() => setEditingBot(null)} className="text-text-muted hover:text-text-primary">
@@ -316,7 +316,7 @@ export default function BotPool() {
                     type="text"
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
-                    className="w-full px-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent"
+                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
                   />
                 </div>
                 <div>
@@ -327,7 +327,7 @@ export default function BotPool() {
                     onChange={(e) => setEditPriority(Number(e.target.value))}
                     min={0}
                     max={10}
-                    className="w-full px-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent font-mono"
+                    className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors font-mono"
                   />
                 </div>
                 <div className="flex justify-end gap-3 mt-2">
@@ -354,7 +354,7 @@ export default function BotPool() {
         {/* Delete confirmation */}
         {deleteConfirm !== null && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="bg-bg-card border border-border rounded-xl p-6 w-full max-w-sm shadow-2xl">
+            <div className="bg-[#0C0C0C] border border-border rounded-xl p-6 w-full max-w-sm shadow-2xl">
               <h3 className="text-sm font-semibold text-text-primary mb-3">Delete Bot</h3>
               <p className="text-sm text-text-secondary mb-5">
                 Are you sure you want to permanently delete this bot? This action cannot be undone.

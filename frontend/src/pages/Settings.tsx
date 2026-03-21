@@ -145,7 +145,7 @@ export default function Settings() {
           <>
             {/* System tab */}
             {activeTab === 'system' && (
-              <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden">
+              <div className="bg-bg-card border border-border-subtle rounded-lg overflow-hidden">
                 <div className="px-5 py-3 border-b border-border-subtle">
                   <h3 className="text-sm font-semibold text-text-primary">General System Settings</h3>
                 </div>
@@ -168,7 +168,7 @@ export default function Settings() {
                     onChange={(e) => updateLocal('session_timeout_minutes', Number(e.target.value))}
                     min={5}
                     max={1440}
-                    className="w-24 px-3 py-1.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary text-right font-mono focus:outline-none focus:border-accent"
+                    className="w-24 h-9 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary text-right font-mono focus:outline-none focus:border-accent transition-colors"
                   />
                 </SettingCard>
                 <SettingCard
@@ -178,7 +178,7 @@ export default function Settings() {
                   <select
                     value={String(getLocal('default_language', 'zh-CN'))}
                     onChange={(e) => updateLocal('default_language', e.target.value)}
-                    className="px-3 py-1.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent"
+                    className="h-9 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary focus:outline-none focus:border-accent transition-colors"
                   >
                     <option value="zh-CN">Chinese (Simplified)</option>
                     <option value="en">English</option>
@@ -190,7 +190,7 @@ export default function Settings() {
 
             {/* Turnstile tab */}
             {activeTab === 'turnstile' && (
-              <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden">
+              <div className="bg-bg-card border border-border-subtle rounded-lg overflow-hidden">
                 <div className="px-5 py-3 border-b border-border-subtle">
                   <h3 className="text-sm font-semibold text-text-primary">Cloudflare Turnstile Configuration</h3>
                 </div>
@@ -212,7 +212,7 @@ export default function Settings() {
                     value={String(getLocal('turnstile_site_key', ''))}
                     onChange={(e) => updateLocal('turnstile_site_key', e.target.value)}
                     placeholder="0x..."
-                    className="w-64 px-3 py-1.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder font-mono focus:outline-none focus:border-accent"
+                    className="w-64 h-9 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder font-mono focus:outline-none focus:border-accent transition-colors"
                   />
                 </SettingCard>
                 <SettingCard
@@ -224,7 +224,7 @@ export default function Settings() {
                     value={String(getLocal('turnstile_secret_key', ''))}
                     onChange={(e) => updateLocal('turnstile_secret_key', e.target.value)}
                     placeholder="0x..."
-                    className="w-64 px-3 py-1.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder font-mono focus:outline-none focus:border-accent"
+                    className="w-64 h-9 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder font-mono focus:outline-none focus:border-accent transition-colors"
                   />
                 </SettingCard>
                 <SettingCard
@@ -237,7 +237,7 @@ export default function Settings() {
                     onChange={(e) => updateLocal('turnstile_valid_days', Number(e.target.value))}
                     min={1}
                     max={365}
-                    className="w-24 px-3 py-1.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary text-right font-mono focus:outline-none focus:border-accent"
+                    className="w-24 h-9 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary text-right font-mono focus:outline-none focus:border-accent transition-colors"
                   />
                 </SettingCard>
               </div>
@@ -245,7 +245,7 @@ export default function Settings() {
 
             {/* Media Cache tab */}
             {activeTab === 'media' && (
-              <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden">
+              <div className="bg-bg-card border border-border-subtle rounded-lg overflow-hidden">
                 <div className="px-5 py-3 border-b border-border-subtle">
                   <h3 className="text-sm font-semibold text-text-primary">Media Cache Settings</h3>
                 </div>
@@ -259,7 +259,7 @@ export default function Settings() {
                     onChange={(e) => updateLocal('media_cache_days', Number(e.target.value))}
                     min={1}
                     max={90}
-                    className="w-24 px-3 py-1.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary text-right font-mono focus:outline-none focus:border-accent"
+                    className="w-24 h-9 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary text-right font-mono focus:outline-none focus:border-accent transition-colors"
                   />
                 </SettingCard>
                 <SettingCard
@@ -271,7 +271,7 @@ export default function Settings() {
                     value={String(getLocal('media_cache_max_mb', 0))}
                     onChange={(e) => updateLocal('media_cache_max_mb', Number(e.target.value))}
                     min={0}
-                    className="w-24 px-3 py-1.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary text-right font-mono focus:outline-none focus:border-accent"
+                    className="w-24 h-9 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary text-right font-mono focus:outline-none focus:border-accent transition-colors"
                   />
                 </SettingCard>
               </div>
@@ -279,7 +279,7 @@ export default function Settings() {
 
             {/* Schedules tab */}
             {activeTab === 'schedule' && (
-              <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden">
+              <div className="bg-bg-card border border-border-subtle rounded-lg overflow-hidden">
                 <div className="px-5 py-3 border-b border-border-subtle">
                   <h3 className="text-sm font-semibold text-text-primary">Scheduled Tasks</h3>
                 </div>
@@ -293,7 +293,7 @@ export default function Settings() {
                     onChange={(e) => updateLocal('missed_knowledge_update_hour', Number(e.target.value))}
                     min={0}
                     max={23}
-                    className="w-24 px-3 py-1.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary text-right font-mono focus:outline-none focus:border-accent"
+                    className="w-24 h-9 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary text-right font-mono focus:outline-none focus:border-accent transition-colors"
                   />
                 </SettingCard>
                 <SettingCard
@@ -306,7 +306,7 @@ export default function Settings() {
                     onChange={(e) => updateLocal('media_cleanup_hour', Number(e.target.value))}
                     min={0}
                     max={23}
-                    className="w-24 px-3 py-1.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary text-right font-mono focus:outline-none focus:border-accent"
+                    className="w-24 h-9 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary text-right font-mono focus:outline-none focus:border-accent transition-colors"
                   />
                 </SettingCard>
               </div>

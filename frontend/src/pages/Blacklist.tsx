@@ -48,14 +48,14 @@ export default function Blacklist() {
             Loading...
           </div>
         ) : users.length === 0 ? (
-          <div className="bg-bg-card border border-border-subtle rounded-xl p-12 text-center text-text-muted text-sm">
+          <div className="bg-bg-card border border-border-subtle rounded-lg p-12 text-center text-text-muted text-sm">
             No blocked users.
           </div>
         ) : (
           <>
-            <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden">
+            <div className="bg-bg-card border border-border-subtle rounded-lg overflow-hidden">
               {/* Table header */}
-              <div className="grid grid-cols-[48px_1fr_120px_1fr_160px_160px_100px] gap-4 px-4 py-3 border-b border-border-subtle text-xs text-text-muted uppercase tracking-wide">
+              <div className="grid grid-cols-[48px_1fr_120px_1fr_160px_160px_100px] gap-4 px-5 py-3 border-b border-border-subtle text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">
                 <span />
                 <span>Name</span>
                 <span>TGUID</span>
@@ -73,7 +73,7 @@ export default function Blacklist() {
                 return (
                   <div
                     key={user.id}
-                    className="grid grid-cols-[48px_1fr_120px_1fr_160px_160px_100px] gap-4 px-4 py-3 border-b border-border-subtle last:border-b-0 items-center hover:bg-bg-elevated/50 transition-colors"
+                    className="grid grid-cols-[48px_1fr_120px_1fr_160px_160px_100px] gap-4 px-5 py-3.5 border-b border-border-subtle last:border-b-0 items-center hover:bg-bg-elevated/50 transition-colors"
                   >
                     {/* Avatar */}
                     <div
@@ -118,7 +118,7 @@ export default function Blacklist() {
                       <button
                         onClick={() => unblockMutation.mutate(user.id)}
                         disabled={unblockMutation.isPending}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green/10 text-green border border-green/20 hover:bg-green/20 transition-colors text-xs font-medium disabled:opacity-50"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-green/10 text-green border border-green/20 hover:bg-green/20 transition-colors text-xs font-medium disabled:opacity-50"
                       >
                         <ShieldOff size={12} />
                         Unblock

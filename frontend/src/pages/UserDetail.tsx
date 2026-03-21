@@ -110,7 +110,7 @@ export default function UserDetail() {
           {/* Left column: User info */}
           <div className="col-span-2 space-y-4">
             {/* Profile card */}
-            <div className="bg-bg-card border border-border-subtle rounded-xl p-6">
+            <div className="bg-bg-card border border-border-subtle rounded-lg p-6">
               <div className="flex items-start gap-5">
                 <div
                   className="w-20 h-20 rounded-full flex items-center justify-center text-white text-3xl font-semibold font-['Space_Grotesk'] shrink-0"
@@ -149,7 +149,7 @@ export default function UserDetail() {
             </div>
 
             {/* Turnstile verification */}
-            <div className="bg-bg-card border border-border-subtle rounded-xl p-5">
+            <div className="bg-bg-card border border-border-subtle rounded-lg p-5">
               <div className="flex items-center gap-2 mb-3">
                 <Shield size={16} className="text-accent" />
                 <h3 className="text-sm font-semibold text-text-primary font-['Space_Grotesk']">Turnstile Verification</h3>
@@ -175,7 +175,7 @@ export default function UserDetail() {
             </div>
 
             {/* Conversation history */}
-            <div className="bg-bg-card border border-border-subtle rounded-xl p-5">
+            <div className="bg-bg-card border border-border-subtle rounded-lg p-5">
               <div className="flex items-center gap-2 mb-3">
                 <MessageSquare size={16} className="text-accent" />
                 <h3 className="text-sm font-semibold text-text-primary font-['Space_Grotesk']">Conversation History</h3>
@@ -223,7 +223,7 @@ export default function UserDetail() {
           {/* Right column: Tags, Groups, Actions */}
           <div className="space-y-4">
             {/* Tags management */}
-            <div className="bg-bg-card border border-border-subtle rounded-xl p-5">
+            <div className="bg-bg-card border border-border-subtle rounded-lg p-5">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <Tag size={16} className="text-accent" />
@@ -284,7 +284,7 @@ export default function UserDetail() {
             </div>
 
             {/* Groups management */}
-            <div className="bg-bg-card border border-border-subtle rounded-xl p-5">
+            <div className="bg-bg-card border border-border-subtle rounded-lg p-5">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <Users size={16} className="text-accent" />
@@ -335,7 +335,7 @@ export default function UserDetail() {
             </div>
 
             {/* Block / Unblock */}
-            <div className="bg-bg-card border border-border-subtle rounded-xl p-5">
+            <div className="bg-bg-card border border-border-subtle rounded-lg p-5">
               <h3 className="text-sm font-semibold text-text-primary font-['Space_Grotesk'] mb-3">Actions</h3>
               {user.is_blocked ? (
                 <div>
@@ -370,7 +370,7 @@ export default function UserDetail() {
                         placeholder="Block reason (optional)"
                         value={blockReason}
                         onChange={(e) => setBlockReason(e.target.value)}
-                        className="w-full px-3 py-2 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-red transition-colors"
+                        className="w-full h-10 px-3.5 bg-bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-red transition-colors"
                       />
                       <div className="flex gap-2">
                         <button

@@ -64,17 +64,17 @@ export default function FAQRanking() {
         </div>
 
         {isLoading ? (
-          <div className="bg-bg-card border border-border-subtle rounded-xl p-8 text-center text-text-muted text-sm">
+          <div className="bg-bg-card border border-border-subtle rounded-lg p-8 text-center text-text-muted text-sm">
             Loading...
           </div>
         ) : rankings.length === 0 ? (
-          <div className="bg-bg-card border border-border-subtle rounded-xl p-8 text-center text-text-muted text-sm">
+          <div className="bg-bg-card border border-border-subtle rounded-lg p-8 text-center text-text-muted text-sm">
             No FAQ hits recorded for this period.
           </div>
         ) : (
           <>
             {/* Visual bar chart */}
-            <div className="bg-bg-card border border-border-subtle rounded-xl p-6 mb-6">
+            <div className="bg-bg-card border border-border-subtle rounded-lg p-6 mb-6">
               <h3 className="text-sm font-medium text-text-secondary mb-4">
                 Top FAQ Topics
               </h3>
@@ -116,20 +116,20 @@ export default function FAQRanking() {
             </div>
 
             {/* Full table */}
-            <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden">
+            <div className="bg-bg-card border border-border-subtle rounded-lg overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border-subtle text-text-secondary">
-                    <th className="text-center px-4 py-3 font-medium w-16">
+                  <tr className="border-b border-border-subtle">
+                    <th className="text-center px-5 py-3 w-16 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">
                       Rank
                     </th>
-                    <th className="text-left px-4 py-3 font-medium">
+                    <th className="text-left px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">
                       Rule / Topic
                     </th>
-                    <th className="text-center px-4 py-3 font-medium">
+                    <th className="text-center px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">
                       Hit Count
                     </th>
-                    <th className="text-center px-4 py-3 font-medium">
+                    <th className="text-center px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider font-['JetBrains_Mono']">
                       Last Hit
                     </th>
                   </tr>
@@ -138,9 +138,9 @@ export default function FAQRanking() {
                   {rankings.map((item, index) => (
                     <tr
                       key={item.rule_id}
-                      className="border-b border-border-subtle last:border-0 hover:bg-bg-elevated/50 transition-colors"
+                      className="border-b border-border-subtle/50 last:border-0 hover:bg-bg-elevated/50 transition-colors"
                     >
-                      <td className="px-4 py-3 text-center">
+                      <td className="px-5 py-3.5 text-center">
                         {index < 3 ? (
                           <span
                             className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
@@ -159,15 +159,15 @@ export default function FAQRanking() {
                           </span>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-text-primary">
+                      <td className="px-5 py-3.5 text-text-primary">
                         {item.rule_name || `Rule #${item.rule_id}`}
                       </td>
-                      <td className="px-4 py-3 text-center">
+                      <td className="px-5 py-3.5 text-center">
                         <span className="font-mono text-accent font-medium">
                           {item.hit_count.toLocaleString()}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-center text-text-secondary text-xs">
+                      <td className="px-5 py-3.5 text-center text-text-secondary text-xs">
                         {formatDate(item.last_hit_at)}
                       </td>
                     </tr>
