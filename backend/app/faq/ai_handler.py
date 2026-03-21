@@ -1,0 +1,288 @@
+"""
+AI Handler - manages all AI reply modes for the FAQ engine.
+
+Supports OpenAI-compatible API format (works with OpenAI, Anthropic proxy, custom endpoints).
+"""
+from __future__ import annotations
+
+import json
+import logging
+import time
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
+
+import httpx
+
+logger = logging.getLogger(__name__)
+
+
+@dataclass
+class AIResponse:
+    """Wrapper for AI API responses."""
+
+    content: str
+    tokens_used: int = 0
+    prompt_tokens: int = 0
+    completion_tokens: int = 0
+    model: str = ""
+    latency_ms: float = 0.0
+
+
+@dataclass
+class AIConfig:
+    """Runtime AI configuration."""
+
+    base_url: str
+    api_key: str
+    model: str = "gpt-3.5-turbo"
+    max_tokens: int = 500
+    temperature: float = 0.7
+    system_prompt: str = ""
+    timeout: float = 30.0
+
+
+class AIHandler:
+    """
+    Handles all AI reply modes for the FAQ engine.
+
+    Each method corresponds to a reply_mode defined in FAQ_ENGINE.md.
+    Uses httpx async client to call OpenAI-compatible chat completions API.
+    """
+
+    def __init__(self) -> None:
+        self._client: Optional[httpx.AsyncClient] = None
+
+    async def _get_client(self) -> httpx.AsyncClient:
+        if self._client is None or self._client.is_closed:
+            self._client = httpx.AsyncClient(timeout=60.0)
+        return self._client
+
+    async def close(self) -> None:
+        if self._client and not self._client.is_closed:
+            await self._client.aclose()
+
+    async def _call_ai(
+        self,
+        messages: List[Dict[str, str]],
+        config: AIConfig,
+    ) -> AIResponse:
+        """
+        Call an OpenAI-compatible chat completions endpoint.
+
+        Returns an AIResponse with content and token usage.
+        """
+        client = await self._get_client()
+
+        url = config.base_url.rstrip("/") + "/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {config.api_key}",
+            "Content-Type": "application/json",
+        }
+        payload: Dict[str, Any] = {
+            "model": config.model,
+            "messages": messages,
+            "max_tokens": config.max_tokens,
+            "temperature": config.temperature,
+        }
+
+        start = time.monotonic()
+        try:
+            resp = await client.post(
+                url,
+                headers=headers,
+                json=payload,
+                timeout=config.timeout,
+            )
+            resp.raise_for_status()
+            data = resp.json()
+        except httpx.HTTPStatusError as exc:
+            logger.error("AI API HTTP error %s: %s", exc.response.status_code, exc.response.text)
+            raise
+        except Exception:
+            logger.exception("AI API call failed")
+            raise
+
+        latency = (time.monotonic() - start) * 1000
+
+        # Parse OpenAI-format response
+        choice = data.get("choices", [{}])[0]
+        content = choice.get("message", {}).get("content", "").strip()
+        usage = data.get("usage", {})
+
+        return AIResponse(
+            content=content,
+            tokens_used=usage.get("total_tokens", 0),
+            prompt_tokens=usage.get("prompt_tokens", 0),
+            completion_tokens=usage.get("completion_tokens", 0),
+            model=data.get("model", config.model),
+            latency_ms=latency,
+        )
+
+    def _build_messages(
+        self,
+        system: str,
+        user_content: str,
+    ) -> List[Dict[str, str]]:
+        msgs: List[Dict[str, str]] = []
+        if system:
+            msgs.append({"role": "system", "content": system})
+        msgs.append({"role": "user", "content": user_content})
+        return msgs
+
+    # ----------------------------------------------------------------
+    # Mode 1: direct - pure passthrough, no AI involved
+    # ----------------------------------------------------------------
+    async def reply_direct(self, answer: str) -> str:
+        """Return the preset answer directly. No AI call."""
+        return answer
+
+    # ----------------------------------------------------------------
+    # Mode 2: ai_only - pure AI reply
+    # ----------------------------------------------------------------
+    async def reply_ai_only(
+        self,
+        question: str,
+        config: AIConfig,
+    ) -> AIResponse:
+        """Send the user question directly to AI and return the response."""
+        system = config.system_prompt or "You are a helpful customer service assistant. Answer concisely and professionally."
+        messages = self._build_messages(system, question)
+        return await self._call_ai(messages, config)
+
+    # ----------------------------------------------------------------
+    # Mode 3: ai_polish - FAQ answer + AI rewrite
+    # ----------------------------------------------------------------
+    async def reply_ai_polish(
+        self,
+        question: str,
+        answer: str,
+        config: AIConfig,
+    ) -> AIResponse:
+        """Match a FAQ answer then have AI polish/rewrite it naturally."""
+        system = config.system_prompt or (
+            "You are a professional copywriter for customer service. "
+            "Rewrite the given answer to be more natural and friendly, "
+            "but do NOT change the core information."
+        )
+        user_content = (
+            f"User question: {question}\n\n"
+            f"Original answer: {answer}\n\n"
+            "Please rewrite this answer to sound more natural and engaging, "
+            "while keeping all factual information intact."
+        )
+        messages = self._build_messages(system, user_content)
+        return await self._call_ai(messages, config)
+
+    # ----------------------------------------------------------------
+    # Mode 4: ai_fallback - FAQ first, AI if no match
+    # ----------------------------------------------------------------
+    async def reply_ai_fallback(
+        self,
+        question: str,
+        faq_answer: Optional[str],
+        config: AIConfig,
+    ) -> AIResponse | str:
+        """
+        If faq_answer is available, return it directly.
+        Otherwise, fall back to AI for an answer.
+        """
+        if faq_answer:
+            return faq_answer
+        return await self.reply_ai_only(question, config)
+
+    # ----------------------------------------------------------------
+    # Mode 5: ai_intent - AI classifies intent then route to FAQ category
+    # ----------------------------------------------------------------
+    async def reply_ai_intent(
+        self,
+        question: str,
+        categories: List[str],
+        config: AIConfig,
+    ) -> AIResponse:
+        """
+        AI analyzes user intent and classifies it into one of the given categories.
+        Returns a JSON-parseable response with category and confidence.
+        """
+        categories_str = ", ".join(categories)
+        system = (
+            "You are an intent classification system. "
+            "Analyze the user's question and return the most matching category. "
+            "Respond ONLY with valid JSON in this format: "
+            '{"category": "xxx", "confidence": 0.95}'
+        )
+        user_content = (
+            f"Available categories: [{categories_str}]\n"
+            f"User question: {question}\n"
+            "Return the classification result as JSON."
+        )
+        messages = self._build_messages(system, user_content)
+        return await self._call_ai(messages, config)
+
+    # ----------------------------------------------------------------
+    # Mode 6: ai_template - template + AI fills variables
+    # ----------------------------------------------------------------
+    async def reply_ai_template(
+        self,
+        question: str,
+        template: str,
+        config: AIConfig,
+    ) -> AIResponse:
+        """
+        Given a template with {variable} placeholders,
+        AI fills in the variables based on user question context.
+        """
+        system = config.system_prompt or (
+            "You are a template-filling assistant. "
+            "Fill in the template variables based on context. "
+            "Return ONLY the completed template text, nothing else."
+        )
+        user_content = (
+            f"Template: {template}\n\n"
+            f"User question: {question}\n\n"
+            "Fill in all the {{variable}} placeholders in the template "
+            "with appropriate values based on the user's question. "
+            "Return only the completed text."
+        )
+        messages = self._build_messages(system, user_content)
+        return await self._call_ai(messages, config)
+
+    # ----------------------------------------------------------------
+    # Mode 8: ai_classify_and_answer - AI answers with FAQ context
+    # ----------------------------------------------------------------
+    async def reply_ai_classify_and_answer(
+        self,
+        question: str,
+        faq_context: str,
+        config: AIConfig,
+    ) -> AIResponse:
+        """
+        AI comprehensively understands the question and answers
+        using FAQ knowledge base as reference context.
+        """
+        system = config.system_prompt or (
+            "You are a knowledgeable customer service assistant. "
+            "Use the provided FAQ knowledge base as reference to answer the user's question. "
+            "If the answer is in the knowledge base, use that information. "
+            "If not, provide a helpful response based on your understanding."
+        )
+        user_content = (
+            f"FAQ Knowledge Base:\n{faq_context}\n\n"
+            f"User Question: {question}\n\n"
+            "Please answer the user's question based on the knowledge base above."
+        )
+        messages = self._build_messages(system, user_content)
+        return await self._call_ai(messages, config)
+
+    # ----------------------------------------------------------------
+    # Test connection
+    # ----------------------------------------------------------------
+    async def test_connection(self, config: AIConfig) -> AIResponse:
+        """Test the AI API connection with a simple prompt."""
+        messages = [
+            {"role": "user", "content": "Hello, please respond with 'OK' to confirm the connection works."}
+        ]
+        return await self._call_ai(messages, config)
+
+
+# Module-level singleton
+ai_handler = AIHandler()

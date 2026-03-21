@@ -1,0 +1,21 @@
+{$SITE_ADDRESS:localhost} {
+    # Backend API
+    handle /api/* {
+        reverse_proxy backend:8000
+    }
+
+    # WebSocket
+    handle /ws/* {
+        reverse_proxy backend:8000
+    }
+
+    # Webhook (Telegram)
+    handle /webhook/* {
+        reverse_proxy backend:8000
+    }
+
+    # Frontend (catch-all)
+    handle {
+        reverse_proxy frontend:80
+    }
+}
