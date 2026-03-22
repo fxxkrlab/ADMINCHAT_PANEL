@@ -304,19 +304,12 @@ async def handle_private_message(message: TgMessage, bot_db_id: int) -> None:
 
                         if final_answers:
                             for answer_text in final_answers:
-                                # Send sticker badge + text message
-                                import os
-                                from aiogram.types import FSInputFile
-                                assets_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "assets")
-                                sticker_file = os.path.join(assets_dir, f"sticker_{reply_sender_type}.webp")
-
-                                if os.path.exists(sticker_file):
-                                    try:
-                                        sticker = FSInputFile(sticker_file)
-                                        await message.answer_sticker(sticker=sticker)
-                                    except Exception:
-                                        logger.warning("Failed to send sticker badge")
-                                await message.answer(answer_text)
+                                if reply_sender_type == "ai":
+                                    label = "✦ AI"
+                                else:
+                                    label = "✦ FAQ"
+                                tg_reply = f"<b>{label}</b>\n\n{answer_text}"
+                                await message.answer(tg_reply, parse_mode="HTML")
 
                                 # Store reply in DB
                                 faq_msg = Message(

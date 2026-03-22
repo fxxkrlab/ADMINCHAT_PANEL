@@ -307,23 +307,13 @@ async def send_message(
             if tg_user and effective_bot_id:
                 bot_instance = get_bot_instance(effective_bot_id)
                 if bot_instance:
-                    import os
-                    from aiogram.types import FSInputFile
-                    assets_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "assets")
-                    sticker_file = os.path.join(assets_dir, "sticker_admin.webp")
+                    human_text = f"<b>✦ Human</b>\n\n{text_content}" if text_content else ""
 
                     if conv.source_type == "private":
-                        # Send sticker badge + text
-                        if os.path.exists(sticker_file):
-                            try:
-                                sticker = FSInputFile(sticker_file)
-                                await bot_instance.send_sticker(chat_id=tg_user.tg_uid, sticker=sticker)
-                            except Exception:
-                                logger.warning("Failed to send sticker badge")
                         await bot_instance.send_message(
                             chat_id=tg_user.tg_uid,
-                            text=text_content or "",
-                            parse_mode=parse_mode if parse_mode else None,
+                            text=human_text,
+                            parse_mode="HTML",
                         )
                     elif conv.source_type == "group" and conv.source_group_id:
                         # Group chat: send to group, reply to user's last message
@@ -345,20 +335,9 @@ async def send_message(
                             )
                             reply_to_id = last_inbound.scalar_one_or_none()
 
-                            if os.path.exists(sticker_file):
-                                try:
-                                    sticker = FSInputFile(sticker_file)
-                                    await bot_instance.send_sticker(
-                                        chat_id=group.tg_chat_id,
-                                        sticker=sticker,
-                                        reply_to_message_id=reply_to_id,
-                                    )
-                                except Exception:
-                                    logger.warning("Failed to send sticker in group")
-
                             await bot_instance.send_message(
                                 chat_id=group.tg_chat_id,
-                                text=text_content or "",
+                                text=human_text,
                                 parse_mode=parse_mode if parse_mode else None,
                                 reply_to_message_id=reply_to_id,
                             )

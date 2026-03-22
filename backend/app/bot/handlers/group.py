@@ -342,18 +342,12 @@ async def handle_group_message(
                         if final_answers:
                             for answer in final_answers:
                                 try:
-                                    import os
-                                    from aiogram.types import FSInputFile
-                                    assets_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "assets")
-                                    sticker_file = os.path.join(assets_dir, f"sticker_{reply_sender_type}.webp")
-
-                                    if os.path.exists(sticker_file):
-                                        try:
-                                            sticker = FSInputFile(sticker_file)
-                                            await message.reply_sticker(sticker=sticker)
-                                        except Exception:
-                                            logger.warning("Failed to send sticker in group")
-                                    await message.reply(answer)
+                                    if reply_sender_type == "ai":
+                                        label = "✦ AI"
+                                    else:
+                                        label = "✦ FAQ"
+                                    tg_reply = f"<b>{label}</b>\n\n{answer}"
+                                    await message.reply(tg_reply, parse_mode="HTML")
 
                                     faq_msg = Message(
                                         conversation_id=conv.id,
