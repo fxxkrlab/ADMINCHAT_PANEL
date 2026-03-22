@@ -242,7 +242,8 @@ async def handle_private_message(message: TgMessage, bot_db_id: int) -> None:
                         final_answers = list(faq_result.answers) if faq_result.answers else []
                         reply_sender_type = "faq"
 
-                        logger.info("FAQ matched: rule_id=%s, reply_mode=%s, answers=%d", faq_result.rule_id, faq_result.reply_mode, len(final_answers))
+                        import sys
+                        print(f"[FAQ] matched: rule_id={faq_result.rule_id}, reply_mode={faq_result.reply_mode}, answers={len(final_answers)}", file=sys.stderr, flush=True)
                         if faq_result.reply_mode != "direct" and final_answers:
                             # AI processing modes
                             try:
@@ -267,12 +268,11 @@ async def handle_private_message(message: TgMessage, bot_db_id: int) -> None:
                                     )
 
                                     if faq_result.reply_mode == "ai_polish":
-                                        # Polish the preset answer with AI
-                                        logger.info("AI Polish: question=%s, answer=%s", text_content, final_answers[0])
+                                        print(f"[AI] Polish: q={text_content}, a={final_answers[0]}, url={runtime.base_url}, model={runtime.model}, format={runtime.api_format}", file=sys.stderr, flush=True)
                                         ai_resp = await handler.reply_ai_polish(
                                             text_content, final_answers[0], runtime
                                         )
-                                        logger.info("AI Polish result: content='%s', tokens=%d", ai_resp.content[:100] if ai_resp.content else "EMPTY", ai_resp.tokens_used)
+                                        print(f"[AI] Result: content='{ai_resp.content[:100] if ai_resp.content else 'EMPTY'}', tokens={ai_resp.tokens_used}", file=sys.stderr, flush=True)
                                         if ai_resp.content:
                                             final_answers = [ai_resp.content]
                                             reply_sender_type = "ai"
