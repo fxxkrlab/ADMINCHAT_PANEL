@@ -38,7 +38,26 @@ ADMINCHAT Panel is a full-featured Telegram customer service management system. 
 - **Role-Based Access** &mdash; Super Admin / Admin / Agent with granular permissions
 - **Audit Logging** &mdash; Automatic tracking of critical operations
 - **Knowledge Gap Analysis** &mdash; Auto-detect unmatched questions, daily ranking updates at 3 AM
+- **Bot Groups + FAQ Group Routing** &mdash; Organize bots into groups, FAQ rules into Group→Category hierarchy, auto-route replies through the assigned bot group
 - **Docker Deployment** &mdash; Single `docker compose up` to run, GHCR image publishing
+
+## Screenshots
+
+<p align="center">
+  <img src="docs/designs/3.jpg" width="45%" alt="Dashboard" />
+  <img src="docs/designs/2.jpg" width="45%" alt="Chat" />
+</p>
+<p align="center">
+  <img src="docs/designs/4.jpg" width="45%" alt="Bot Pool" />
+  <img src="docs/designs/7.jpg" width="45%" alt="FAQ Editor" />
+</p>
+<p align="center">
+  <img src="docs/designs/6.jpg" width="45%" alt="Users" />
+  <img src="docs/designs/5.jpg" width="45%" alt="Settings" />
+</p>
+<p align="center">
+  <img src="docs/designs/1.jpg" width="45%" alt="Login" />
+</p>
 
 ## Architecture
 
@@ -102,13 +121,17 @@ flowchart LR
 | `messages` | Message records | direction, content_type, faq_matched |
 | `tg_groups` | Telegram groups | tg_chat_id, title |
 | `tags` / `user_tags` | User tags | name, color (many-to-many) |
-| `faq_rules` | FAQ rules | response_mode, reply_mode, ai_config |
+| `faq_rules` | FAQ rules | response_mode, reply_mode, category_id |
+| `faq_groups` | FAQ groups (level 1) | name, bot_group_id |
+| `faq_categories` | FAQ categories (level 2) | name, faq_group_id, bot_group_id |
 | `faq_hit_stats` | FAQ hit stats | hit_count, date |
 | `missed_keywords` | Knowledge gaps | keyword, occurrence_count |
+| `bot_groups` | Bot groups | name, description |
+| `bot_group_members` | Bot group members | bot_group_id, bot_id (unique) |
 | `ai_configs` | AI provider configs | base_url, api_key, model |
 | `audit_logs` | Audit trail | action, target_type, details |
 
-> 23 tables total. See [docs/DATABASE_DESIGN.md](docs/DATABASE_DESIGN.md) for full schema.
+> 27 tables total. See [docs/DATABASE_DESIGN.md](docs/DATABASE_DESIGN.md) for full schema.
 
 ## FAQ Reply Modes
 

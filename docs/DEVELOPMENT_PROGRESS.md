@@ -150,6 +150,20 @@
 - ✅ 17.4 GitHub Actions 自动构建 + 推送 GHCR
 - ✅ 17.5 .env.example + 部署文档
 
+## Phase 18: Bot 分组 + FAQ 分组路由
+
+- ✅ 18.1 BotGroup + BotGroupMember 模型
+- ✅ 18.2 FaqGroup + FaqCategory 模型 + FaqRule.category_id
+- ✅ 18.3 Bot Group CRUD API + 成员管理
+- ✅ 18.4 FAQ Group / Category CRUD API
+- ✅ 18.5 FAQ 路由继承逻辑 (category → group → fallback)
+- ✅ 18.6 get_bot_from_group() 按优先级选 Bot
+- ✅ 18.7 Private / Group Handler 路由 Bot 发送
+- ✅ 18.8 前端 BotPool 分组 UI + 成员管理弹窗
+- ✅ 18.9 前端 FAQList 左侧树形导航
+- ✅ 18.10 前端 FAQEditor Category 选择器
+- ✅ 18.11 Alembic 迁移 (4 张新表 + 1 字段)
+
 ---
 
 ## 变更记录
@@ -158,3 +172,4 @@
 |------|---------|
 | 2026-03-21 | 初始创建开发计划 |
 | 2026-03-21 | Phase 1-12, 13(部分), 14, 15(部分), 17 全部完成 |
+| 2026-03-22 | Phase 18 完成: Bot 分组 + FAQ 分组路由 (v0.5.0) |

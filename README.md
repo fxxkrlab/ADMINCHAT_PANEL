@@ -38,7 +38,26 @@ ADMINCHAT Panel 是一个功能完备的 Telegram 客服管理系统。它将 Te
 - **角色权限系统** &mdash; Super Admin / Admin / Agent 三级权限，细粒度权限控制
 - **操作审计日志** &mdash; 关键操作自动记录，可追溯
 - **遗漏知识点分析** &mdash; 自动统计未匹配问题，每日凌晨 3 点更新排行榜
+- **Bot 分组 + FAQ 分组路由** &mdash; Bot 按组管理，FAQ 规则按 组→分类 两级归类，匹配后自动选择对应组的 Bot 回复
 - **Docker 一键部署** &mdash; docker compose up 即可运行，支持 GHCR 镜像发布
+
+## 界面预览
+
+<p align="center">
+  <img src="docs/designs/3.jpg" width="45%" alt="Dashboard" />
+  <img src="docs/designs/2.jpg" width="45%" alt="Chat" />
+</p>
+<p align="center">
+  <img src="docs/designs/4.jpg" width="45%" alt="Bot Pool" />
+  <img src="docs/designs/7.jpg" width="45%" alt="FAQ Editor" />
+</p>
+<p align="center">
+  <img src="docs/designs/6.jpg" width="45%" alt="Users" />
+  <img src="docs/designs/5.jpg" width="45%" alt="Settings" />
+</p>
+<p align="center">
+  <img src="docs/designs/1.jpg" width="45%" alt="Login" />
+</p>
 
 ## 技术架构
 
@@ -105,15 +124,19 @@ flowchart LR
 | `user_groups` | 用户分组 | name, description |
 | `faq_questions` | FAQ 问题/关键词 | keyword, match_mode |
 | `faq_answers` | FAQ 答案 | content, content_type |
-| `faq_rules` | FAQ 规则 | response_mode, reply_mode, ai_config |
+| `faq_rules` | FAQ 规则 | response_mode, reply_mode, category_id |
+| `faq_groups` | FAQ 分组 (一级) | name, bot_group_id |
+| `faq_categories` | FAQ 分类 (二级) | name, faq_group_id, bot_group_id |
 | `faq_hit_stats` | FAQ 命中统计 | hit_count, date |
 | `missed_keywords` | 遗漏知识点 | keyword, occurrence_count |
+| `bot_groups` | Bot 分组 | name, description |
+| `bot_group_members` | Bot 分组成员 | bot_group_id, bot_id (唯一) |
 | `ai_configs` | AI 配置 | base_url, api_key, model |
 | `ai_usage_logs` | AI 用量日志 | tokens_used, cost_estimate |
 | `system_settings` | 系统设置 | key-value (JSONB) |
 | `audit_logs` | 审计日志 | action, target_type, details |
 
-> 共 23 张表，完整设计参见 [docs/DATABASE_DESIGN.md](docs/DATABASE_DESIGN.md)
+> 共 27 张表，完整设计参见 [docs/DATABASE_DESIGN.md](docs/DATABASE_DESIGN.md)
 
 ## FAQ 回复模式
 

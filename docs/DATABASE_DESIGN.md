@@ -13,12 +13,17 @@ tg_users ┤── messages
          │── user_groups (多对多)
          │
 bots ────┤── messages (via_bot_id)
-         │── bot_rate_limits
+         │── bot_group_members ── bot_groups
          │
 groups ──┤── messages
          │── group_bots (多对多, 群内活跃bot)
          │
-faq_questions ──── faq_rules ──── faq_answers (多对多)
+faq_groups ── faq_categories ── faq_rules ── faq_answers (多对多)
+         │                          │── faq_questions (多对多)
+         │
+bot_groups ── bot_group_members (多对多)
+         │── faq_groups.bot_group_id (路由)
+         │── faq_categories.bot_group_id (路由)
          │
 missed_keywords ── (独立统计表)
 ```
@@ -388,6 +393,72 @@ CREATE TABLE audit_logs (
 CREATE INDEX idx_audit_admin ON audit_logs(admin_id);
 CREATE INDEX idx_audit_action ON audit_logs(action);
 CREATE INDEX idx_audit_created ON audit_logs(created_at);
+```
+
+### 18. bot_groups - Bot 分组
+
+```sql
+CREATE TABLE bot_groups (
+    id              SERIAL PRIMARY KEY,
+    name            VARCHAR(100) UNIQUE NOT NULL,
+    description     TEXT,
+    is_active       BOOLEAN DEFAULT TRUE,
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### 19. bot_group_members - Bot 分组成员
+
+```sql
+CREATE TABLE bot_group_members (
+    bot_group_id    INTEGER REFERENCES bot_groups(id) ON DELETE CASCADE,
+    bot_id          INTEGER REFERENCES bots(id) ON DELETE CASCADE,
+    PRIMARY KEY (bot_group_id, bot_id),
+    CONSTRAINT uq_bot_group_members_bot_id UNIQUE (bot_id)
+    -- 每个 bot 最多属于 1 个组
+);
+```
+
+### 20. faq_groups - FAQ 分组 (一级)
+
+```sql
+CREATE TABLE faq_groups (
+    id              SERIAL PRIMARY KEY,
+    name            VARCHAR(100) UNIQUE NOT NULL,
+    description     TEXT,
+    bot_group_id    INTEGER REFERENCES bot_groups(id) ON DELETE SET NULL,
+                    -- 绑定 Bot 分组，匹配后用该组的 Bot 回复
+    is_active       BOOLEAN DEFAULT TRUE,
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### 21. faq_categories - FAQ 分类 (二级)
+
+```sql
+CREATE TABLE faq_categories (
+    id              SERIAL PRIMARY KEY,
+    name            VARCHAR(100) NOT NULL,
+    faq_group_id    INTEGER NOT NULL REFERENCES faq_groups(id) ON DELETE CASCADE,
+    bot_group_id    INTEGER REFERENCES bot_groups(id) ON DELETE SET NULL,
+                    -- 可覆盖 faq_group 的 bot_group_id
+    is_active       BOOLEAN DEFAULT TRUE,
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- faq_rules 新增字段:
+ALTER TABLE faq_rules ADD COLUMN category_id INTEGER
+    REFERENCES faq_categories(id) ON DELETE SET NULL;
+```
+
+**FAQ 路由继承逻辑:**
+```
+Rule 匹配 → category.bot_group_id 有值? → 用该 Bot Group
+         → 为空? → category.faq_group.bot_group_id 有值? → 用该 Bot Group
+         → 都为空? → 用接收消息的原路 Bot
 ```
 
 ## 媒体缓存策略

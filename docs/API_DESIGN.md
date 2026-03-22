@@ -325,6 +325,66 @@ Query Params:
 |--------|------|------|------|
 | GET | `/blacklist` | 黑名单列表 | agent+ |
 
+## 14. Bot 分组 (Bot Groups)
+
+| Method | Path | 说明 | 权限 |
+|--------|------|------|------|
+| GET | `/bot-groups` | 列表所有 Bot 分组 | admin+ |
+| POST | `/bot-groups` | 创建 Bot 分组 | admin+ |
+| PATCH | `/bot-groups/{id}` | 更新 Bot 分组 | admin+ |
+| DELETE | `/bot-groups/{id}` | 删除 Bot 分组 | admin+ |
+| PUT | `/bot-groups/{id}/members` | 设置分组成员 (bot_ids) | admin+ |
+
+### PUT /bot-groups/{id}/members
+
+```json
+// Request
+{ "bot_ids": [1, 3, 5] }
+
+// Response - 返回更新后的分组信息
+{
+  "id": 1, "name": "Sales Team",
+  "members": [
+    { "bot_id": 1, "bot_username": "sales_bot1", "display_name": "Sales Bot" },
+    { "bot_id": 3, "bot_username": "sales_bot2", "display_name": null }
+  ]
+}
+```
+
+> 每个 Bot 最多属于 1 个分组，重复分配会返回 400 错误。
+
+## 15. FAQ 分组 (FAQ Groups & Categories)
+
+| Method | Path | 说明 | 权限 |
+|--------|------|------|------|
+| GET | `/faq/groups` | 列表 FAQ 分组（含分类） | admin+ |
+| POST | `/faq/groups` | 创建 FAQ 分组 | admin+ |
+| PATCH | `/faq/groups/{id}` | 更新 FAQ 分组 | admin+ |
+| DELETE | `/faq/groups/{id}` | 删除 FAQ 分组（级联删除分类） | admin+ |
+| GET | `/faq/categories` | 列表 FAQ 分类 | admin+ |
+| POST | `/faq/categories` | 创建 FAQ 分类 | admin+ |
+| PATCH | `/faq/categories/{id}` | 更新 FAQ 分类 | admin+ |
+| DELETE | `/faq/categories/{id}` | 删除 FAQ 分类（规则 category_id 置空） | admin+ |
+
+### FAQ Rules 过滤增强
+
+```
+GET /faq/rules?category_id=5    -- 按分类过滤
+GET /faq/rules?group_id=2       -- 按分组过滤（返回该组下所有分类的规则）
+```
+
+### FAQ 路由继承逻辑
+
+```
+Rule 匹配 → rule.category_id
+  → category.bot_group_id 有值? → 用该 Bot Group 里的 Bot 回复
+  → category.bot_group_id 为空? → 看 category.faq_group.bot_group_id
+    → 有值? → 用该 Bot Group 回复
+    → 为空? → 用原路 Bot 回复 (默认行为)
+```
+
+Bot Group 内选 Bot: 按 priority 排序，跳过被限流的，全部限流则 fallback 到原路 Bot。
+
 ---
 
 ## WebSocket 接口
