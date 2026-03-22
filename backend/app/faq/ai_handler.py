@@ -73,6 +73,7 @@ class AIHandler:
         Returns an AIResponse with content and token usage.
         """
         client = await self._get_client()
+        logger.info("_call_ai: api_format=%s, base_url=%s, model=%s", config.api_format, config.base_url, config.model)
 
         base = config.base_url.rstrip("/")
 
@@ -166,7 +167,7 @@ class AIHandler:
                             continue
 
                         event_type = event_data.get("type", "")
-                        logger.debug("SSE event: %s", event_type)
+                        logger.info("SSE event: %s", event_type)
 
                         # Collect text deltas
                         if event_type == "response.output_text.delta":
