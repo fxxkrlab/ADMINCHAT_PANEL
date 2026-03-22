@@ -230,7 +230,7 @@ export default function BotPool() {
                       <span className="text-[14px] text-white font-medium">{bot.name}</span>
                     </td>
                     <td className="px-5 py-3.5">
-                      <span className="text-[13px] text-[#00D9FF] font-['JetBrains_Mono']">@{bot.username}</span>
+                      <span className="text-[13px] text-[#00D9FF] font-['JetBrains_Mono']">{bot.username}</span>
                     </td>
                     <td className="px-5 py-3.5">
                       <PriorityBar value={bot.priority} />
