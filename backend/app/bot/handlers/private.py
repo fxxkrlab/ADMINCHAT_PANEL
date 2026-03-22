@@ -267,11 +267,16 @@ async def handle_private_message(message: TgMessage, bot_db_id: int) -> None:
 
                                     if faq_result.reply_mode == "ai_polish":
                                         # Polish the preset answer with AI
+                                        logger.info("AI Polish: question=%s, answer=%s", text_content, final_answers[0])
                                         ai_resp = await handler.reply_ai_polish(
                                             text_content, final_answers[0], runtime
                                         )
-                                        final_answers = [ai_resp.content]
-                                        reply_sender_type = "ai"
+                                        logger.info("AI Polish result: content='%s', tokens=%d", ai_resp.content[:100] if ai_resp.content else "EMPTY", ai_resp.tokens_used)
+                                        if ai_resp.content:
+                                            final_answers = [ai_resp.content]
+                                            reply_sender_type = "ai"
+                                        else:
+                                            logger.warning("AI returned empty content, keeping original FAQ answer")
                                     elif faq_result.reply_mode == "ai_only":
                                         ai_resp = await handler.reply_ai_only(text_content, runtime)
                                         final_answers = [ai_resp.content]

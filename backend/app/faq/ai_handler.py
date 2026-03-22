@@ -166,10 +166,12 @@ class AIHandler:
                             continue
 
                         event_type = event_data.get("type", "")
+                        logger.debug("SSE event: %s", event_type)
 
                         # Collect text deltas
                         if event_type == "response.output_text.delta":
-                            content += event_data.get("delta", "")
+                            delta = event_data.get("delta", "")
+                            content += delta
 
                         # Get usage from completed response
                         elif event_type == "response.completed":
@@ -181,6 +183,7 @@ class AIHandler:
                             model_name = resp_obj.get("model", config.model)
 
                 content = content.strip()
+                logger.info("AI streaming result: content_len=%d, tokens=%d, model=%s", len(content), tokens_used, model_name)
 
             except httpx.HTTPStatusError as exc:
                 logger.error("AI API streaming HTTP error: %s", str(exc))
