@@ -242,6 +242,7 @@ async def handle_private_message(message: TgMessage, bot_db_id: int) -> None:
                         final_answers = list(faq_result.answers) if faq_result.answers else []
                         reply_sender_type = "faq"
 
+                        logger.info("FAQ matched: rule_id=%s, reply_mode=%s, answers=%d", faq_result.rule_id, faq_result.reply_mode, len(final_answers))
                         if faq_result.reply_mode != "direct" and final_answers:
                             # AI processing modes
                             try:
