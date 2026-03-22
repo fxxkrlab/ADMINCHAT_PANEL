@@ -6,7 +6,7 @@ import Header from '../components/layout/Header';
 import { TableRowSkeleton } from '../components/ui/Skeleton';
 import { getRules, updateRule, deleteRule, getFAQGroups, createFAQGroup, deleteFAQGroup, createFAQCategory, deleteFAQCategory } from '../services/faqApi';
 import { getBotGroups } from '../services/botApi';
-import type { FAQRule, FAQGroup } from '../types';
+import type { FAQRule } from '../types';
 
 const REPLY_MODE_LABELS: Record<string, string> = {
   direct: 'Direct',
