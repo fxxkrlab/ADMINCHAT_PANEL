@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Pencil, Trash2, Zap, X, CheckCircle, XCircle, Loader2, BarChart3, Activity, Database } from 'lucide-react';
 import Header from '../components/layout/Header';
 import { getAIConfigs, createAIConfig, updateAIConfig, deleteAIConfig, testAIConfig, getAIUsage, getRAGConfig, saveRAGConfig, deleteRAGConfig, testRAGConfig } from '../services/aiConfigApi';
-import type { AIConfig, AIConfigCreate, AIConfigUpdate, AITestResult, AIUsageStats, RAGConfig, RAGTestResult, AuthMethod } from '../types';
+import type { AIConfig, AIConfigCreate, AIConfigUpdate, AITestResult, AIUsageStats, RAGTestResult, AuthMethod } from '../types';
 import AuthMethodSelector from '../components/ai/AuthMethodSelector';
 import OAuthFlowModal from '../components/ai/OAuthFlowModal';
 

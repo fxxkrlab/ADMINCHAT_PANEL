@@ -49,7 +49,7 @@ export default function OAuthFlowModal({ authMethod, onClose, onSuccess }: OAuth
   };
 
   // Track timeouts for cleanup on unmount
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     return () => {
@@ -149,12 +149,14 @@ export default function OAuthFlowModal({ authMethod, onClose, onSuccess }: OAuth
     }
   };
 
-  const methodLabel = {
+  const methodLabels: Record<string, string> = {
     openai_oauth: 'OpenAI',
     claude_oauth: 'Claude',
     claude_session: 'Claude (Session Token)',
     gemini_oauth: 'Gemini',
-  }[authMethod] || authMethod;
+    api_key: 'API Key',
+  };
+  const methodLabel = methodLabels[authMethod] || authMethod;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
