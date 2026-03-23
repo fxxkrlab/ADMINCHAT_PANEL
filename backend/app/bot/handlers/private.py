@@ -371,18 +371,25 @@ async def handle_private_message(message: TgMessage, bot_db_id: int) -> None:
                                 tg_reply = f"<b>{label}</b>\n\n{answer_text}"
 
                                 # Send via routing bot if available, else original bot
+                                sent = False
                                 if route_bot:
                                     route_aiogram = get_bot_instance(route_bot.id)
                                     if route_aiogram:
-                                        await route_aiogram.send_message(
-                                            chat_id=message.chat.id,
-                                            text=tg_reply,
-                                            parse_mode="HTML",
-                                        )
-                                    else:
-                                        await message.answer(tg_reply, parse_mode="HTML")
-                                else:
+                                        try:
+                                            await route_aiogram.send_message(
+                                                chat_id=message.chat.id,
+                                                text=tg_reply,
+                                                parse_mode="HTML",
+                                            )
+                                            sent = True
+                                        except Exception as route_err:
+                                            logger.warning(
+                                                "Route bot %s failed to send, falling back to original bot: %s",
+                                                route_bot.id, route_err,
+                                            )
+                                if not sent:
                                     await message.answer(tg_reply, parse_mode="HTML")
+                                    send_bot_id = bot_db_id
 
                                 # Store reply in DB
                                 faq_msg = Message(
