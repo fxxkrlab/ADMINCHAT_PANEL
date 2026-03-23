@@ -42,19 +42,6 @@
 
 ADMINCHAT Panel 是一个功能完备的 Telegram 客服管理系统。它将 Telegram Bot 收到的私聊消息和群组 @提及 消息统一转发到 Web 管理面板，让管理员/客服人员可以在浏览器中实时查看并回复用户消息，同时支持 FAQ 自动回复、AI 智能应答、RAG 知识库检索、用户管理等丰富功能。
 
-### v0.8.1 新特性
-
-- **AI 用量追踪与成本估算** &mdash; 每次 AI 调用自动记录 prompt/completion tokens、模型名称和回复模式到 `ai_usage_logs` 表。内置 25+ 模型定价表（GPT-4o、Claude、Gemini、DeepSeek 等），模糊匹配模型名称，自动计算成本估算
-- **增强 Usage Statistics 面板** &mdash; 新增 4 卡片布局（请求数/Token 数含输入输出拆分/估算成本/平均 Token），Provider 表格新增模型列和 Token 细分
-- **修复聊天消息堆叠** &mdash; 修复 5 秒自动刷新导致消息列表重复渲染和页面跳动的问题
-
-### v0.8.0 新特性
-
-- **遗漏关键词过滤器** &mdash; 全新的可配置过滤系统，支持 4 种匹配模式（精确/前缀/包含/正则），可自动跳过不相关的 Bot 命令和无效关键词（如 `/start`、`/help` 等），避免这些命令污染遗漏知识点统计。管理界面位于遗漏知识点页面 `/faq/missed`
-- **Catch All 兜底匹配模式** &mdash; FAQ 问题新增 `catch_all` 匹配模式，匹配任何用户消息。设计为低优先级兜底规则，适用于 RAG 知识库回复场景 &mdash; 当所有精确/前缀/包含/正则规则均未命中时，自动触发兜底 RAG 检索
-- **代码质量全面提升** &mdash; 修复会话列表、用户列表、FAQ 列表中的 N+1 查询问题；修复 Pydantic Schema 中的可变默认值；补齐缺失的外键约束和数据库索引；前端新增全局 Error Boundary 组件，捕获并优雅处理运行时错误；修复空 catch 块等代码异味
-- **新增数据库表** &mdash; 新增 `missed_keyword_filters` 表，数据库共 30 张表
-
 ## 核心功能
 
 ### 消息转发与通信
@@ -696,7 +683,7 @@ npm run dev
 
 ## 版本说明
 
-- **公开版本**: `VERSION` 文件 (semver 格式，当前 v0.8.1)
+- **公开版本**: `VERSION` 文件 (semver 格式)
 - **内部版本**: `BUILD_VERSION` 文件 (格式 YYYYMMDD.NNNN)
 - 页脚显示: `Powered By ADMINCHAT PANEL v{VERSION} ({BUILD_VERSION})`
 

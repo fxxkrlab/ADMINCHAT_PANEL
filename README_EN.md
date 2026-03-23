@@ -644,21 +644,6 @@ npm run dev
 
 </details>
 
-## What's New in v0.8.1
-
-- **AI Usage Tracking & Cost Estimation** &mdash; Every AI call now logs prompt/completion tokens, model name, and reply mode to `ai_usage_logs`. Built-in pricing table for 25+ models (GPT-4o, Claude, Gemini, DeepSeek, etc.) with fuzzy model name matching for automatic cost estimation
-- **Enhanced Usage Statistics** &mdash; 4-card summary layout (requests, tokens with input/output split, estimated cost, avg tokens/request), model column and token breakdown in per-provider table
-- **Chat Message Stacking Fix** &mdash; Fixed 5-second auto-refresh causing message list duplication and page jumping
-
-## What's New in v0.8.0
-
-- **Missed Keyword Filters** &mdash; Configurable filter system with 4 match modes (exact, prefix, contains, regex) to automatically bypass irrelevant keywords like bot commands (`/start`, `/about`) from the missed knowledge rankings
-- **Catch All Match Mode** &mdash; New FAQ question `match_mode` that matches any incoming message, designed as a low-priority fallback for RAG-based rules
-- **N+1 Query Optimizations** &mdash; Eager loading applied across critical API endpoints to eliminate redundant database queries
-- **Schema Validation Fixes** &mdash; Corrected Pydantic schema definitions and added missing foreign key constraints and indexes
-- **Global Error Boundary** &mdash; Frontend error isolation component preventing unhandled exceptions from crashing the entire application
-- **Improved Error Logging** &mdash; Structured error output across backend services for easier debugging
-
 ## License
 
 This project is licensed under the [GNU General Public License v3.0](LICENSE).
