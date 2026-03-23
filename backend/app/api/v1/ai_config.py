@@ -248,12 +248,16 @@ async def get_ai_usage(
             func.count(AiUsageLog.id),
             func.coalesce(func.sum(AiUsageLog.tokens_used), 0),
             func.coalesce(func.sum(AiUsageLog.cost_estimate), 0),
+            func.coalesce(func.sum(AiUsageLog.prompt_tokens), 0),
+            func.coalesce(func.sum(AiUsageLog.completion_tokens), 0),
         ).where(AiUsageLog.created_at >= cutoff)
     )
     row = total_result.one()
     total_requests = row[0]
     total_tokens = int(row[1])
     total_cost = float(row[2])
+    total_prompt_tokens = int(row[3])
+    total_completion_tokens = int(row[4])
 
     # Daily stats
     daily_result = await db.execute(
@@ -262,6 +266,8 @@ async def get_ai_usage(
             func.count(AiUsageLog.id).label("requests"),
             func.coalesce(func.sum(AiUsageLog.tokens_used), 0).label("tokens"),
             func.coalesce(func.sum(AiUsageLog.cost_estimate), 0).label("cost"),
+            func.coalesce(func.sum(AiUsageLog.prompt_tokens), 0).label("prompt_tokens"),
+            func.coalesce(func.sum(AiUsageLog.completion_tokens), 0).label("completion_tokens"),
         )
         .where(AiUsageLog.created_at >= cutoff)
         .group_by("day")
@@ -273,6 +279,8 @@ async def get_ai_usage(
             "requests": r.requests,
             "tokens": int(r.tokens),
             "cost": float(r.cost),
+            "prompt_tokens": int(r.prompt_tokens),
+            "completion_tokens": int(r.completion_tokens),
         }
         for r in daily_result.all()
     ]
@@ -282,21 +290,27 @@ async def get_ai_usage(
         select(
             AiUsageLog.ai_config_id,
             AiConfig.name,
+            AiConfig.model.label("config_model"),
             func.count(AiUsageLog.id).label("requests"),
             func.coalesce(func.sum(AiUsageLog.tokens_used), 0).label("tokens"),
             func.coalesce(func.sum(AiUsageLog.cost_estimate), 0).label("cost"),
+            func.coalesce(func.sum(AiUsageLog.prompt_tokens), 0).label("prompt_tokens"),
+            func.coalesce(func.sum(AiUsageLog.completion_tokens), 0).label("completion_tokens"),
         )
         .outerjoin(AiConfig, AiUsageLog.ai_config_id == AiConfig.id)
         .where(AiUsageLog.created_at >= cutoff)
-        .group_by(AiUsageLog.ai_config_id, AiConfig.name)
+        .group_by(AiUsageLog.ai_config_id, AiConfig.name, AiConfig.model)
     )
     per_config = [
         {
             "config_id": r.ai_config_id,
             "config_name": r.name or "Unknown",
+            "model": r.config_model or "",
             "requests": r.requests,
             "tokens": int(r.tokens),
             "cost": float(r.cost),
+            "prompt_tokens": int(r.prompt_tokens),
+            "completion_tokens": int(r.completion_tokens),
         }
         for r in config_result.all()
     ]
@@ -305,6 +319,8 @@ async def get_ai_usage(
         total_requests=total_requests,
         total_tokens=total_tokens,
         total_cost=total_cost,
+        total_prompt_tokens=total_prompt_tokens,
+        total_completion_tokens=total_completion_tokens,
         daily_stats=daily_stats,
         per_config_stats=per_config,
     )

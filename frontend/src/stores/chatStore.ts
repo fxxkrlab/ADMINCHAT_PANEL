@@ -104,9 +104,22 @@ export const useChatStore = create<ChatState>((set, get) => ({
     try {
       const result = await getMessages(conversationId, { page, page_size: 50 });
       if (page === 1) {
+        const newMessages = [...result.items].reverse();
+        const existing = get().messages;
+        // Skip update if messages haven't changed (same count + same last message id)
+        // This prevents unnecessary re-renders during 5s polling
+        const isSame =
+          existing.length === newMessages.length &&
+          existing.length > 0 &&
+          newMessages.length > 0 &&
+          existing[existing.length - 1]?.id === newMessages[newMessages.length - 1]?.id;
+        if (isSame) {
+          set({ messagesLoading: false });
+          return;
+        }
         // Reverse to show oldest first (API returns newest first)
         set({
-          messages: [...result.items].reverse(),
+          messages: newMessages,
           messagesTotal: result.total,
           messagesPage: page,
           messagesLoading: false,

@@ -338,18 +338,25 @@ export interface AIUsageStats {
   total_requests: number;
   total_tokens: number;
   total_cost: number;
+  total_prompt_tokens: number;
+  total_completion_tokens: number;
   daily_stats: Array<{
     date: string;
     requests: number;
     tokens: number;
     cost: number;
+    prompt_tokens: number;
+    completion_tokens: number;
   }>;
   per_config_stats: Array<{
     config_id: number;
     config_name: string;
+    model: string;
     requests: number;
     tokens: number;
     cost: number;
+    prompt_tokens: number;
+    completion_tokens: number;
   }>;
 }
 

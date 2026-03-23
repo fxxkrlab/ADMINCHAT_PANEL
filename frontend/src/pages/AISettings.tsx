@@ -450,7 +450,7 @@ export default function AISettings() {
             ) : (
               <>
                 {/* Summary cards */}
-                <div className="grid grid-cols-3 gap-6 mb-8">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                   <div className="bg-[#0A0A0A] border border-[#1A1A1A] rounded-xl p-6">
                     <p className="text-xs text-[#6a6a6a] mb-1">Total Requests (30d)</p>
                     <p className="text-2xl font-bold text-[#FFFFFF] font-mono">{usage.total_requests.toLocaleString()}</p>
@@ -458,10 +458,18 @@ export default function AISettings() {
                   <div className="bg-[#0A0A0A] border border-[#1A1A1A] rounded-xl p-6">
                     <p className="text-xs text-[#6a6a6a] mb-1">Total Tokens</p>
                     <p className="text-2xl font-bold text-[#00D9FF] font-mono">{usage.total_tokens.toLocaleString()}</p>
+                    <div className="flex gap-3 mt-1.5 text-[10px] font-mono text-[#4a4a4a]">
+                      <span>In: {(usage.total_prompt_tokens ?? 0).toLocaleString()}</span>
+                      <span>Out: {(usage.total_completion_tokens ?? 0).toLocaleString()}</span>
+                    </div>
                   </div>
                   <div className="bg-[#0A0A0A] border border-[#1A1A1A] rounded-xl p-6">
                     <p className="text-xs text-[#6a6a6a] mb-1">Estimated Cost</p>
-                    <p className="text-2xl font-bold text-[#FF8800] font-mono">${usage.total_cost.toFixed(4)}</p>
+                    <p className="text-2xl font-bold text-[#FF8800] font-mono">${usage.total_cost < 0.01 ? usage.total_cost.toFixed(6) : usage.total_cost.toFixed(4)}</p>
+                  </div>
+                  <div className="bg-[#0A0A0A] border border-[#1A1A1A] rounded-xl p-6">
+                    <p className="text-xs text-[#6a6a6a] mb-1">Avg Tokens / Request</p>
+                    <p className="text-2xl font-bold text-[#8B5CF6] font-mono">{usage.total_requests ? Math.round(usage.total_tokens / usage.total_requests).toLocaleString() : '—'}</p>
                   </div>
                 </div>
 
@@ -475,6 +483,7 @@ export default function AISettings() {
                       <thead>
                         <tr className="border-b border-[#1A1A1A]">
                           <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Provider</th>
+                          <th className="text-left text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Model</th>
                           <th className="text-right text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Requests</th>
                           <th className="text-right text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Tokens</th>
                           <th className="text-right text-xs font-semibold text-[#6a6a6a] uppercase tracking-wider font-['JetBrains_Mono'] px-6 py-4">Cost</th>
@@ -484,9 +493,15 @@ export default function AISettings() {
                         {usage.per_config_stats.map((stat, i) => (
                           <tr key={i} className="border-b border-[#1A1A1A]/50">
                             <td className="px-6 py-4.5 text-sm text-[#FFFFFF]">{stat.config_name}</td>
+                            <td className="px-6 py-4.5 text-xs text-[#6a6a6a] font-mono">{stat.model || '—'}</td>
                             <td className="px-6 py-4.5 text-sm text-[#8a8a8a] text-right font-mono">{stat.requests.toLocaleString()}</td>
-                            <td className="px-6 py-4.5 text-sm text-[#00D9FF] text-right font-mono">{stat.tokens.toLocaleString()}</td>
-                            <td className="px-6 py-4.5 text-sm text-[#FF8800] text-right font-mono">${stat.cost.toFixed(4)}</td>
+                            <td className="px-6 py-4.5 text-right font-mono">
+                              <span className="text-sm text-[#00D9FF]">{stat.tokens.toLocaleString()}</span>
+                              <div className="text-[10px] text-[#4a4a4a] mt-0.5">
+                                {(stat.prompt_tokens ?? 0).toLocaleString()} / {(stat.completion_tokens ?? 0).toLocaleString()}
+                              </div>
+                            </td>
+                            <td className="px-6 py-4.5 text-sm text-[#FF8800] text-right font-mono">${stat.cost < 0.01 ? stat.cost.toFixed(6) : stat.cost.toFixed(4)}</td>
                           </tr>
                         ))}
                       </tbody>

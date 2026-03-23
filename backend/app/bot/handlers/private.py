@@ -257,7 +257,7 @@ async def handle_private_message(message: TgMessage, bot_db_id: int) -> None:
                                             f"[{r.source}] {r.content}" if r.source else r.content
                                             for r in rag_results
                                         )
-                                        from app.faq.ai_handler import AIHandler, AIConfig as AIRuntimeConfig
+                                        from app.faq.ai_handler import AIHandler, AIConfig as AIRuntimeConfig, log_ai_usage
                                         from app.models.ai_config import AiConfig
 
                                         ai_cfg_result = await session.execute(
@@ -281,6 +281,7 @@ async def handle_private_message(message: TgMessage, bot_db_id: int) -> None:
                                                 if ai_resp.content:
                                                     final_answers = [ai_resp.content]
                                                     reply_sender_type = "ai"
+                                                await log_ai_usage(session, ai_cfg.id, db_user.id, ai_resp, "rag")
                                             finally:
                                                 await handler.close()
                                         else:
@@ -297,7 +298,7 @@ async def handle_private_message(message: TgMessage, bot_db_id: int) -> None:
                         elif faq_result.reply_mode != "direct" and final_answers:
                             # AI processing modes
                             try:
-                                from app.faq.ai_handler import AIHandler, AIConfig as AIRuntimeConfig
+                                from app.faq.ai_handler import AIHandler, AIConfig as AIRuntimeConfig, log_ai_usage
                                 from app.models.ai_config import AiConfig
 
                                 ai_cfg_result = await session.execute(
@@ -326,11 +327,13 @@ async def handle_private_message(message: TgMessage, bot_db_id: int) -> None:
                                                 reply_sender_type = "ai"
                                             else:
                                                 logger.warning("AI returned empty content, keeping original FAQ answer")
+                                            await log_ai_usage(session, ai_cfg.id, db_user.id, ai_resp, "ai_polish")
                                         elif faq_result.reply_mode == "ai_only":
                                             ai_resp = await handler.reply_ai_only(text_content, runtime)
                                             if ai_resp.content:
                                                 final_answers = [ai_resp.content]
                                                 reply_sender_type = "ai"
+                                            await log_ai_usage(session, ai_cfg.id, db_user.id, ai_resp, "ai_only")
                                         elif faq_result.reply_mode == "ai_fallback":
                                             pass  # FAQ matched, keep FAQ answer
                                         elif faq_result.reply_mode == "ai_classify_and_answer":
@@ -341,6 +344,7 @@ async def handle_private_message(message: TgMessage, bot_db_id: int) -> None:
                                             if ai_resp.content:
                                                 final_answers = [ai_resp.content]
                                                 reply_sender_type = "ai"
+                                            await log_ai_usage(session, ai_cfg.id, db_user.id, ai_resp, "ai_classify_and_answer")
                                         else:
                                             pass  # Unknown mode: use preset answer
                                     finally:

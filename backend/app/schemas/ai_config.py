@@ -78,6 +78,8 @@ class AIUsageStatsResponse(BaseModel):
     total_requests: int = 0
     total_tokens: int = 0
     total_cost: float = 0.0
+    total_prompt_tokens: int = 0
+    total_completion_tokens: int = 0
     daily_stats: List[Dict[str, Any]] = Field(default_factory=list)
     per_config_stats: List[Dict[str, Any]] = Field(default_factory=list)
 

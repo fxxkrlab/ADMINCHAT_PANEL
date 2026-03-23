@@ -394,3 +394,27 @@ class AIHandler:
 
 # Module-level singleton
 ai_handler = AIHandler()
+
+
+async def log_ai_usage(
+    session,
+    ai_config_id: int | None,
+    tg_user_id: int | None,
+    ai_resp: AIResponse,
+    reply_mode: str | None = None,
+) -> None:
+    """Persist an AI usage log row with token breakdown and cost estimate."""
+    from app.models.ai_config import AiUsageLog
+    from app.utils.model_pricing import estimate_cost
+
+    cost = estimate_cost(ai_resp.model, ai_resp.prompt_tokens, ai_resp.completion_tokens)
+    session.add(AiUsageLog(
+        ai_config_id=ai_config_id,
+        tg_user_id=tg_user_id,
+        tokens_used=ai_resp.tokens_used,
+        prompt_tokens=ai_resp.prompt_tokens,
+        completion_tokens=ai_resp.completion_tokens,
+        model=ai_resp.model or None,
+        reply_mode=reply_mode,
+        cost_estimate=cost,
+    ))

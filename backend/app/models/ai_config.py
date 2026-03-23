@@ -44,6 +44,10 @@ class AiUsageLog(Base):
         Integer, ForeignKey("ai_configs.id"), nullable=True
     )
     tokens_used: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    prompt_tokens: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    completion_tokens: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    model: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    reply_mode: Mapped[Optional[str]] = mapped_column(String(30), nullable=True)
     cost_estimate: Mapped[Optional[float]] = mapped_column(
         Numeric(10, 6), nullable=True
     )

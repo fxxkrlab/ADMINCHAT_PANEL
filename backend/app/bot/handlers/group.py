@@ -311,7 +311,7 @@ async def handle_group_message(
                                             f"[{r.source}] {r.content}" if r.source else r.content
                                             for r in rag_results
                                         )
-                                        from app.faq.ai_handler import AIHandler, AIConfig as AIRuntimeConfig
+                                        from app.faq.ai_handler import AIHandler, AIConfig as AIRuntimeConfig, log_ai_usage
                                         from app.models.ai_config import AiConfig
 
                                         ai_cfg_result = await session.execute(
@@ -335,6 +335,7 @@ async def handle_group_message(
                                                 if ai_resp.content:
                                                     final_answers = [ai_resp.content]
                                                     reply_sender_type = "ai"
+                                                await log_ai_usage(session, ai_cfg.id, db_user.id, ai_resp, "rag")
                                             finally:
                                                 await handler.close()
                                         else:
@@ -349,7 +350,7 @@ async def handle_group_message(
 
                         elif faq_result.reply_mode != "direct" and final_answers:
                             try:
-                                from app.faq.ai_handler import AIHandler, AIConfig as AIRuntimeConfig
+                                from app.faq.ai_handler import AIHandler, AIConfig as AIRuntimeConfig, log_ai_usage
                                 from app.models.ai_config import AiConfig
 
                                 ai_cfg_result = await session.execute(
@@ -375,17 +376,20 @@ async def handle_group_message(
                                             if ai_resp.content:
                                                 final_answers = [ai_resp.content]
                                                 reply_sender_type = "ai"
+                                            await log_ai_usage(session, ai_cfg.id, db_user.id, ai_resp, "ai_polish")
                                         elif faq_result.reply_mode == "ai_only":
                                             ai_resp = await handler.reply_ai_only(faq_text_for_ai, runtime)
                                             if ai_resp.content:
                                                 final_answers = [ai_resp.content]
                                                 reply_sender_type = "ai"
+                                            await log_ai_usage(session, ai_cfg.id, db_user.id, ai_resp, "ai_only")
                                         elif faq_result.reply_mode == "ai_classify_and_answer":
                                             faq_context = "\n".join(final_answers)
                                             ai_resp = await handler.reply_ai_classify_and_answer(faq_text_for_ai, faq_context, runtime)
                                             if ai_resp.content:
                                                 final_answers = [ai_resp.content]
                                                 reply_sender_type = "ai"
+                                            await log_ai_usage(session, ai_cfg.id, db_user.id, ai_resp, "ai_classify_and_answer")
                                     finally:
                                         await handler.close()
                             except Exception:

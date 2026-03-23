@@ -49,6 +49,7 @@ export default function ChatWindow() {
 
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const prevMessageCount = useRef(0);
+  const prevLastMessageId = useRef<number | null>(null);
 
   // Get the conversation from the list if selectedConversation is null
   const conv =
@@ -65,9 +66,13 @@ export default function ChatWindow() {
     overscan: 10,
   });
 
+  // Track the last message ID for change detection
+  const lastMessageId = messages.length > 0 ? messages[messages.length - 1]?.id : null;
+
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
-    if (messages.length > prevMessageCount.current) {
+    // Only scroll when there's actually a new message (different last ID)
+    if (lastMessageId !== prevLastMessageId.current && lastMessageId !== null) {
       const isLoadingOlder = prevMessageCount.current > 0 && messages.length - prevMessageCount.current > 1;
       if (!isLoadingOlder) {
         // Scroll to the last virtual item
@@ -77,7 +82,8 @@ export default function ChatWindow() {
       }
     }
     prevMessageCount.current = messages.length;
-  }, [messages.length, virtualizer]);
+    prevLastMessageId.current = lastMessageId;
+  }, [lastMessageId, messages.length, virtualizer]);
 
   // Scroll to bottom on conversation change
   useEffect(() => {
