@@ -340,6 +340,12 @@ npm run dev
 # Visit http://localhost:5173
 ```
 
+## What's New in v0.8.1
+
+- **AI Usage Tracking & Cost Estimation** &mdash; Every AI call now logs prompt/completion tokens, model name, and reply mode to `ai_usage_logs`. Built-in pricing table for 25+ models (GPT-4o, Claude, Gemini, DeepSeek, etc.) with fuzzy model name matching for automatic cost estimation
+- **Enhanced Usage Statistics** &mdash; 4-card summary layout (requests, tokens with input/output split, estimated cost, avg tokens/request), model column and token breakdown in per-provider table
+- **Chat Message Stacking Fix** &mdash; Fixed 5-second auto-refresh causing message list duplication and page jumping
+
 ## What's New in v0.8.0
 
 - **Missed Keyword Filters** &mdash; Configurable filter system with 4 match modes (exact, prefix, contains, regex) to automatically bypass irrelevant keywords like bot commands (`/start`, `/about`) from the missed knowledge rankings

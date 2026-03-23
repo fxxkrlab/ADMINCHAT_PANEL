@@ -5,6 +5,20 @@ All notable changes to the ADMINCHAT Panel project will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.1] - 2026-03-23
+
+### Added
+- AI usage tracking: every AI call now logs `prompt_tokens`, `completion_tokens`, `model`, and `reply_mode` to `ai_usage_logs`
+- Model pricing table (`model_pricing.py`) with 25+ models (GPT-4o, Claude, Gemini, DeepSeek, etc.) and fuzzy name matching
+- `log_ai_usage()` helper function wired into all 8 AI call sites (private + group handlers)
+- Cost estimation calculated automatically from model pricing on each AI request
+- Enhanced Usage Statistics tab: 4-card summary with input/output token breakdown, model column in provider table, avg tokens/request card
+- Alembic migration `006_extend_ai_usage_logs` adding 4 columns to `ai_usage_logs`
+
+### Fixed
+- Chat message stacking on 5-second auto-refresh: store now skips update when data is unchanged
+- Auto-scroll jumping to bottom on every poll: now tracks `lastMessageId` instead of `messages.length`
+
 ## [0.8.0] - 2026-03-23
 
 ### Added
@@ -249,7 +263,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Caddy/Nginx reverse proxy configuration
 - Comprehensive deployment documentation and `.env.example`
 
-[0.8.0]: https://github.com/user/adminchat-panel/compare/v0.7.1...v0.8.0
+[0.8.1]: https://github.com/fxxkrlab/ADMINCHAT_PANEL/compare/v0.8.0...v0.8.1
+[0.8.0]: https://github.com/fxxkrlab/ADMINCHAT_PANEL/compare/v0.7.1...v0.8.0
 [0.7.1]: https://github.com/user/adminchat-panel/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/user/adminchat-panel/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/user/adminchat-panel/compare/v0.5.0...v0.6.0

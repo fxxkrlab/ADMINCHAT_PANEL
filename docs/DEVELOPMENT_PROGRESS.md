@@ -236,6 +236,19 @@
 - ✅ 24.9 前端: Fix empty catch blocks, type safety
 - ✅ 24.10 Migration 005 for all DB fixes
 
+## Phase 25: AI Usage Tracking & Cost Estimation (v0.8.1)
+
+- ✅ 25.1 后端: model_pricing.py 模型定价表 (25+ 模型, 模糊匹配)
+- ✅ 25.2 后端: AiUsageLog 扩展 prompt_tokens/completion_tokens/model/reply_mode 4 列
+- ✅ 25.3 后端: Alembic 迁移 006_extend_ai_usage_logs
+- ✅ 25.4 后端: log_ai_usage() 辅助函数 (ai_handler.py)
+- ✅ 25.5 后端: private.py 4 处 AI 调用点接入日志
+- ✅ 25.6 后端: group.py 4 处 AI 调用点接入日志
+- ✅ 25.7 后端: /ai/usage API 增强 (prompt/completion tokens + model 拆分)
+- ✅ 25.8 前端: AIUsageStats 类型更新
+- ✅ 25.9 前端: Usage Statistics 面板增强 (4 卡片 + model 列 + token 细分)
+- ✅ 25.10 修复: 聊天 5 秒轮询消息堆叠 (chatStore + ChatWindow scroll)
+
 ---
 
 ## 变更记录
@@ -252,3 +265,4 @@
 | 2026-03-23 | Phase 23 完成: Catch All Match Mode (v0.8.0) |
 | 2026-03-23 | Phase 24 完成: Code Quality Overhaul (v0.8.0) |
 | 2026-03-23 | Phase 16.4/16.5 更新: N+1 查询修复 + 安全审计完成 |
+| 2026-03-23 | Phase 25 完成: AI Usage Tracking & Cost Estimation (v0.8.1) |
