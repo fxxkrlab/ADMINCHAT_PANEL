@@ -64,7 +64,11 @@ class DifyRAGProvider(RAGProvider):
             "query": query,
             "retrieval_model": {
                 "search_method": "hybrid_search",
+                "reranking_enable": True,
+                "reranking_mode": "reranking_model",
                 "top_k": top_k,
+                "score_threshold_enabled": False,
+                "score_threshold": 0.0,
             },
         }
 
