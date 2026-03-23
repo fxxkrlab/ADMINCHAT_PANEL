@@ -203,7 +203,7 @@ AI 将用户问题分类到预定义的类别中，返回 `{"category": "xxx", "
 
 #### 第 1 步：部署 Dify
 
-推荐使用 Dify 官方 Docker Compose 部署。Dify 自带 pgvector 和知识库管理界面。
+推荐使用 Dify 官方 Docker Compose 部署。
 
 ```bash
 # 克隆 Dify
@@ -219,52 +219,82 @@ docker compose up -d
 
 启动后访问 `http://your-server-ip` 完成 Dify 初始化设置。
 
-#### 第 2 步：安装 Text Embedding Inference (TEI) 插件
+> **进阶**：如果你已有 PostgreSQL（带 pgvector 扩展）和 Redis，可以通过 `docker-compose.override.yaml` 禁用 Dify 自带的数据库组件，让 Dify 连接你现有的服务。参考 Dify 官方文档的外部数据库配置说明。
 
-Dify 默认不带本地 Embedding 模型，需要安装 Hugging Face TEI 插件来使用 GTE-multilingual-base。
+#### 第 2 步：部署 Text Embedding Inference (TEI)
 
-**方法 A：通过 Dify 插件市场安装（推荐）**
+GTE-multilingual-base 是推荐的多语言 Embedding 模型，约 1.1GB，可以在 CPU 上运行。通过 Hugging Face TEI 容器部署。
 
-1. 登录 Dify 管理后台
-2. 进入 **插件 (Plugins)** 页面
-3. 搜索 `Text Embedding Inference`
-4. 点击安装
-
-**方法 B：手动部署 TEI 容器**
+**方法 A：自动下载模型（简单，但首次启动慢）**
 
 ```bash
-# 部署 TEI 容器（CPU 模式，适合大多数场景）
 docker run -d \
-  --name text-embeddings-inference \
+  --name gte-embedding \
   --restart unless-stopped \
   -p 8090:80 \
   -v tei-data:/data \
-  ghcr.io/huggingface/text-embeddings-inference:cpu-1.5 \
+  ghcr.io/huggingface/text-embeddings-inference:cpu-1.6 \
   --model-id Alibaba-NLP/gte-multilingual-base \
   --port 80
+```
 
-# 验证是否启动成功
+> 首次启动会自动从 Hugging Face 下载模型，可能需要几分钟。
+
+**方法 B：预下载模型到本地（推荐，启动更快）**
+
+```bash
+# 先下载模型到本地目录
+mkdir -p /opt/models
+pip install huggingface_hub
+huggingface-cli download Alibaba-NLP/gte-multilingual-base \
+  --local-dir /opt/models/gte-multilingual-base
+
+# 启动 TEI 容器，挂载本地模型目录
+docker run -d \
+  --name gte-embedding \
+  --restart unless-stopped \
+  -p 8090:80 \
+  -v /opt/models/gte-multilingual-base:/model \
+  ghcr.io/huggingface/text-embeddings-inference:cpu-1.6 \
+  --model-id /model \
+  --port 80
+```
+
+**验证 TEI 是否正常运行：**
+
+```bash
 curl http://localhost:8090/embed \
   -X POST \
   -H 'Content-Type: application/json' \
   -d '{"inputs": "测试文本"}'
 ```
 
-> **注意**：`gte-multilingual-base` 约 1.1GB，首次启动会下载模型，需要等待几分钟。
+**将 TEI 加入 Docker 网络（与 Dify 互通）：**
 
-#### 第 3 步：在 Dify 中配置 Embedding 模型
+```bash
+# 如果 Dify 使用默认网络 docker_default
+docker network connect docker_default gte-embedding
 
-1. 进入 Dify 后台 → **设置** → **模型供应商**
-2. 找到 **Text Embedding Inference** 或 **Hugging Face**
-3. 配置：
-   - **模型名称**: `gte-multilingual-base`（随意填写，仅做标识）
-   - **服务器 URL**: `http://text-embeddings-inference:80`（Docker 内部网络）或 `http://your-server-ip:8090`（外部访问）
-4. 保存并测试连接
+# 或者如果你用了自定义网络
+docker network connect your-shared-network gte-embedding
+```
+
+#### 第 3 步：在 Dify 中安装 TEI 插件并配置
+
+1. 登录 Dify 管理后台 → **插件 (Plugins)**
+2. 搜索 `Text Embedding Inference` → 安装
+3. 进入 **设置** → **模型供应商** → 找到 **Text Embedding Inference**
+4. 配置：
+   - **模型名称**: `gte-multilingual-base`（标识用，可自定义）
+   - **服务器 URL**: `http://gte-embedding:80`（Docker 内部网络名称）
+5. 保存并测试连接
+
+> **注意**：TEI 容器名称就是 Docker 内部 DNS 名称。只要两者在同一个 Docker 网络内，就可以用容器名直接访问。
 
 #### 第 4 步：创建知识库并导入文档
 
 1. 进入 Dify → **知识库** → **创建知识库**
-2. 选择 Embedding 模型为刚配置的 `gte-multilingual-base`
+2. 选择 Embedding 模型为 `gte-multilingual-base`
 3. 上传文档（支持 TXT、PDF、Markdown、CSV 等）
 4. Dify 会自动分段、向量化并存入 pgvector
 5. 创建完成后，记录：
@@ -275,7 +305,9 @@ curl http://localhost:8090/embed \
 1. 进入 Dify → **知识库** → 选择你的知识库
 2. 进入 **API 访问** 或 **设置**
 3. 获取 **Dataset API Key**（格式为 `dataset-xxxxxxxx`）
-4. 记录 Dify API 地址（通常为 `http://your-server-ip/v1` 或 Docker 内部 `http://docker-api-1:5001/v1`）
+4. 记录 Dify API 内部地址：`http://<dify-api容器名>:5001/v1`（Docker 内部）
+
+> Dify API 容器默认监听 5001 端口。容器名可通过 `docker ps | grep dify-api` 查看（通常为 `docker-api-1`）。
 
 #### 第 6 步：在 ADMINCHAT Panel 中配置 RAG
 
@@ -284,12 +316,14 @@ curl http://localhost:8090/embed \
 3. 点击 **Add RAG Config**，填写：
    - **Name**: 自定义名称（如 "产品知识库"）
    - **Provider**: `dify`
-   - **Base URL**: Dify API 地址（如 `http://docker-api-1:5001/v1`）
-   - **API Key**: 上面获取的 Dataset API Key
-   - **Dataset ID**: 上面记录的知识库 UUID
-   - **Top K**: `3`（返回最相关的前 3 条结果）
-4. 点击 **Test** 验证连接，确认返回结果
+   - **Base URL**: Dify API 内部地址（如 `http://docker-api-1:5001/v1`）
+   - **API Key**: Dataset API Key（`dataset-xxxxxxxx`）
+   - **Dataset ID**: 知识库 UUID
+   - **Top K**: `3`（返回前 3 条最相关结果）
+4. 点击 **Test** 验证连接
 5. 保存
+
+> **重要**：ADMINCHAT 后端容器必须与 Dify API 容器在同一个 Docker 网络内，否则无法通过容器名访问。
 
 #### 第 7 步：配置 FAQ 规则使用 RAG
 
@@ -301,27 +335,33 @@ curl http://localhost:8090/embed \
 #### 推荐部署架构
 
 ```
-┌─────────────────────────────────────────────────┐
-│  Docker Host                                     │
-│                                                   │
-│  ┌─────────────┐  ┌──────────────────────────┐   │
-│  │ ADMINCHAT   │  │ Dify (docker compose)     │   │
-│  │ Backend     │──│  ├─ dify-api              │   │
-│  │ Frontend    │  │  ├─ dify-web              │   │
-│  └─────────────┘  │  ├─ postgres (pgvector)   │   │
-│                    │  ├─ redis                 │   │
-│  ┌─────────────┐  │  └─ ...                   │   │
-│  │ TEI Server  │──│                            │   │
-│  │ (gte-multi) │  └──────────────────────────┘   │
-│  └─────────────┘                                  │
-│                    ┌──────────────────────────┐   │
-│                    │ AI API (外部)             │   │
-│                    │ GPT / Claude / Gemini     │   │
-│                    └──────────────────────────┘   │
-└─────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────┐
+│  Docker Host                                           │
+│                                                         │
+│  ┌── 共享 Docker Network ──────────────────────────┐   │
+│  │                                                   │   │
+│  │  ┌──────────────┐   ┌────────────────────────┐   │   │
+│  │  │ ADMINCHAT    │   │ Dify                    │   │   │
+│  │  │  backend     │──→│  api (:5001)            │   │   │
+│  │  │  frontend    │   │  web                    │   │   │
+│  │  └──────────────┘   │  worker                 │   │   │
+│  │                      │  plugin_daemon          │   │   │
+│  │  ┌──────────────┐   └────────────────────────┘   │   │
+│  │  │ TEI Server   │                                 │   │
+│  │  │ gte-multi    │   ┌────────────────────────┐   │   │
+│  │  │ (:80/8090)   │   │ PostgreSQL + pgvector   │   │   │
+│  │  └──────────────┘   │ Redis                   │   │   │
+│  │                      └────────────────────────┘   │   │
+│  └───────────────────────────────────────────────────┘   │
+│                                                           │
+│                ┌─────────────────────┐                    │
+│                │ AI API (外部)       │                    │
+│                │ GPT / Claude / etc. │                    │
+│                └─────────────────────┘                    │
+└───────────────────────────────────────────────────────┘
 ```
 
-> **提示**：如果 ADMINCHAT 和 Dify 在同一台服务器上，使用 Docker 内部网络通信（如 `http://docker-api-1:5001/v1`）可以避免经过外部网络，速度更快且更安全。确保两者在同一个 Docker network 中。
+> **提示**：所有组件（ADMINCHAT、Dify、TEI、PostgreSQL、Redis）通过同一个 Docker bridge 网络互通，使用容器名作为 DNS 地址通信。这样无需暴露额外端口，更快更安全。
 
 </details>
 

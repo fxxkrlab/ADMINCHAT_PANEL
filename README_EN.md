@@ -189,7 +189,7 @@ Component responsibilities:
 
 #### Step 1: Deploy Dify
 
-We recommend Dify's official Docker Compose deployment. Dify includes pgvector and a knowledge base management UI out of the box.
+We recommend Dify's official Docker Compose deployment.
 
 ```bash
 # Clone Dify
@@ -205,53 +205,83 @@ docker compose up -d
 
 After startup, visit `http://your-server-ip` to complete Dify initialization.
 
-#### Step 2: Install Text Embedding Inference (TEI) Plugin
+> **Advanced**: If you already have PostgreSQL (with pgvector extension) and Redis, you can disable Dify's built-in database components via `docker-compose.override.yaml` and point Dify to your existing services. Refer to Dify's official docs for external database configuration.
 
-Dify doesn't include a local embedding model by default. You need the Hugging Face TEI plugin to use GTE-multilingual-base.
+#### Step 2: Deploy Text Embedding Inference (TEI)
 
-**Option A: Install via Dify Plugin Marketplace (Recommended)**
+GTE-multilingual-base is the recommended multilingual embedding model (~1.1GB, runs on CPU). Deploy it via the Hugging Face TEI container.
 
-1. Log in to Dify admin dashboard
-2. Go to **Plugins** page
-3. Search for `Text Embedding Inference`
-4. Click Install
-
-**Option B: Deploy TEI Container Manually**
+**Option A: Auto-download model (simple, but slower first start)**
 
 ```bash
-# Deploy TEI container (CPU mode, suitable for most scenarios)
 docker run -d \
-  --name text-embeddings-inference \
+  --name gte-embedding \
   --restart unless-stopped \
   -p 8090:80 \
   -v tei-data:/data \
-  ghcr.io/huggingface/text-embeddings-inference:cpu-1.5 \
+  ghcr.io/huggingface/text-embeddings-inference:cpu-1.6 \
   --model-id Alibaba-NLP/gte-multilingual-base \
   --port 80
+```
 
-# Verify it's running
+> First startup automatically downloads the model from Hugging Face. This may take a few minutes.
+
+**Option B: Pre-download model locally (recommended, faster startup)**
+
+```bash
+# Download model to a local directory
+mkdir -p /opt/models
+pip install huggingface_hub
+huggingface-cli download Alibaba-NLP/gte-multilingual-base \
+  --local-dir /opt/models/gte-multilingual-base
+
+# Start TEI container with local model mount
+docker run -d \
+  --name gte-embedding \
+  --restart unless-stopped \
+  -p 8090:80 \
+  -v /opt/models/gte-multilingual-base:/model \
+  ghcr.io/huggingface/text-embeddings-inference:cpu-1.6 \
+  --model-id /model \
+  --port 80
+```
+
+**Verify TEI is running:**
+
+```bash
 curl http://localhost:8090/embed \
   -X POST \
   -H 'Content-Type: application/json' \
   -d '{"inputs": "test text"}'
 ```
 
-> **Note**: `gte-multilingual-base` is ~1.1GB. First startup will download the model and may take a few minutes.
+**Connect TEI to the Docker network (so Dify can reach it):**
 
-#### Step 3: Configure Embedding Model in Dify
+```bash
+# If Dify uses the default network docker_default
+docker network connect docker_default gte-embedding
 
-1. Go to Dify → **Settings** → **Model Providers**
-2. Find **Text Embedding Inference** or **Hugging Face**
-3. Configure:
-   - **Model Name**: `gte-multilingual-base` (display name only)
-   - **Server URL**: `http://text-embeddings-inference:80` (Docker internal) or `http://your-server-ip:8090` (external)
-4. Save and test the connection
+# Or if you use a custom shared network
+docker network connect your-shared-network gte-embedding
+```
+
+#### Step 3: Install TEI Plugin in Dify and Configure
+
+1. Log in to Dify → **Plugins**
+2. Search for `Text Embedding Inference` → Install
+3. Go to **Settings** → **Model Providers** → find **Text Embedding Inference**
+4. Configure:
+   - **Model Name**: `gte-multilingual-base` (display label, customizable)
+   - **Server URL**: `http://gte-embedding:80` (Docker internal container name)
+5. Save and test the connection
+
+> **Note**: The TEI container name IS the Docker internal DNS name. As long as both containers are on the same Docker network, you can address it by container name.
 
 #### Step 4: Create Knowledge Base and Import Documents
 
 1. Go to Dify → **Knowledge** → **Create Knowledge Base**
-2. Select the embedding model you just configured (`gte-multilingual-base`)
-3. Upload documents (supports TXT, PDF, Markdown, CSV, etc.)
+2. Select `gte-multilingual-base` as the embedding model
+3. Upload documents (TXT, PDF, Markdown, CSV, etc.)
 4. Dify will automatically segment, vectorize, and store in pgvector
 5. After creation, note down:
    - **Dataset ID**: The UUID in the knowledge base URL (e.g. `abc123-def456` from `datasets/abc123-def456/...`)
@@ -261,7 +291,9 @@ curl http://localhost:8090/embed \
 1. Go to Dify → **Knowledge** → select your knowledge base
 2. Go to **API Access** or **Settings**
 3. Get the **Dataset API Key** (format: `dataset-xxxxxxxx`)
-4. Note the Dify API address (usually `http://your-server-ip/v1` or Docker internal `http://docker-api-1:5001/v1`)
+4. Note the Dify API internal address: `http://<dify-api-container-name>:5001/v1` (Docker internal)
+
+> The Dify API container listens on port 5001 by default. Find the container name with `docker ps | grep dify-api` (typically `docker-api-1`).
 
 #### Step 6: Configure RAG in ADMINCHAT Panel
 
@@ -270,12 +302,14 @@ curl http://localhost:8090/embed \
 3. Click **Add RAG Config** and fill in:
    - **Name**: Custom name (e.g. "Product Knowledge Base")
    - **Provider**: `dify`
-   - **Base URL**: Dify API address (e.g. `http://docker-api-1:5001/v1`)
-   - **API Key**: The Dataset API Key from above
-   - **Dataset ID**: The knowledge base UUID from above
+   - **Base URL**: Dify API internal address (e.g. `http://docker-api-1:5001/v1`)
+   - **API Key**: Dataset API Key (`dataset-xxxxxxxx`)
+   - **Dataset ID**: Knowledge base UUID
    - **Top K**: `3` (return top 3 most relevant results)
 4. Click **Test** to verify the connection
 5. Save
+
+> **Important**: The ADMINCHAT backend container must be on the same Docker network as the Dify API container, otherwise it can't resolve the container name.
 
 #### Step 7: Configure FAQ Rules to Use RAG
 
@@ -287,27 +321,33 @@ curl http://localhost:8090/embed \
 #### Recommended Deployment Architecture
 
 ```
-┌─────────────────────────────────────────────────┐
-│  Docker Host                                     │
-│                                                   │
-│  ┌─────────────┐  ┌──────────────────────────┐   │
-│  │ ADMINCHAT   │  │ Dify (docker compose)     │   │
-│  │ Backend     │──│  ├─ dify-api              │   │
-│  │ Frontend    │  │  ├─ dify-web              │   │
-│  └─────────────┘  │  ├─ postgres (pgvector)   │   │
-│                    │  ├─ redis                 │   │
-│  ┌─────────────┐  │  └─ ...                   │   │
-│  │ TEI Server  │──│                            │   │
-│  │ (gte-multi) │  └──────────────────────────┘   │
-│  └─────────────┘                                  │
-│                    ┌──────────────────────────┐   │
-│                    │ AI API (external)         │   │
-│                    │ GPT / Claude / Gemini     │   │
-│                    └──────────────────────────┘   │
-└─────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────┐
+│  Docker Host                                           │
+│                                                         │
+│  ┌── Shared Docker Network ────────────────────────┐   │
+│  │                                                   │   │
+│  │  ┌──────────────┐   ┌────────────────────────┐   │   │
+│  │  │ ADMINCHAT    │   │ Dify                    │   │   │
+│  │  │  backend     │──→│  api (:5001)            │   │   │
+│  │  │  frontend    │   │  web                    │   │   │
+│  │  └──────────────┘   │  worker                 │   │   │
+│  │                      │  plugin_daemon          │   │   │
+│  │  ┌──────────────┐   └────────────────────────┘   │   │
+│  │  │ TEI Server   │                                 │   │
+│  │  │ gte-multi    │   ┌────────────────────────┐   │   │
+│  │  │ (:80/8090)   │   │ PostgreSQL + pgvector   │   │   │
+│  │  └──────────────┘   │ Redis                   │   │   │
+│  │                      └────────────────────────┘   │   │
+│  └───────────────────────────────────────────────────┘   │
+│                                                           │
+│                ┌─────────────────────┐                    │
+│                │ AI API (external)   │                    │
+│                │ GPT / Claude / etc. │                    │
+│                └─────────────────────┘                    │
+└───────────────────────────────────────────────────────┘
 ```
 
-> **Tip**: If ADMINCHAT and Dify are on the same server, use Docker internal networking (e.g. `http://docker-api-1:5001/v1`) to avoid external traffic. This is faster and more secure. Make sure both are on the same Docker network.
+> **Tip**: All components (ADMINCHAT, Dify, TEI, PostgreSQL, Redis) communicate via a shared Docker bridge network using container names as DNS addresses. No extra ports need to be exposed — faster and more secure.
 
 </details>
 
