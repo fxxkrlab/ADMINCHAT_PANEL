@@ -1,19 +1,19 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class MessageOut(BaseModel):
     id: int
     conversation_id: int
-    direction: str  # 'inbound' | 'outbound'
-    sender_type: str  # 'user' | 'admin' | 'bot' | 'faq'
+    direction: str
+    sender_type: str
     sender_admin_id: Optional[int] = None
     sender_admin_name: Optional[str] = None
     via_bot_id: Optional[int] = None
     via_bot_name: Optional[str] = None
-    content_type: str  # 'text','photo','video','document', etc.
+    content_type: str
     text_content: Optional[str] = None
     media_url: Optional[str] = None
     reply_to_message_id: Optional[int] = None
@@ -26,6 +26,11 @@ class MessageOut(BaseModel):
 
 
 class MessageCreate(BaseModel):
-    content_type: str = "text"
+    content_type: str = Field(
+        default="text",
+        pattern=r"^(text|photo|video|document|sticker|voice|animation)$",
+    )
     text_content: Optional[str] = None
-    parse_mode: Optional[str] = None  # 'MarkdownV2' | 'HTML'
+    parse_mode: Optional[str] = Field(
+        default=None, pattern=r"^(MarkdownV2|HTML)$"
+    )

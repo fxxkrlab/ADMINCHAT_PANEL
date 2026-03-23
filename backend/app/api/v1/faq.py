@@ -16,6 +16,9 @@ DELETE /faq/rules/:id          - delete rule
 GET    /faq/ranking            - hit stats ranking
 GET    /faq/missed-keywords    - missed knowledge ranking
 DELETE /faq/missed-keywords/:id - remove keyword
+GET    /faq/missed-keyword-filters    - list keyword filters
+POST   /faq/missed-keyword-filters    - create keyword filter
+DELETE /faq/missed-keyword-filters/:id - delete keyword filter
 GET    /faq/groups             - list FAQ groups
 POST   /faq/groups             - create FAQ group
 PATCH  /faq/groups/:id         - update FAQ group
@@ -28,6 +31,7 @@ DELETE /faq/categories/:id     - delete FAQ category
 from __future__ import annotations
 
 import logging
+import re
 from datetime import date, datetime, timedelta, timezone
 from typing import Annotated, Optional
 
@@ -47,7 +51,7 @@ from app.models.faq import (
     FaqRuleAnswer,
     FaqRuleQuestion,
 )
-from app.models.stats import FaqHitStat, MissedKeyword
+from app.models.stats import FaqHitStat, MissedKeyword, MissedKeywordFilter
 from app.schemas.common import APIResponse
 from app.services.audit import log_action
 from app.schemas.faq import (
@@ -61,8 +65,11 @@ from app.schemas.faq import (
     FAQRuleCreate,
     FAQRuleResponse,
     FAQRuleUpdate,
+    MissedKeywordFilterCreate,
+    MissedKeywordFilterResponse,
     MissedKeywordItem,
 )
+from app.utils.keyword_filter import keyword_matches_filter
 from app.schemas.faq_group import (
     FAQCategoryCreate,
     FAQCategoryResponse,
@@ -336,15 +343,22 @@ async def list_rules(
     result = await db.execute(stmt)
     rules = result.scalars().unique().all()
 
-    items = []
-    for rule in rules:
+    # Batch query: hit counts for all rules in one query
+    rule_ids = [r.id for r in rules]
+    hit_map: dict[int, int] = {rid: 0 for rid in rule_ids}
+    if rule_ids:
         hit_result = await db.execute(
-            select(func.coalesce(func.sum(FaqHitStat.hit_count), 0)).where(
-                FaqHitStat.faq_rule_id == rule.id
+            select(
+                FaqHitStat.faq_rule_id,
+                func.coalesce(func.sum(FaqHitStat.hit_count), 0).label("total"),
             )
+            .where(FaqHitStat.faq_rule_id.in_(rule_ids))
+            .group_by(FaqHitStat.faq_rule_id)
         )
-        total_hits = hit_result.scalar() or 0
-        items.append(_build_rule_response(rule, total_hits))
+        for row in hit_result.all():
+            hit_map[row.faq_rule_id] = row.total
+
+    items = [_build_rule_response(rule, hit_map.get(rule.id, 0)) for rule in rules]
 
     return APIResponse(data=items)
 
@@ -635,8 +649,101 @@ async def delete_missed_keyword(
         raise HTTPException(status_code=404, detail="Keyword not found")
 
     keyword.is_resolved = True
-    keyword.updated_at = datetime.utcnow()
+    keyword.updated_at = datetime.now(timezone.utc)
     return APIResponse(message="Keyword marked as resolved")
+
+
+# ============================================================
+# Missed Keyword Filters
+# ============================================================
+
+@router.get("/missed-keyword-filters", response_model=APIResponse)
+async def list_missed_keyword_filters(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    _current_user: Annotated[Admin, Depends(require_admin)],
+):
+    """List all missed keyword filters."""
+    result = await db.execute(
+        select(MissedKeywordFilter).order_by(MissedKeywordFilter.created_at.desc())
+    )
+    filters = result.scalars().all()
+    items = [
+        MissedKeywordFilterResponse.model_validate(f).model_dump(mode="json")
+        for f in filters
+    ]
+    return APIResponse(data=items)
+
+
+@router.post(
+    "/missed-keyword-filters",
+    response_model=APIResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_missed_keyword_filter(
+    body: MissedKeywordFilterCreate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    _current_user: Annotated[Admin, Depends(require_admin)],
+):
+    """Create a new missed keyword filter and auto-resolve matching keywords."""
+    # Validate regex pattern
+    if body.match_mode == "regex":
+        try:
+            re.compile(body.pattern)
+        except re.error as e:
+            raise HTTPException(
+                status_code=400, detail=f"Invalid regex pattern: {e}"
+            )
+
+    new_filter = MissedKeywordFilter(
+        pattern=body.pattern,
+        match_mode=body.match_mode,
+        description=body.description,
+    )
+    db.add(new_filter)
+    await db.flush()
+    await db.refresh(new_filter)
+
+    # Auto-resolve existing matching missed keywords
+    result = await db.execute(
+        select(MissedKeyword).where(MissedKeyword.is_resolved.is_(False))
+    )
+    unresolved = result.scalars().all()
+    resolved_count = 0
+    now = datetime.now(timezone.utc)
+    for kw in unresolved:
+        if keyword_matches_filter(kw.keyword, body.pattern, body.match_mode):
+            kw.is_resolved = True
+            kw.updated_at = now
+            resolved_count += 1
+
+    logger.info(
+        "Filter '%s' (%s) auto-resolved %d missed keywords.",
+        body.pattern, body.match_mode, resolved_count,
+    )
+
+    return APIResponse(
+        code=201,
+        message=f"Filter created, {resolved_count} keywords auto-resolved",
+        data=MissedKeywordFilterResponse.model_validate(new_filter).model_dump(mode="json"),
+    )
+
+
+@router.delete("/missed-keyword-filters/{filter_id}", response_model=APIResponse)
+async def delete_missed_keyword_filter(
+    filter_id: int,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    _current_user: Annotated[Admin, Depends(require_admin)],
+):
+    """Delete a missed keyword filter."""
+    result = await db.execute(
+        select(MissedKeywordFilter).where(MissedKeywordFilter.id == filter_id)
+    )
+    f = result.scalar_one_or_none()
+    if f is None:
+        raise HTTPException(status_code=404, detail="Filter not found")
+
+    await db.delete(f)
+    return APIResponse(message="Filter deleted")
 
 
 # ============================================================

@@ -1,7 +1,7 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Literal, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class TagOut(BaseModel):
@@ -98,7 +98,7 @@ class ConversationDetail(BaseModel):
 
 
 class ConversationStatusUpdate(BaseModel):
-    status: str  # 'open' | 'resolved'
+    status: Literal["open", "resolved", "blocked"]
 
 
 class ConversationAssign(BaseModel):

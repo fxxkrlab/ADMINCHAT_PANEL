@@ -36,18 +36,26 @@ def match_regex(text: str, pattern: str) -> bool:
         return False
 
 
+def match_catch_all(text: str, _keyword: str) -> bool:
+    """Always matches any non-empty text. Used as a low-priority fallback (e.g. for RAG)."""
+    return bool(text and text.strip())
+
+
 # Dispatch table keyed by match_mode value
 MATCHERS = {
     "exact": match_exact,
     "prefix": match_prefix,
     "contains": match_contains,
     "regex": match_regex,
+    "catch_all": match_catch_all,
 }
 
 # Priority order for tie-breaking within the same rule priority
+# Lower number = checked first within the same rule
 MODE_PRIORITY = {
     "exact": 0,
     "prefix": 1,
     "contains": 2,
     "regex": 3,
+    "catch_all": 99,  # Always last — acts as fallback
 }

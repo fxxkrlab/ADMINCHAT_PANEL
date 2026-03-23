@@ -87,18 +87,24 @@ async def list_users(
     result = await db.execute(users_query)
     users = result.scalars().unique().all()
 
-    # Build items with message counts
+    # Batch query: message counts for all users in one query
+    user_ids = [u.id for u in users]
+    msg_count_map: dict[int, int] = {uid: 0 for uid in user_ids}
+    if user_ids:
+        msg_count_query = (
+            select(Conversation.tg_user_id, func.count(Message.id).label("cnt"))
+            .join(Message, Message.conversation_id == Conversation.id)
+            .where(Conversation.tg_user_id.in_(user_ids))
+            .where(Message.direction == "inbound")
+            .group_by(Conversation.tg_user_id)
+        )
+        msg_count_result = await db.execute(msg_count_query)
+        for row in msg_count_result.all():
+            msg_count_map[row.tg_user_id] = row.cnt
+
+    # Build items
     items = []
     for user in users:
-        # Get message count
-        msg_count_result = await db.execute(
-            select(func.count(Message.id))
-            .join(Conversation, Conversation.id == Message.conversation_id)
-            .where(Conversation.tg_user_id == user.id)
-            .where(Message.direction == "inbound")
-        )
-        msg_count = msg_count_result.scalar() or 0
-
         tags = [TagOut(id=ut.tag.id, name=ut.tag.name, color=ut.tag.color) for ut in user.user_tags]
 
         items.append(
@@ -113,7 +119,7 @@ async def list_users(
                 phone_region=user.phone_region,
                 is_blocked=user.is_blocked,
                 tags=tags,
-                message_count=msg_count,
+                message_count=msg_count_map.get(user.id, 0),
                 last_active_at=user.last_active_at,
             )
         )

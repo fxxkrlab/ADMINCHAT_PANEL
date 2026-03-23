@@ -34,6 +34,7 @@ class BotGroupMember(Base):
         Integer, ForeignKey("bots.id", ondelete="CASCADE"), primary_key=True
     )
 
+    # A bot can only belong to one group at a time
     __table_args__ = (
         UniqueConstraint("bot_id", name="uq_bot_group_members_bot_id"),
     )

@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from typing import Annotated, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import String as SAString, and_, cast, desc, func, select
+from sqlalchemy import String as SAString, and_, case, cast, desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -106,44 +106,88 @@ async def list_conversations(
     result = await db.execute(query)
     conversations = result.scalars().unique().all()
 
+    # Batch: collect IDs for bulk queries
+    conv_ids = [c.id for c in conversations]
+    bot_ids = {c.primary_bot_id for c in conversations if c.primary_bot_id}
+
+    # Batch query: last message per conversation (using lateral join pattern)
+    last_msg_map: dict[int, Message] = {}
+    if conv_ids:
+        # Use DISTINCT ON to get last message per conversation in one query
+        last_msgs_query = (
+            select(Message)
+            .where(Message.conversation_id.in_(conv_ids))
+            .order_by(Message.conversation_id, desc(Message.created_at))
+            .distinct(Message.conversation_id)
+        )
+        last_msgs_result = await db.execute(last_msgs_query)
+        for msg in last_msgs_result.scalars().all():
+            last_msg_map[msg.conversation_id] = msg
+
+    # Batch query: unread counts per conversation
+    unread_map: dict[int, int] = {cid: 0 for cid in conv_ids}
+    if conv_ids:
+        # Build resolved_at map for conditional counting
+        resolved_at_map = {c.id: c.resolved_at for c in conversations}
+        # For simplicity, count all inbound messages; then subtract for resolved convs
+        unread_query = (
+            select(Message.conversation_id, func.count().label("cnt"))
+            .where(
+                and_(
+                    Message.conversation_id.in_(conv_ids),
+                    Message.direction == "inbound",
+                )
+            )
+            .group_by(Message.conversation_id)
+        )
+        unread_result = await db.execute(unread_query)
+        total_inbound = {row.conversation_id: row.cnt for row in unread_result.all()}
+
+        # For resolved conversations, subtract messages before resolved_at
+        resolved_conv_ids = [cid for cid, rat in resolved_at_map.items() if rat]
+        before_resolved = {}
+        if resolved_conv_ids:
+            # Count inbound messages BEFORE resolved_at for each resolved conv
+            for cid in resolved_conv_ids:
+                rat = resolved_at_map[cid]
+                cnt_q = select(func.count()).where(
+                    and_(
+                        Message.conversation_id == cid,
+                        Message.direction == "inbound",
+                        Message.created_at <= rat,
+                    )
+                )
+                cnt_result = await db.execute(cnt_q)
+                before_resolved[cid] = cnt_result.scalar() or 0
+
+        for cid in conv_ids:
+            total = total_inbound.get(cid, 0)
+            if cid in before_resolved:
+                unread_map[cid] = total - before_resolved[cid]
+            else:
+                unread_map[cid] = total
+
+    # Batch query: bots
+    bot_map: dict[int, Bot] = {}
+    if bot_ids:
+        bot_result = await db.execute(select(Bot).where(Bot.id.in_(bot_ids)))
+        bot_map = {b.id: b for b in bot_result.scalars().all()}
+
     # Build response items
     items = []
     for conv in conversations:
         tg_user = conv.tg_user
         tags = [ut.tag for ut in (tg_user.user_tags or [])]
+        last_msg = last_msg_map.get(conv.id)
 
-        # Get last message
-        last_msg_query = (
-            select(Message)
-            .where(Message.conversation_id == conv.id)
-            .order_by(desc(Message.created_at))
-            .limit(1)
-        )
-        last_msg_result = await db.execute(last_msg_query)
-        last_msg = last_msg_result.scalar_one_or_none()
-
-        # Count unread (inbound messages since last resolved or creation)
-        unread_query = select(func.count()).where(
-            and_(
-                Message.conversation_id == conv.id,
-                Message.direction == "inbound",
-            )
-        )
-        if conv.resolved_at:
-            unread_query = unread_query.where(Message.created_at > conv.resolved_at)
-        unread_count = (await db.execute(unread_query)).scalar() or 0
-
-        # Get bot info
         bot_brief = None
-        if conv.primary_bot_id:
-            bot_result = await db.execute(select(Bot).where(Bot.id == conv.primary_bot_id))
-            bot = bot_result.scalar_one_or_none()
-            if bot:
-                bot_brief = BotBrief(
-                    id=bot.id,
-                    bot_username=bot.bot_username,
-                    display_name=bot.display_name,
-                )
+        bot = bot_map.get(conv.primary_bot_id) if conv.primary_bot_id else None
+        if bot:
+            bot_brief = BotBrief(
+                id=bot.id,
+                bot_username=bot.bot_username,
+                display_name=bot.display_name,
+            )
 
         item = ConversationListItem(
             id=conv.id,
@@ -168,7 +212,7 @@ async def list_conversations(
                 content_type=last_msg.content_type,
                 created_at=last_msg.created_at,
             ) if last_msg else None,
-            unread_count=unread_count,
+            unread_count=unread_map.get(conv.id, 0),
             last_message_at=conv.last_message_at,
             created_at=conv.created_at,
         )
@@ -288,7 +332,7 @@ async def update_conversation_status(
     conv.status = body.status
 
     if body.status == "resolved":
-        conv.resolved_at = datetime.utcnow()
+        conv.resolved_at = datetime.now(timezone.utc)
         conv.resolved_by = current_user.id
     elif body.status == "open" and old_status == "resolved":
         # Reopening - clear resolved info

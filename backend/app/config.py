@@ -1,7 +1,12 @@
 from __future__ import annotations
 
+import logging
+import warnings
+
 from pydantic_settings import BaseSettings
 from typing import Optional, List
+
+logger = logging.getLogger(__name__)
 
 
 class Settings(BaseSettings):
@@ -70,3 +75,16 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+# Warn about insecure defaults at import time
+if settings.JWT_SECRET_KEY == "change-me-in-production":
+    warnings.warn(
+        "JWT_SECRET_KEY is using the default insecure value. "
+        "Set JWT_SECRET_KEY environment variable in production!",
+        stacklevel=1,
+    )
+if not settings.OAUTH_ENCRYPTION_KEY:
+    logger.warning(
+        "OAUTH_ENCRYPTION_KEY is empty — a random key will be generated. "
+        "OAuth tokens will be lost on restart. Set this in production."
+    )

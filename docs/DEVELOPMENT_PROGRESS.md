@@ -139,8 +139,8 @@
 - ⬜ 16.1 后端单元测试 (核心逻辑)
 - ⬜ 16.2 API 集成测试
 - ⬜ 16.3 前端组件测试
-- ⬜ 16.4 性能优化 (N+1 查询, 缓存策略)
-- ⬜ 16.5 安全审计 (XSS, CSRF, SQL注入)
+- ✅ 16.4 性能优化 (N+1 查询, 缓存策略)
+- ✅ 16.5 安全审计 (XSS, CSRF, SQL注入)
 
 ## Phase 17: Docker 与发布
 
@@ -208,6 +208,34 @@
 - ✅ 21.8 前端: AISettings.tsx 适配新 RAG 配置接口
 - ✅ 21.9 前端: types/index.ts 新增 RAG 配置类型定义
 
+## Phase 22: Missed Keyword Filters (v0.8.0)
+
+- ✅ 22.1 后端: MissedKeywordFilter model + migration 004
+- ✅ 22.2 后端: keyword_matches_filter() utility
+- ✅ 22.3 后端: Scheduler integration (filter keywords during analysis)
+- ✅ 22.4 后端: Filter CRUD API (/missed-keyword-filters)
+- ✅ 22.5 前端: MissedKeywordFilter type + API functions
+- ✅ 22.6 前端: Collapsible filter panel in MissedKnowledge page
+
+## Phase 23: Catch All Match Mode (v0.8.0)
+
+- ✅ 23.1 后端: match_catch_all() in matcher.py
+- ✅ 23.2 后端: MatchModeType Literal updated
+- ✅ 23.3 前端: catch_all in MATCH_MODES + keyword auto-fill
+
+## Phase 24: Code Quality Overhaul (v0.8.0)
+
+- ✅ 24.1 Fix N+1 queries (conversations, users, faq rules)
+- ✅ 24.2 Fix tag.color server_default
+- ✅ 24.3 Fix message.faq_rule_id missing FK
+- ✅ 24.4 Add missing indexes (conversation, message)
+- ✅ 24.5 Add updated_at to messages + tags
+- ✅ 24.6 Fix mutable defaults in Pydantic schemas
+- ✅ 24.7 Fix deprecated datetime.utcnow()
+- ✅ 24.8 前端: Global ErrorBoundary
+- ✅ 24.9 前端: Fix empty catch blocks, type safety
+- ✅ 24.10 Migration 005 for all DB fixes
+
 ---
 
 ## 变更记录
@@ -220,3 +248,7 @@
 | 2026-03-23 | Phase 19 完成: RAG 模块化接入 Dify Knowledge API (v0.6.0) |
 | 2026-03-23 | Phase 20 完成: AI Provider OAuth 多认证 (v0.7.0) |
 | 2026-03-23 | Phase 21 完成: RAG 配置模块独立化 (v0.7.1) |
+| 2026-03-23 | Phase 22 完成: Missed Keyword Filters (v0.8.0) |
+| 2026-03-23 | Phase 23 完成: Catch All Match Mode (v0.8.0) |
+| 2026-03-23 | Phase 24 完成: Code Quality Overhaul (v0.8.0) |
+| 2026-03-23 | Phase 16.4/16.5 更新: N+1 查询修复 + 安全审计完成 |

@@ -118,12 +118,12 @@ function MessageBubbleInner({ message }: MessageBubbleProps) {
         <div className="flex items-center gap-1.5 mt-1.5 justify-end flex-wrap">
           {isFaq && (
             <span className="text-[10px] text-[#059669] font-['JetBrains_Mono'] font-semibold bg-[#059669]/10 px-1.5 py-0.5 rounded">
-              FAQ 自动回复
+              FAQ Auto-Reply
             </span>
           )}
           {message.sender_type === 'ai' && (
             <span className="text-[10px] text-[#8B5CF6] font-['JetBrains_Mono'] font-semibold bg-[#8B5CF6]/10 px-1.5 py-0.5 rounded">
-              AI 回复
+              AI Reply
             </span>
           )}
           {message.faq_rule_name && (

@@ -174,7 +174,7 @@ export interface BotGroup {
 }
 
 // === FAQ ===
-export type MatchMode = 'exact' | 'prefix' | 'contains' | 'regex';
+export type MatchMode = 'exact' | 'prefix' | 'contains' | 'regex' | 'catch_all';
 export type ResponseMode = 'single' | 'random' | 'all';
 export type ReplyMode = 'direct' | 'ai_only' | 'ai_polish' | 'ai_fallback' | 'ai_intent' | 'ai_template' | 'rag' | 'ai_classify_and_answer';
 
@@ -258,6 +258,16 @@ export interface MissedKeyword {
   is_resolved: boolean;
   last_seen_at: string;
   created_at: string;
+}
+
+export interface MissedKeywordFilter {
+  id: number;
+  pattern: string;
+  match_mode: 'exact' | 'prefix' | 'contains' | 'regex';
+  description?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 // === AI ===
@@ -414,6 +424,7 @@ export interface DashboardStats {
 // === WebSocket Events ===
 export type WSEvent =
   | { type: 'new_message'; data: Message }
+  | { type: 'new_conversation'; data: Conversation }
   | { type: 'conversation_updated'; data: Conversation }
   | { type: 'bot_status'; data: Bot }
   | { type: 'stats_update'; data: Partial<DashboardStats> };

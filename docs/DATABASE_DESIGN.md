@@ -2,7 +2,7 @@
 
 ## 数据库: PostgreSQL 16
 
-## ER 关系概览
+## ER 关系概览 (30 tables)
 
 ```
 admins ──┬── conversations (assigned_to)
@@ -26,6 +26,8 @@ bot_groups ── bot_group_members (多对多)
          │── faq_categories.bot_group_id (路由)
          │
 missed_keywords ── (独立统计表)
+missed_keyword_filters ── (过滤规则表)
+rag_configs ── (RAG 配置表)
 ```
 
 ## 表结构设计
@@ -466,6 +468,57 @@ Rule 匹配 → category.bot_group_id 有值? → 用该 Bot Group
          → 为空? → category.faq_group.bot_group_id 有值? → 用该 Bot Group
          → 都为空? → 用接收消息的原路 Bot
 ```
+
+### 22. rag_configs - RAG 配置
+
+```sql
+CREATE TABLE rag_configs (
+    id              SERIAL PRIMARY KEY,
+    name            VARCHAR(100) NOT NULL,
+    provider        VARCHAR(50) NOT NULL DEFAULT 'dify',
+    base_url        VARCHAR(500) NOT NULL,
+    api_key         VARCHAR(500) NOT NULL,
+    dataset_id      VARCHAR(255),
+    top_k           INTEGER DEFAULT 3,
+    is_active       BOOLEAN DEFAULT TRUE,
+    extra_params    JSONB DEFAULT '{}',
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### 23. missed_keyword_filters - 遗漏关键词过滤器
+
+```sql
+CREATE TABLE missed_keyword_filters (
+    id              SERIAL PRIMARY KEY,
+    pattern         VARCHAR(500) NOT NULL,         -- 过滤模式 (关键词/正则)
+    match_mode      VARCHAR(20) NOT NULL,          -- 'exact','contains','regex'
+    description     TEXT,                          -- 规则描述
+    is_active       BOOLEAN DEFAULT TRUE,
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+> 在凌晨 3 点定时分析任务中，系统根据此表的过滤规则自动排除无意义关键词，减少人工审核成本。
+
+### Migration 005: DB 质量修复
+
+Migration 005 包含以下数据库修复:
+
+- **message.faq_rule_id**: 添加 FK 约束 `REFERENCES faq_rules(id) ON DELETE SET NULL`
+- **tag.color**: 修复 `server_default` 为 `'#3B82F6'`
+- **messages.updated_at**: 新增列 `TIMESTAMPTZ DEFAULT NOW()`
+- **tags.updated_at**: 新增列 `TIMESTAMPTZ DEFAULT NOW()`
+- **新增索引**:
+  - `idx_conv_source_type` ON `conversations(source_type)`
+  - `idx_conv_created_at` ON `conversations(created_at)`
+  - `idx_msg_sender_type` ON `messages(sender_type)`
+  - `idx_msg_content_type` ON `messages(content_type)`
+  - `idx_msg_via_bot` ON `messages(via_bot_id)`
+
+---
 
 ## 媒体缓存策略
 

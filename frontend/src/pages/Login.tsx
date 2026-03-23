@@ -201,7 +201,7 @@ export default function Login() {
           </form>
 
           <p className="text-center text-[#4a4a4a] text-[11px] mt-6 font-['JetBrains_Mono']">
-            ADMINCHAT Panel v1.0
+            ADMINCHAT Panel v{__APP_VERSION__}
           </p>
         </div>
       </div>

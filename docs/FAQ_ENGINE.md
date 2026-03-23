@@ -26,7 +26,7 @@
          → 否则 → 转人工 (推送到 Web 面板)
 ```
 
-### 匹配模式 (match_mode)
+### 匹配模式 (match_mode) - 共 5 种
 
 | 模式 | 说明 | 示例 keyword | 匹配 "你好，请问价格多少？" |
 |------|------|-------------|------------------------|
@@ -34,11 +34,21 @@
 | `prefix` | 从头匹配 | "你好" | 是 |
 | `contains` | 包含匹配 | "价格" | 是 |
 | `regex` | 正则表达式 | `价格\|多少钱\|费用` | 是 |
+| `catch_all` | 兜底匹配 (匹配所有消息) | `*` (自动填充) | 是 |
+
+#### catch_all 模式说明
+
+`catch_all` 是一种特殊的兜底匹配模式，无论用户输入什么内容都会命中。适用于需要对所有未被更高优先级规则匹配的消息做统一处理的场景（如 AI 兜底回复）。
+
+- 关键词自动填充为 `*`（前端自动处理）
+- 匹配函数 `match_catch_all()` 在 `matcher.py` 中实现，始终返回 `True`
+- 应设置较低的 priority，确保其他精确规则优先匹配
+- 通常与 `reply_mode=ai_fallback` 或 `reply_mode=ai_only` 配合使用
 
 ### 匹配优先级
 
 1. `priority` 字段越大越优先
-2. 同 priority 下，`exact` > `prefix` > `contains` > `regex`
+2. 同 priority 下，`exact` > `prefix` > `contains` > `regex` > `catch_all`
 3. 命中第一条即停止 (不做多规则叠加)
 
 ### 响应模式 (response_mode)
@@ -224,6 +234,56 @@ async def analyze_missed_knowledge():
 → 跳转到 FAQ 编辑器 → 创建新的 FAQ 规则
 → 保存后 → 标记该 missed_keyword 为 is_resolved=true
 ```
+
+### Missed Keyword Filters (遗漏关键词过滤器)
+
+在凌晨3点定时分析任务中，系统会根据管理员配置的过滤规则自动排除无意义的关键词（如语气词、问候语等），减少人工审核成本。
+
+**过滤器数据模型 (`missed_keyword_filters` 表):**
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `id` | SERIAL PK | 主键 |
+| `pattern` | VARCHAR(500) | 过滤模式 (关键词/正则) |
+| `match_mode` | VARCHAR(20) | 匹配方式: `exact` / `contains` / `regex` |
+| `description` | TEXT | 过滤规则描述 (可选) |
+| `is_active` | BOOLEAN | 是否启用 |
+| `created_at` | TIMESTAMPTZ | 创建时间 |
+| `updated_at` | TIMESTAMPTZ | 更新时间 |
+
+**过滤逻辑:**
+
+```python
+def keyword_matches_filter(keyword: str, filters: list[MissedKeywordFilter]) -> bool:
+    """检查关键词是否匹配任一过滤规则，匹配则跳过不记录"""
+    for f in filters:
+        if f.match_mode == "exact" and keyword == f.pattern:
+            return True
+        elif f.match_mode == "contains" and f.pattern in keyword:
+            return True
+        elif f.match_mode == "regex" and re.search(f.pattern, keyword):
+            return True
+    return False
+```
+
+**Scheduler 集成:**
+
+定时任务在提取关键词后，会加载所有 `is_active=True` 的过滤规则，对提取结果做过滤，被命中的关键词不会写入 `missed_keywords` 表。
+
+**前端交互:**
+
+MissedKnowledge 页面顶部提供可折叠的过滤器管理面板，支持:
+- 查看所有过滤规则
+- 新增过滤规则 (pattern + match_mode + description)
+- 删除过滤规则
+
+**API 端点:**
+
+| Method | Path | 说明 |
+|--------|------|------|
+| GET | `/api/v1/faq/missed-keyword-filters` | 列表所有过滤规则 |
+| POST | `/api/v1/faq/missed-keyword-filters` | 创建过滤规则 |
+| DELETE | `/api/v1/faq/missed-keyword-filters/{id}` | 删除过滤规则 |
 
 ## FAQ 编辑器 UI 设计 (左右分屏)
 

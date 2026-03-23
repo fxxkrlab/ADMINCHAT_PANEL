@@ -75,7 +75,8 @@ export const useAuthStore = create<AuthState>()(
             user: authData.user,
             isAuthenticated: true,
           });
-        } catch {
+        } catch (err) {
+          console.error('[auth] Token refresh failed:', err);
           get().logout();
         }
       },
@@ -86,7 +87,8 @@ export const useAuthStore = create<AuthState>()(
             '/auth/me',
           );
           set({ user: resp.data });
-        } catch {
+        } catch (err) {
+          console.error('[auth] fetchCurrentUser failed:', err);
           get().logout();
         }
       },

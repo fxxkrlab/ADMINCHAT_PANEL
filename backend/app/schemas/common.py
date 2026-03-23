@@ -5,13 +5,13 @@ T = TypeVar("T")
 
 
 class APIResponse(BaseModel):
-    code: int = 200
+    code: int = Field(default=200, ge=0)
     message: str = "success"
     data: Optional[Any] = None
 
 
 class PaginatedData(BaseModel, Generic[T]):
-    items: List[T] = []
+    items: List[T] = Field(default_factory=list)
     total: int = 0
     page: int = 1
     page_size: int = 20

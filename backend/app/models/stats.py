@@ -45,6 +45,18 @@ class MissedKeyword(Base):
     created_at: Mapped[datetime] = mapped_column(server_default="now()")
 
 
+class MissedKeywordFilter(Base):
+    __tablename__ = "missed_keyword_filters"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    pattern: Mapped[str] = mapped_column(String(500), nullable=False, index=True)
+    match_mode: Mapped[str] = mapped_column(String(20), server_default="exact")
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, server_default="true")
+    created_at: Mapped[datetime] = mapped_column(server_default="now()")
+    updated_at: Mapped[datetime] = mapped_column(server_default="now()")
+
+
 class UnmatchedMessage(Base):
     __tablename__ = "unmatched_messages"
 

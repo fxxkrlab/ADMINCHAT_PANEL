@@ -1,6 +1,45 @@
-import { lazy, Suspense } from 'react';
+import { Component, lazy, Suspense, type ErrorInfo, type ReactNode } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import AppLayout from './components/layout/AppLayout';
+
+class ErrorBoundary extends Component<
+  { children: ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.error('[ErrorBoundary]', error, info.componentStack);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex items-center justify-center h-screen bg-[#0C0C0C]">
+          <div className="flex flex-col items-center gap-4 max-w-md text-center">
+            <div className="text-[#FF4444] text-4xl">!</div>
+            <h2 className="text-white text-lg font-semibold">Something went wrong</h2>
+            <p className="text-[#8a8a8a] text-sm">{this.state.error?.message}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 rounded-md bg-[#00D9FF]/10 text-[#00D9FF] text-sm hover:bg-[#00D9FF]/20 transition-colors"
+            >
+              Reload Page
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 // Route-based code splitting: lazy-load all pages so only the needed chunk is loaded
 const Login = lazy(() => import('./pages/Login'));
@@ -33,6 +72,7 @@ function PageLoader() {
 
 export default function App() {
   return (
+    <ErrorBoundary>
     <BrowserRouter>
       <Suspense fallback={<PageLoader />}>
         <Routes>
@@ -62,5 +102,6 @@ export default function App() {
         </Routes>
       </Suspense>
     </BrowserRouter>
+    </ErrorBoundary>
   );
 }

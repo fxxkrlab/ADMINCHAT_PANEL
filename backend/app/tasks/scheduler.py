@@ -16,7 +16,8 @@ from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import async_session_factory
-from app.models.stats import MissedKeyword, UnmatchedMessage
+from app.models.stats import MissedKeyword, MissedKeywordFilter, UnmatchedMessage
+from app.utils.keyword_filter import keyword_matches_filter
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +81,7 @@ async def analyze_missed_knowledge() -> None:
 
     async with async_session_factory() as session:
         try:
-            now = datetime.utcnow()
+            now = datetime.now(timezone.utc)
             yesterday = now - timedelta(hours=24)
 
             # 1. Fetch recent unmatched messages
@@ -102,6 +103,28 @@ async def analyze_missed_knowledge() -> None:
 
             # 2. Extract keywords
             keyword_counts = extract_keywords(texts)
+
+            # 2b. Apply keyword filters
+            filter_result = await session.execute(
+                select(MissedKeywordFilter).where(
+                    MissedKeywordFilter.is_active.is_(True)
+                )
+            )
+            active_filters = filter_result.scalars().all()
+            if active_filters:
+                filtered_counts: Counter = Counter()
+                for kw, count in keyword_counts.items():
+                    if not any(
+                        keyword_matches_filter(kw, f.pattern, f.match_mode)
+                        for f in active_filters
+                    ):
+                        filtered_counts[kw] = count
+                logger.info(
+                    "Keyword filters removed %d of %d keywords.",
+                    len(keyword_counts) - len(filtered_counts),
+                    len(keyword_counts),
+                )
+                keyword_counts = filtered_counts
 
             # 3. Upsert into missed_keywords
             # Build a mapping of text -> sample messages for each keyword

@@ -49,19 +49,16 @@ export default function Chat() {
   // WebSocket integration
   const onWSMessage = useCallback(
     (event: WSEvent) => {
-      console.log('[WS] Event received:', event.type);
       switch (event.type) {
         case 'new_message':
           handleNewMessage(event.data as Message);
           break;
+        case 'new_conversation':
+          handleNewConversation(event.data);
+          break;
         case 'conversation_updated':
           handleConversationUpdated(event.data as Conversation & { id: number });
           break;
-      }
-
-      // Handle new_conversation as a generic event (not in WSEvent union but backend may send it)
-      if ((event as { type: string }).type === 'new_conversation') {
-        handleNewConversation((event as unknown as { data: Conversation }).data);
       }
     },
     [handleNewMessage, handleConversationUpdated, handleNewConversation]

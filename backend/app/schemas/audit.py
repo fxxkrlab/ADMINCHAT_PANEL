@@ -16,7 +16,7 @@ class AuditLogOut(BaseModel):
     action: str
     target_type: Optional[str] = None
     target_id: Optional[int] = None
-    details: Dict[str, Any] = {}
+    details: Dict[str, Any] = Field(default_factory=dict)
     ip_address: Optional[str] = None
     created_at: datetime
 
@@ -24,7 +24,7 @@ class AuditLogOut(BaseModel):
 
 
 class AuditLogListResponse(BaseModel):
-    items: List[AuditLogOut] = []
+    items: List[AuditLogOut] = Field(default_factory=list)
     total: int = 0
     page: int = 1
     page_size: int = 20

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, X, Save, ArrowLeft } from 'lucide-react';
+import { Plus, X, Save, ArrowLeft, Trash2, Pencil, Check } from 'lucide-react';
 import Header from '../components/layout/Header';
 import {
   getQuestions,
@@ -11,6 +11,9 @@ import {
   createAnswer,
   createRule,
   updateRule,
+  updateQuestion,
+  deleteQuestion,
+  deleteAnswer,
   getFAQGroups,
 } from '../services/faqApi';
 import type { MatchMode, ResponseMode, ReplyMode } from '../types';
@@ -20,6 +23,7 @@ const MATCH_MODES: { value: MatchMode; label: string; desc: string }[] = [
   { value: 'prefix', label: 'Prefix Match', desc: 'Text must start with keyword' },
   { value: 'contains', label: 'Contains', desc: 'Keyword found anywhere in text' },
   { value: 'regex', label: 'Regex', desc: 'Regular expression pattern matching' },
+  { value: 'catch_all', label: 'Catch All', desc: 'Match any message — use as low-priority fallback for RAG' },
 ];
 
 const RESPONSE_MODES: { value: ResponseMode; label: string }[] = [
@@ -63,6 +67,10 @@ export default function FAQEditor() {
   const [showNewQuestion, setShowNewQuestion] = useState(false);
   const [newAnswerContent, setNewAnswerContent] = useState('');
   const [showNewAnswer, setShowNewAnswer] = useState(false);
+
+  // Edit state for questions
+  const [editingQuestionId, setEditingQuestionId] = useState<number | null>(null);
+  const [editingQuestionKeyword, setEditingQuestionKeyword] = useState('');
 
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
@@ -136,7 +144,10 @@ export default function FAQEditor() {
   }, []);
 
   const createQuestionMutation = useMutation({
-    mutationFn: () => createQuestion({ keyword: newQuestionKeyword, match_mode: newQuestionMode }),
+    mutationFn: () => createQuestion({
+      keyword: newQuestionMode === 'catch_all' ? '*' : newQuestionKeyword,
+      match_mode: newQuestionMode,
+    }),
     onSuccess: (newQ) => {
       refetchQuestions();
       setSelectedQuestionIds((prev) => new Set([...prev, newQ.id]));
@@ -152,6 +163,39 @@ export default function FAQEditor() {
       setSelectedAnswerIds((prev) => new Set([...prev, newA.id]));
       setNewAnswerContent('');
       setShowNewAnswer(false);
+    },
+  });
+
+  const deleteQuestionMutation = useMutation({
+    mutationFn: (id: number) => deleteQuestion(id),
+    onSuccess: (_, deletedId) => {
+      refetchQuestions();
+      setSelectedQuestionIds((prev) => {
+        const next = new Set(prev);
+        next.delete(deletedId);
+        return next;
+      });
+    },
+  });
+
+  const updateQuestionMutation = useMutation({
+    mutationFn: ({ id, keyword }: { id: number; keyword: string }) =>
+      updateQuestion(id, { keyword }),
+    onSuccess: () => {
+      refetchQuestions();
+      setEditingQuestionId(null);
+    },
+  });
+
+  const deleteAnswerMutation = useMutation({
+    mutationFn: (id: number) => deleteAnswer(id),
+    onSuccess: (_, deletedId) => {
+      refetchAnswers();
+      setSelectedAnswerIds((prev) => {
+        const next = new Set(prev);
+        next.delete(deletedId);
+        return next;
+      });
     },
   });
 
@@ -393,11 +437,34 @@ export default function FAQEditor() {
             </div>
             <div className="max-h-[300px] overflow-auto">
               {allQuestions.map((q) => (
-                <label key={q.id} className={`flex items-center gap-3 px-4 py-2.5 border-b border-[#1A1A1A] cursor-pointer transition-colors hover:bg-[#141414] ${selectedQuestionIds.has(q.id) ? 'bg-[#2563EB]/5' : ''}`}>
-                  <input type="checkbox" checked={selectedQuestionIds.has(q.id)} onChange={() => toggleQuestion(q.id)} className="w-4 h-4 rounded accent-[#2563EB]" />
-                  <span className="flex-1 text-sm text-white truncate">{q.keyword}</span>
-                  <span className="text-[10px] text-[#6a6a6a] font-['JetBrains_Mono'] px-1.5 py-0.5 rounded bg-[#141414]">{q.match_mode}</span>
-                </label>
+                <div key={q.id} className={`flex items-center gap-3 px-4 py-2.5 border-b border-[#1A1A1A] transition-colors hover:bg-[#141414] ${selectedQuestionIds.has(q.id) ? 'bg-[#2563EB]/5' : ''}`}>
+                  <input type="checkbox" checked={selectedQuestionIds.has(q.id)} onChange={() => toggleQuestion(q.id)} className="w-4 h-4 rounded accent-[#2563EB] cursor-pointer" />
+                  {editingQuestionId === q.id ? (
+                    <input
+                      type="text"
+                      value={editingQuestionKeyword}
+                      onChange={(e) => setEditingQuestionKeyword(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter' && editingQuestionKeyword.trim()) updateQuestionMutation.mutate({ id: q.id, keyword: editingQuestionKeyword }); if (e.key === 'Escape') setEditingQuestionId(null); }}
+                      autoFocus
+                      className="flex-1 h-7 px-2 bg-[#141414] border border-[#2563EB] rounded text-sm text-white focus:outline-none"
+                    />
+                  ) : (
+                    <span className="flex-1 text-sm text-white truncate cursor-pointer" onClick={() => toggleQuestion(q.id)}>{q.keyword}</span>
+                  )}
+                  <span className={`text-[10px] font-['JetBrains_Mono'] px-1.5 py-0.5 rounded ${q.match_mode === 'catch_all' ? 'bg-[#FF8800]/10 text-[#FF8800]' : 'bg-[#141414] text-[#6a6a6a]'}`}>{q.match_mode === 'catch_all' ? 'catch all' : q.match_mode}</span>
+                  {editingQuestionId === q.id ? (
+                    <button onClick={() => updateQuestionMutation.mutate({ id: q.id, keyword: editingQuestionKeyword })} disabled={!editingQuestionKeyword.trim() || updateQuestionMutation.isPending} className="p-1 rounded hover:bg-[#2563EB]/20 text-[#2563EB] disabled:opacity-40" title="Save">
+                      <Check size={13} />
+                    </button>
+                  ) : (
+                    <button onClick={() => { setEditingQuestionId(q.id); setEditingQuestionKeyword(q.keyword); }} className="p-1 rounded hover:bg-[#141414] text-[#6a6a6a] hover:text-[#2563EB]" title="Edit keyword">
+                      <Pencil size={13} />
+                    </button>
+                  )}
+                  <button onClick={() => { if (confirm(`Delete keyword "${q.keyword}"?`)) deleteQuestionMutation.mutate(q.id); }} disabled={deleteQuestionMutation.isPending} className="p-1 rounded hover:bg-[#FF4444]/10 text-[#6a6a6a] hover:text-[#FF4444] disabled:opacity-40" title="Delete keyword">
+                    <Trash2 size={13} />
+                  </button>
+                </div>
               ))}
               {allQuestions.length === 0 && !showNewQuestion && (
                 <p className="text-[#6a6a6a] text-xs text-center py-4">No questions yet.</p>
@@ -405,9 +472,13 @@ export default function FAQEditor() {
               {showNewQuestion && (
                 <div className="flex items-center gap-2 px-4 py-3 border-t border-[#1A1A1A]">
                   <input
-                    type="text" value={newQuestionKeyword} onChange={(e) => setNewQuestionKeyword(e.target.value)}
-                    placeholder="Keyword..." autoFocus
-                    className="flex-1 h-8 px-3 bg-[#141414] border border-[#2f2f2f] rounded text-sm text-white placeholder:text-[#4a4a4a] focus:outline-none focus:border-[#2563EB]"
+                    type="text"
+                    value={newQuestionMode === 'catch_all' ? '*' : newQuestionKeyword}
+                    onChange={(e) => setNewQuestionKeyword(e.target.value)}
+                    placeholder={newQuestionMode === 'catch_all' ? 'Matches all messages' : 'Keyword...'}
+                    disabled={newQuestionMode === 'catch_all'}
+                    autoFocus={newQuestionMode !== 'catch_all'}
+                    className="flex-1 h-8 px-3 bg-[#141414] border border-[#2f2f2f] rounded text-sm text-white placeholder:text-[#4a4a4a] focus:outline-none focus:border-[#2563EB] disabled:opacity-50 disabled:cursor-not-allowed"
                     onKeyDown={(e) => { if (e.key === 'Enter' && newQuestionKeyword.trim()) createQuestionMutation.mutate(); }}
                   />
                   <select value={newQuestionMode} onChange={(e) => setNewQuestionMode(e.target.value as MatchMode)} className="h-8 px-2 bg-[#141414] border border-[#2f2f2f] rounded text-xs text-white focus:outline-none">
@@ -435,11 +506,14 @@ export default function FAQEditor() {
             </div>
             <div className="max-h-[300px] overflow-auto">
               {allAnswers.map((a) => (
-                <label key={a.id} className={`flex items-start gap-3 px-4 py-2.5 border-b border-[#1A1A1A] cursor-pointer transition-colors hover:bg-[#141414] ${selectedAnswerIds.has(a.id) ? 'bg-[#059669]/5' : ''}`}>
-                  <input type="checkbox" checked={selectedAnswerIds.has(a.id)} onChange={() => toggleAnswer(a.id)} className="w-4 h-4 mt-0.5 rounded accent-[#059669]" />
-                  <span className="flex-1 text-sm text-white line-clamp-2">{a.content}</span>
+                <div key={a.id} className={`flex items-start gap-3 px-4 py-2.5 border-b border-[#1A1A1A] transition-colors hover:bg-[#141414] ${selectedAnswerIds.has(a.id) ? 'bg-[#059669]/5' : ''}`}>
+                  <input type="checkbox" checked={selectedAnswerIds.has(a.id)} onChange={() => toggleAnswer(a.id)} className="w-4 h-4 mt-0.5 rounded accent-[#059669] cursor-pointer" />
+                  <span className="flex-1 text-sm text-white line-clamp-2 cursor-pointer" onClick={() => toggleAnswer(a.id)}>{a.content}</span>
                   <span className="text-[10px] text-[#6a6a6a] font-['JetBrains_Mono'] px-1.5 py-0.5 rounded bg-[#141414] shrink-0">{a.content_type}</span>
-                </label>
+                  <button onClick={() => { if (confirm(`Delete this answer?`)) deleteAnswerMutation.mutate(a.id); }} disabled={deleteAnswerMutation.isPending} className="p-1 rounded hover:bg-[#FF4444]/10 text-[#6a6a6a] hover:text-[#FF4444] disabled:opacity-40 shrink-0 mt-0.5" title="Delete answer">
+                    <Trash2 size={13} />
+                  </button>
+                </div>
               ))}
               {allAnswers.length === 0 && !showNewAnswer && (
                 <p className="text-[#6a6a6a] text-xs text-center py-4">No answers yet.</p>

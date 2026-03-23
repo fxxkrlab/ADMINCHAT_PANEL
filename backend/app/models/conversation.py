@@ -18,7 +18,7 @@ class Conversation(Base, TimestampMixin):
         String(20), nullable=False
     )  # 'private' | 'group'
     source_group_id: Mapped[Optional[int]] = mapped_column(
-        Integer, ForeignKey("tg_groups.id"), nullable=True
+        Integer, ForeignKey("tg_groups.id", ondelete="SET NULL"), nullable=True, index=True
     )
     status: Mapped[str] = mapped_column(
         String(20), server_default="open", index=True
@@ -27,7 +27,7 @@ class Conversation(Base, TimestampMixin):
         Integer, ForeignKey("admins.id"), nullable=True, index=True
     )
     primary_bot_id: Mapped[Optional[int]] = mapped_column(
-        Integer, ForeignKey("bots.id"), nullable=True
+        Integer, ForeignKey("bots.id"), nullable=True, index=True
     )
     last_message_at: Mapped[Optional[datetime]] = mapped_column(nullable=True, index=True)
     resolved_at: Mapped[Optional[datetime]] = mapped_column(nullable=True)
@@ -36,11 +36,12 @@ class Conversation(Base, TimestampMixin):
     )
 
     # Relationships
-    tg_user = relationship("TgUser", back_populates="conversations")
-    source_group = relationship("TgGroup", back_populates="conversations")
+    tg_user = relationship("TgUser", back_populates="conversations", lazy="selectin")
+    source_group = relationship("TgGroup", back_populates="conversations", lazy="selectin")
     assigned_admin = relationship(
         "Admin",
         foreign_keys=[assigned_to],
         back_populates="assigned_conversations",
+        lazy="selectin",
     )
-    messages = relationship("Message", back_populates="conversation", cascade="all, delete-orphan")
+    messages = relationship("Message", back_populates="conversation", cascade="all, delete-orphan", lazy="noload")

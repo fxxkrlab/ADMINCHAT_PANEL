@@ -23,10 +23,10 @@ class Message(Base):
         String(10), nullable=False
     )  # 'user' | 'admin' | 'bot' | 'faq'
     sender_admin_id: Mapped[Optional[int]] = mapped_column(
-        Integer, ForeignKey("admins.id"), nullable=True
+        Integer, ForeignKey("admins.id"), nullable=True, index=True
     )
     via_bot_id: Mapped[Optional[int]] = mapped_column(
-        Integer, ForeignKey("bots.id"), nullable=True
+        Integer, ForeignKey("bots.id"), nullable=True, index=True
     )
     content_type: Mapped[str] = mapped_column(
         String(20), nullable=False
@@ -39,8 +39,11 @@ class Message(Base):
     reply_to_message_id: Mapped[Optional[int]] = mapped_column(BigInteger, nullable=True)
     raw_data: Mapped[dict] = mapped_column(JSONB, server_default="{}")
     faq_matched: Mapped[bool] = mapped_column(Boolean, server_default="false", index=True)
-    faq_rule_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    faq_rule_id: Mapped[Optional[int]] = mapped_column(
+        Integer, ForeignKey("faq_rules.id", ondelete="SET NULL"), nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(server_default="now()", index=True)
+    updated_at: Mapped[datetime] = mapped_column(server_default="now()")
 
     # Relationships
     conversation = relationship("Conversation", back_populates="messages")

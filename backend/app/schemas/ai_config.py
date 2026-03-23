@@ -51,7 +51,7 @@ class AIConfigResponse(BaseModel):
     api_key_masked: str = ""  # Only show last 4 chars
     model: Optional[str] = None
     api_format: str = "openai_chat"
-    default_params: Dict[str, Any] = {}
+    default_params: Dict[str, Any] = Field(default_factory=dict)
     is_active: bool = True
     auth_method: str = "api_key"
     oauth_status: Optional[str] = None  # 'active' | 'expiring' | 'expired' | 'no_token'
@@ -62,7 +62,7 @@ class AIConfigResponse(BaseModel):
 
 
 class AIConfigListResponse(BaseModel):
-    items: List[AIConfigResponse] = []
+    items: List[AIConfigResponse] = Field(default_factory=list)
     total: int = 0
 
 
@@ -78,8 +78,8 @@ class AIUsageStatsResponse(BaseModel):
     total_requests: int = 0
     total_tokens: int = 0
     total_cost: float = 0.0
-    daily_stats: List[Dict[str, Any]] = []
-    per_config_stats: List[Dict[str, Any]] = []
+    daily_stats: List[Dict[str, Any]] = Field(default_factory=list)
+    per_config_stats: List[Dict[str, Any]] = Field(default_factory=list)
 
 
 # ---- OAuth schemas ----

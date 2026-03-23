@@ -4,21 +4,29 @@ Pydantic schemas for FAQ API endpoints.
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
 
 from pydantic import BaseModel, Field
+
+# Shared type aliases
+ReplyModeType = Literal[
+    "direct", "ai_only", "ai_polish", "ai_fallback",
+    "ai_intent", "ai_template", "rag", "ai_classify_and_answer",
+]
+ResponseModeType = Literal["single", "random", "all"]
+MatchModeType = Literal["exact", "prefix", "contains", "regex", "catch_all"]
 
 
 # ---- FAQ Question ----
 
 class FAQQuestionCreate(BaseModel):
     keyword: str = Field(..., min_length=1, max_length=500)
-    match_mode: str = Field(default="contains", pattern="^(exact|prefix|contains|regex)$")
+    match_mode: MatchModeType = "contains"
 
 
 class FAQQuestionUpdate(BaseModel):
     keyword: Optional[str] = Field(None, min_length=1, max_length=500)
-    match_mode: Optional[str] = Field(None, pattern="^(exact|prefix|contains|regex)$")
+    match_mode: Optional[MatchModeType] = None
     is_active: Optional[bool] = None
 
 
@@ -64,15 +72,10 @@ class FAQAnswerResponse(BaseModel):
 
 class FAQRuleCreate(BaseModel):
     name: Optional[str] = Field(None, max_length=200)
-    question_ids: List[int] = Field(default_factory=list)
-    answer_ids: List[int] = Field(default_factory=list)
-    response_mode: str = Field(
-        default="single", pattern="^(single|random|all)$"
-    )
-    reply_mode: str = Field(
-        default="direct",
-        pattern="^(direct|ai_only|ai_polish|ai_fallback|ai_intent|ai_template|rag|ai_classify_and_answer)$",
-    )
+    question_ids: List[int] = Field(default_factory=list, min_length=0)
+    answer_ids: List[int] = Field(default_factory=list, min_length=0)
+    response_mode: ResponseModeType = "single"
+    reply_mode: ReplyModeType = "direct"
     ai_config: Dict[str, Any] = Field(default_factory=dict)
     priority: int = Field(default=0, ge=0)
     daily_ai_limit: Optional[int] = Field(None, ge=0)
@@ -85,13 +88,8 @@ class FAQRuleUpdate(BaseModel):
     name: Optional[str] = Field(None, max_length=200)
     question_ids: Optional[List[int]] = None
     answer_ids: Optional[List[int]] = None
-    response_mode: Optional[str] = Field(
-        None, pattern="^(single|random|all)$"
-    )
-    reply_mode: Optional[str] = Field(
-        None,
-        pattern="^(direct|ai_only|ai_polish|ai_fallback|ai_intent|ai_template|rag|ai_classify_and_answer)$",
-    )
+    response_mode: Optional[ResponseModeType] = None
+    reply_mode: Optional[ReplyModeType] = None
     ai_config: Optional[Dict[str, Any]] = None
     priority: Optional[int] = Field(None, ge=0)
     daily_ai_limit: Optional[int] = Field(None, ge=0)
@@ -105,7 +103,7 @@ class FAQRuleResponse(BaseModel):
     name: Optional[str] = None
     response_mode: str
     reply_mode: str
-    ai_config: Dict[str, Any] = {}
+    ai_config: Dict[str, Any] = Field(default_factory=dict)
     priority: int = 0
     daily_ai_limit: Optional[int] = None
     category_id: Optional[int] = None
@@ -114,8 +112,8 @@ class FAQRuleResponse(BaseModel):
     faq_group_name: Optional[str] = None
     rag_config_id: Optional[int] = None
     is_active: bool
-    questions: List[FAQQuestionResponse] = []
-    answers: List[FAQAnswerResponse] = []
+    questions: List[FAQQuestionResponse] = Field(default_factory=list)
+    answers: List[FAQAnswerResponse] = Field(default_factory=list)
     hit_count: int = 0
     created_at: datetime
     updated_at: datetime
@@ -142,5 +140,25 @@ class MissedKeywordItem(BaseModel):
     is_resolved: bool
     last_seen_at: datetime
     created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+# ---- Missed Keyword Filters ----
+
+class MissedKeywordFilterCreate(BaseModel):
+    pattern: str = Field(..., min_length=1, max_length=500)
+    match_mode: str = Field(default="exact", pattern="^(exact|prefix|contains|regex)$")
+    description: Optional[str] = None
+
+
+class MissedKeywordFilterResponse(BaseModel):
+    id: int
+    pattern: str
+    match_mode: str
+    description: Optional[str] = None
+    is_active: bool
+    created_at: datetime
+    updated_at: datetime
 
     model_config = {"from_attributes": True}

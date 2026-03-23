@@ -74,7 +74,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
         conversationsLoading: false,
         conversationsFilter: filter,
       });
-    } catch {
+    } catch (err) {
+      console.error('[chatStore] fetchConversations failed:', err);
       set({ conversationsLoading: false });
     }
   },
@@ -121,7 +122,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
           hasMoreMessages: result.page < result.total_pages,
         });
       }
-    } catch {
+    } catch (err) {
+      console.error('[chatStore] fetchMessages failed:', err);
       set({ messagesLoading: false });
     }
   },
@@ -157,7 +159,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
             : c
         ),
       }));
-    } catch {
+    } catch (err) {
+      console.error('[chatStore] sendMessage failed:', err);
       set({ sending: false });
       throw new Error('Failed to send message');
     }
@@ -176,8 +179,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
             ? { ...state.selectedConversation, status: status as Conversation['status'] }
             : state.selectedConversation,
       }));
-    } catch {
-      // ignore
+    } catch (err) {
+      console.error('[chatStore] updateConversationStatus failed:', err);
     }
   },
 

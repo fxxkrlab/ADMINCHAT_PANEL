@@ -12,8 +12,9 @@ class Tag(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
-    color: Mapped[str] = mapped_column(String(7), server_default="'#3B82F6'")
+    color: Mapped[str] = mapped_column(String(7), server_default="#3B82F6")
     created_at: Mapped[datetime] = mapped_column(server_default="now()")
+    updated_at: Mapped[datetime] = mapped_column(server_default="now()")
 
     # Relationships
     user_tags = relationship("UserTag", back_populates="tag", cascade="all, delete-orphan")

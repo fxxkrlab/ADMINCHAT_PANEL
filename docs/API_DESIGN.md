@@ -262,6 +262,10 @@ Query Params:
 
 ---
 
+> **match_mode** 支持 5 种: `exact` / `prefix` / `contains` / `regex` / `catch_all`
+
+---
+
 ## 8. FAQ 排行榜
 
 | Method | Path | 说明 | 权限 |
@@ -384,6 +388,55 @@ Rule 匹配 → rule.category_id
 ```
 
 Bot Group 内选 Bot: 按 priority 排序，跳过被限流的，全部限流则 fallback 到原路 Bot。
+
+## 16. Missed Keyword Filters (遗漏关键词过滤器)
+
+| Method | Path | 说明 | 权限 |
+|--------|------|------|------|
+| GET | `/faq/missed-keyword-filters` | 列表所有过滤规则 | admin+ |
+| POST | `/faq/missed-keyword-filters` | 创建过滤规则 | admin+ |
+| DELETE | `/faq/missed-keyword-filters/{id}` | 删除过滤规则 | admin+ |
+
+### POST /faq/missed-keyword-filters
+
+```json
+// Request
+{
+  "pattern": "你好|您好|哈喽",
+  "match_mode": "regex",
+  "description": "过滤问候语"
+}
+
+// Response
+{
+  "id": 1,
+  "pattern": "你好|您好|哈喽",
+  "match_mode": "regex",
+  "description": "过滤问候语",
+  "is_active": true,
+  "created_at": "2026-03-23T10:00:00Z",
+  "updated_at": "2026-03-23T10:00:00Z"
+}
+```
+
+### GET /faq/missed-keyword-filters
+
+```json
+// Response
+[
+  {
+    "id": 1,
+    "pattern": "你好|您好|哈喽",
+    "match_mode": "regex",
+    "description": "过滤问候语",
+    "is_active": true,
+    "created_at": "2026-03-23T10:00:00Z",
+    "updated_at": "2026-03-23T10:00:00Z"
+  }
+]
+```
+
+> 过滤规则在凌晨 3 点定时任务中生效，匹配到的关键词不会写入 `missed_keywords` 表。支持 3 种 match_mode: `exact` / `contains` / `regex`。
 
 ---
 

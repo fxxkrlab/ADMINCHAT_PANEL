@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Save, Clock, Shield, Database, Settings as SettingsIcon, Loader2 } from 'lucide-react';
+import { Save, Clock, Shield, Database, Settings as SettingsIcon, Loader2, RefreshCw, ExternalLink } from 'lucide-react';
 import Header from '../components/layout/Header';
-import { getSettings, updateSettings } from '../services/settingsApi';
+import { getSettings, updateSettings, getVersionInfo } from '../services/settingsApi';
 import type { SettingItem } from '../types';
 
 // ---- Tab definitions ----
@@ -63,6 +63,77 @@ function Toggle({ value, onChange }: { value: boolean; onChange: (v: boolean) =>
         }`}
       />
     </button>
+  );
+}
+
+function VersionInfoCard() {
+  const { data: versionInfo, isLoading: versionLoading, refetch } = useQuery({
+    queryKey: ['version-info'],
+    queryFn: getVersionInfo,
+    staleTime: 300_000,
+  });
+
+  return (
+    <div className="mt-8 bg-[#0A0A0A] border border-[#2f2f2f] rounded-[10px] overflow-hidden">
+      <div className="px-5 py-4 border-b border-[#2f2f2f] flex items-center justify-between">
+        <h3 className="text-sm font-semibold text-white font-['Space_Grotesk']">Version Info</h3>
+        <button
+          onClick={() => refetch()}
+          disabled={versionLoading}
+          className="p-1.5 rounded-md hover:bg-[#141414] text-[#6a6a6a] hover:text-white transition-colors disabled:opacity-40"
+          title="Check for updates"
+        >
+          <RefreshCw size={14} className={versionLoading ? 'animate-spin' : ''} />
+        </button>
+      </div>
+      <div className="px-5 py-4">
+        {versionLoading && !versionInfo ? (
+          <div className="flex items-center gap-2 text-[#6a6a6a] text-sm">
+            <Loader2 size={14} className="animate-spin" />
+            Checking version...
+          </div>
+        ) : versionInfo ? (
+          <div className="space-y-3">
+            <div className="flex items-center gap-4">
+              <div className="flex-1">
+                <p className="text-[11px] text-[#6a6a6a] mb-1">Current Version</p>
+                <p className="text-sm text-white font-['JetBrains_Mono']">v{versionInfo.current_version}</p>
+              </div>
+              <div className="flex-1">
+                <p className="text-[11px] text-[#6a6a6a] mb-1">Build</p>
+                <p className="text-sm text-[#8a8a8a] font-['JetBrains_Mono']">{versionInfo.build_version}</p>
+              </div>
+              <div className="flex-1">
+                <p className="text-[11px] text-[#6a6a6a] mb-1">Latest on GitHub</p>
+                <p className="text-sm text-white font-['JetBrains_Mono']">
+                  {versionInfo.latest_version ? `v${versionInfo.latest_version}` : 'Unable to check'}
+                </p>
+              </div>
+            </div>
+            {versionInfo.update_available && (
+              <div className="flex items-center gap-2 mt-2 px-3 py-2 bg-[#00D9FF]/5 border border-[#00D9FF]/20 rounded-lg">
+                <span className="text-[11px] font-semibold font-['JetBrains_Mono'] px-2 py-0.5 rounded bg-[#00D9FF]/10 text-[#00D9FF]">
+                  Update available: v{versionInfo.latest_version}
+                </span>
+                <a
+                  href="https://github.com/fxxkrlab/ADMINCHAT_PANEL/releases"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[11px] text-[#00D9FF] hover:underline flex items-center gap-1 ml-auto"
+                >
+                  View releases <ExternalLink size={11} />
+                </a>
+              </div>
+            )}
+            {!versionInfo.update_available && versionInfo.latest_version && (
+              <p className="text-[11px] text-[#059669] font-['JetBrains_Mono']">You're on the latest version.</p>
+            )}
+          </div>
+        ) : (
+          <p className="text-sm text-[#6a6a6a]">Failed to load version info.</p>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -349,6 +420,9 @@ export default function Settings() {
                 Failed to save: {(saveMutation.error as Error)?.message || 'Unknown error'}
               </p>
             )}
+
+            {/* Version Info */}
+            <VersionInfoCard />
           </>
         )}
       </div>

@@ -7,6 +7,7 @@ import type {
   FAQCategory,
   FAQRankingItem,
   MissedKeyword,
+  MissedKeywordFilter,
   MatchMode,
   ResponseMode,
   ReplyMode,
@@ -150,6 +151,26 @@ export async function getMissedKeywords(): Promise<MissedKeyword[]> {
 
 export async function deleteMissedKeyword(id: number): Promise<void> {
   await api.delete(`/faq/missed-keywords/${id}`);
+}
+
+// ---- Missed Keyword Filters ----
+
+export async function getMissedKeywordFilters(): Promise<MissedKeywordFilter[]> {
+  const { data } = await api.get('/faq/missed-keyword-filters');
+  return data.data;
+}
+
+export async function createMissedKeywordFilter(body: {
+  pattern: string;
+  match_mode: 'exact' | 'prefix' | 'contains' | 'regex';
+  description?: string;
+}): Promise<MissedKeywordFilter> {
+  const { data } = await api.post('/faq/missed-keyword-filters', body);
+  return data.data;
+}
+
+export async function deleteMissedKeywordFilter(id: number): Promise<void> {
+  await api.delete(`/faq/missed-keyword-filters/${id}`);
 }
 
 // ---- FAQ Groups ----

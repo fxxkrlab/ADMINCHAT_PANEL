@@ -8,7 +8,7 @@
 | Bot 框架 | aiogram 3 | 3.x |
 | 前端框架 | React + TypeScript | React 18, TS 5.x |
 | 构建工具 | Vite | 5.x |
-| UI 组件库 | shadcn/ui + Tailwind CSS | Tailwind 3.4 |
+| UI 组件库 | shadcn/ui + Tailwind CSS | Tailwind 4.x |
 | 数据库 | PostgreSQL | 16 |
 | ORM | SQLAlchemy 2.0 (async) | 2.0+ |
 | 数据库迁移 | Alembic | 1.13+ |
@@ -60,6 +60,7 @@
                           │- 消息记录   │ │- WS pub/sub│
                           │- FAQ规则   │ │- 媒体缓存  │
                           │- 权限/角色  │ │- 会话状态  │
+                          │- 30 tables │ │           │
                           └────────────┘ └───────────┘
 ```
 
@@ -111,8 +112,9 @@ backend/
 │   │
 │   ├── faq/                    # FAQ 引擎
 │   │   ├── engine.py           # 匹配引擎主逻辑
-│   │   ├── matcher.py          # 正则/关键字匹配器
+│   │   ├── matcher.py          # 正则/关键字匹配器 (5 modes: exact/prefix/contains/regex/catch_all)
 │   │   ├── ai_handler.py       # AI 回复/润色
+│   │   ├── keyword_filter.py   # 遗漏关键词过滤器 (keyword_matches_filter)
 │   │   ├── rag_handler.py      # RAG 兼容 wrapper
 │   │   └── rag/                # 模块化 RAG 系统
 │   │       ├── __init__.py     # 工厂函数 get_rag_provider()

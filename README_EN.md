@@ -34,30 +34,32 @@ English | [中文](./README.md)
 
 > &reg; 2026 NovaHelix & SAKAKIBARA. All rights reserved.
 
-**Telegram Bidirectional Message Forwarding Bot + Web Customer Service Management Panel** &mdash; An all-in-one Telegram customer service solution with multi-bot pool management, FAQ auto-reply, AI integration, OAuth multi-auth, and real-time web chat.
+**Telegram Bidirectional Message Forwarding Bot + Web Customer Service Panel** &mdash; A complete Telegram customer service solution featuring multi-bot pool management, FAQ auto-reply with 5 match modes and 8 reply modes, RAG knowledge base retrieval, AI provider OAuth multi-auth, and a real-time WebSocket chat interface.
 
 ---
 
 ## Overview
 
-ADMINCHAT Panel is a full-featured Telegram customer service management system. It forwards private messages and group @mentions from Telegram bots to a web management panel, enabling admins and agents to view and reply to user messages in real-time through the browser. It also supports FAQ auto-reply, AI-powered responses, user management, and more.
+ADMINCHAT Panel is a production-ready Telegram customer service management system. It collects private messages and group @mentions received by your Telegram bots and forwards them into a unified web panel where admins and agents can view and respond in real time. Beyond live chat, the platform provides a sophisticated FAQ engine with regex matching, AI-powered responses, RAG knowledge base retrieval, missed keyword analysis, configurable keyword filters, and full user lifecycle management.
 
 ## Key Features
 
-- **Multi-Bot Pool** &mdash; Unlimited bot instances with automatic rate-limit detection and failover
-- **Bidirectional Forwarding** &mdash; Private chat + Group @Bot, preserving text/images/videos/files/Markdown
-- **Real-time Web Chat** &mdash; WebSocket-based live messaging, customer service style interface
-- **FAQ Auto-Reply Engine** &mdash; 8 reply modes (regex match / AI direct / AI polish / AI fallback / intent recognition / template fill / RAG knowledge base / comprehensive AI)
-- **RAG Knowledge Base** &mdash; Modular RAG architecture with Dify Knowledge API integration (GTE-multilingual + pgvector), extensible to other RAG platforms
+- **Multi-Bot Pool** &mdash; Add unlimited bots with automatic rate-limit detection and failover between pool members
+- **Bidirectional Message Forwarding** &mdash; Private chat and group @mentions, preserving text, images, videos, files, and Markdown formatting
+- **Real-time Web Chat** &mdash; WebSocket-powered live messaging with a customer-service-style interface
+- **FAQ Auto-Reply Engine** &mdash; 5 match modes (exact, prefix, contains, regex, catch_all) combined with 8 reply modes for flexible response handling
+- **RAG Knowledge Base** &mdash; Modular RAG architecture with Dify Knowledge API integration (GTE-multilingual + pgvector), extensible to other providers
 - **AI Provider OAuth Multi-Auth** &mdash; 5 authentication methods: API Key / OpenAI OAuth / Claude OAuth / Claude Session Token / Gemini OAuth, with automatic token refresh
-- **User Management** &mdash; Tags, groups, blocking, search, full Telegram user info display
-- **AI Integration** &mdash; OpenAI-compatible API format, multi-provider support
-- **Cloudflare Turnstile** &mdash; Human verification for private chat users
-- **Role-Based Access** &mdash; Super Admin / Admin / Agent with granular permissions
-- **Audit Logging** &mdash; Automatic tracking of critical operations
-- **Knowledge Gap Analysis** &mdash; Auto-detect unmatched questions, daily ranking updates at 3 AM
-- **Bot Groups + FAQ Group Routing** &mdash; Organize bots into groups, FAQ rules into Group-Category hierarchy, auto-route replies through the assigned bot group
-- **Docker Deployment** &mdash; Single `docker compose up` to run, GHCR image publishing
+- **Missed Keyword Filters** &mdash; Configurable filter rules with 4 match modes (exact, prefix, contains, regex) to auto-bypass irrelevant keywords such as bot commands (`/start`, `/about`)
+- **User Management** &mdash; Tags, groups, blocking, search, and full Telegram user profile display
+- **AI Integration** &mdash; OpenAI-compatible API format with multi-provider configuration
+- **Cloudflare Turnstile** &mdash; Human verification for private chat users to prevent abuse
+- **Bot Groups + FAQ Group Routing** &mdash; Organize bots and FAQ rules into a Group &rarr; Category hierarchy; matched rules automatically route replies through the assigned bot group
+- **Role-Based Access Control** &mdash; Super Admin / Admin / Agent with granular permission sets
+- **Audit Logging** &mdash; Automatic tracking of all critical operations
+- **Missed Knowledge Analysis** &mdash; Detects unmatched questions and builds daily frequency rankings (updated at 3 AM)
+- **Global Error Boundary** &mdash; Frontend error isolation preventing full-page crashes
+- **Docker One-Click Deployment** &mdash; `docker compose up` to run, with pre-built images published to GHCR
 
 ## Screenshots
 
@@ -91,7 +93,7 @@ graph TB
         FastAPI["FastAPI (async)"]
         aiogram["aiogram 3 (multi-bot)"]
         SQLAlchemy["SQLAlchemy 2.0"]
-        APScheduler["APScheduler"]
+        APScheduler["APScheduler (scheduled tasks)"]
         OAuthModule["OAuth 2.0 + PKCE"]
     end
 
@@ -100,12 +102,12 @@ graph TB
         Redis[("Redis 7")]
     end
 
-    subgraph External
+    subgraph External Services
         TelegramAPI["Telegram Bot API"]
         CloudflareAPI["Cloudflare Turnstile"]
         AIAPI["AI API (OpenAI compatible)"]
         DifyAPI["Dify Knowledge API"]
-        OAuthProviders["OAuth Providers\n(OpenAI/Claude/Gemini)"]
+        OAuthProviders["OAuth Providers\n(OpenAI / Claude / Gemini)"]
     end
 
     React -->|"REST API + WebSocket"| FastAPI
@@ -116,7 +118,7 @@ graph TB
     FastAPI --> Redis
     aiogram -->|"Bot API"| TelegramAPI
     FastAPI -->|"Verification"| CloudflareAPI
-    FastAPI -->|"AI Reply"| AIAPI
+    FastAPI -->|"AI Replies"| AIAPI
     FastAPI -->|"RAG Retrieval"| DifyAPI
     OAuthModule -->|"OAuth 2.0 + PKCE"| OAuthProviders
 ```
@@ -134,51 +136,98 @@ flowchart LR
     F & G -->|"Reply to User"| A
 ```
 
-## AI Provider Auth Methods
+## AI Provider OAuth Flow
 
-| Method | Flow | Description |
-|--------|------|-------------|
-| API Key | Manual input | Traditional method: enter Base URL + API Key directly |
-| OpenAI OAuth | Popup | OAuth 2.0 + PKCE, browser popup auth with auto-callback |
-| Claude OAuth | Code paste | OAuth 2.0 + PKCE, Claude shows code on its page, user pastes it |
-| Claude Session Token | Cookie paste | Copy sessionKey cookie from claude.ai, backend auto-exchanges for tokens |
-| Gemini OAuth | Popup | Google OAuth 2.0 + PKCE, browser popup auth with auto-callback |
-
-> Automatic token refresh: background job checks every 5 minutes for expiring tokens and auto-renews them. Also runs on server startup to compensate for downtime.
+```mermaid
+flowchart TB
+    U["Admin"] -->|"Select Auth Method"| S{"Auth Method"}
+    S -->|"API Key"| K["Enter Key Manually"]
+    S -->|"OpenAI / Gemini OAuth"| P["Popup Login + Auto Callback"]
+    S -->|"Claude OAuth"| C["Open Link + Paste Code"]
+    S -->|"Claude Session Token"| T["Paste Cookie"]
+    K & P & C & T -->|"access_token stored in api_key"| DB["AiConfig Record"]
+    DB -->|"Check expiry every 5 min"| R["Auto Refresh Token"]
+    R -->|"Update api_key"| DB
+```
 
 ## Database Schema
 
 | Table | Description | Key Fields |
 |-------|-------------|------------|
-| `admins` | Panel admins/agents | username, role, permissions (JSONB) |
+| `admins` | Panel admins and agents | username, role, permissions (JSONB) |
 | `tg_users` | Telegram users | tg_uid, is_blocked, turnstile_verified_at |
 | `bots` | Bot pool | token, priority, is_rate_limited |
 | `conversations` | Chat sessions | status, source_type, assigned_to |
 | `messages` | Message records | direction, content_type, faq_matched |
 | `tg_groups` | Telegram groups | tg_chat_id, title |
+| `group_bots` | Group-bot associations | tg_group_id, bot_id |
 | `tags` / `user_tags` | User tags | name, color (many-to-many) |
+| `user_groups` / `user_group_members` | User groups | name, description (many-to-many) |
 | `faq_rules` | FAQ rules | response_mode, reply_mode, category_id |
+| `faq_questions` / `faq_answers` | FAQ Q&A pairs | keyword, match_mode / content, content_type |
+| `faq_rule_questions` / `faq_rule_answers` | FAQ rule M2M links | faq_rule_id, question_id / answer_id |
 | `faq_groups` | FAQ groups (level 1) | name, bot_group_id |
 | `faq_categories` | FAQ categories (level 2) | name, faq_group_id, bot_group_id |
-| `bot_groups` | Bot groups | name, description |
-| `ai_configs` | AI provider configs | base_url, api_key, model, auth_method, oauth_data |
+| `faq_hit_stats` | FAQ hit statistics | hit_count, date |
+| `missed_keywords` | Unmatched keyword rankings | keyword, occurrence_count |
+| `missed_keyword_filters` | Keyword filter rules | pattern, match_mode (exact/prefix/contains/regex) |
+| `unmatched_messages` | Raw unmatched messages | text_content, tg_user_id |
+| `bot_groups` / `bot_group_members` | Bot groups | name / bot_group_id, bot_id |
+| `ai_configs` | AI provider configurations | base_url, api_key, model, auth_method, oauth_data |
+| `ai_usage_logs` | AI usage tracking | tokens_used, cost_estimate |
 | `rag_configs` | RAG knowledge base configs | provider, base_url, api_key, dataset_id, top_k, is_active |
+| `system_settings` | System settings | key-value (JSONB) |
 | `audit_logs` | Audit trail | action, target_type, details |
 
-> 28 tables total. See [docs/DATABASE_DESIGN.md](docs/DATABASE_DESIGN.md) for full schema.
+> 30 tables total. See [docs/DATABASE_DESIGN.md](docs/DATABASE_DESIGN.md) for the full schema.
+
+## FAQ Match Modes
+
+| Mode | Code | Description |
+|------|------|-------------|
+| Exact | `exact` | Full text must equal the keyword (case-insensitive) |
+| Prefix | `prefix` | Text must start with the keyword |
+| Contains | `contains` | Keyword appears anywhere in the text |
+| Regex | `regex` | Text matches a regular expression pattern |
+| Catch All | `catch_all` | Matches any incoming message; designed as a low-priority fallback for RAG rules |
 
 ## FAQ Reply Modes
 
 | Mode | Code | Description |
 |------|------|-------------|
-| Direct Match | `direct` | Return preset answer on keyword match |
-| AI Only | `ai_only` | Send question directly to AI (rate limited) |
-| AI Polish | `ai_polish` | Match answer + AI rewrite for natural tone |
-| AI Fallback | `ai_fallback` | Try FAQ first, AI if no match |
-| AI Intent | `ai_intent` | AI classifies intent, routes to FAQ category |
-| Template Fill | `ai_template` | Preset template + AI fills dynamic variables |
-| RAG | `rag` | Vector retrieval (Dify/pgvector) + AI synthesized answer |
-| AI Comprehensive | `ai_classify_and_answer` | AI generates answer using FAQ knowledge base |
+| Direct Match | `direct` | Return the preset answer on keyword match |
+| AI Only | `ai_only` | Forward the question directly to AI (rate limited) |
+| AI Polish | `ai_polish` | Match a preset answer, then let AI rewrite it for a natural tone |
+| AI Fallback | `ai_fallback` | Try FAQ first; hand off to AI only when no rule matches |
+| AI Intent | `ai_intent` | AI classifies the user's intent, then routes to the matching FAQ category |
+| Template Fill | `ai_template` | Preset template with AI-filled dynamic variables |
+| RAG | `rag` | Vector retrieval (Dify / pgvector) combined with an AI-synthesized answer |
+| AI Comprehensive | `ai_classify_and_answer` | AI generates an answer referencing the full FAQ knowledge base |
+
+## Missed Keyword Filters
+
+The missed knowledge analysis system automatically collects unmatched user messages and ranks them by frequency. To keep the rankings useful, you can configure **keyword filters** that automatically bypass irrelevant messages such as bot commands (`/start`, `/help`, `/about`) or common greetings.
+
+Each filter supports 4 match modes:
+
+| Mode | Behavior |
+|------|----------|
+| `exact` | Message must exactly equal the pattern |
+| `prefix` | Message must start with the pattern |
+| `contains` | Pattern appears anywhere in the message |
+| `regex` | Message matches the regular expression |
+
+## AI Provider Auth Methods
+
+| Method | Flow | Description |
+|--------|------|-------------|
+| API Key | Manual input | Traditional method: enter Base URL + API Key directly |
+| OpenAI OAuth | Popup login | OAuth 2.0 + PKCE, browser popup with auto-callback |
+| Claude OAuth | Code paste | OAuth 2.0 + PKCE, Claude displays a code on its fixed callback page; the user copies and pastes it |
+| Claude Session Token | Cookie paste | Copy the `sessionKey` cookie from claude.ai; the backend exchanges it for access tokens |
+| Gemini OAuth | Popup login | Google OAuth 2.0 + PKCE, browser popup with auto-callback |
+
+> **Automatic token refresh:** A background job checks every 5 minutes for tokens approaching expiry and renews them automatically. The refresh also runs at server startup to compensate for any downtime.
 
 ## Quick Start
 
@@ -187,28 +236,28 @@ flowchart LR
 git clone https://github.com/fxxkrlab/ADMINCHAT_PANEL.git
 cd ADMINCHAT_PANEL/deploy
 
-# Configure environment
+# Configure environment variables
 cp .env.example .env
 nano .env  # Set passwords, bot tokens, domain, etc.
 
 # One-click start (includes PostgreSQL + Redis + Nginx)
 docker compose -f docker-compose.full.yml up -d
 
-# Visit http://server-ip
+# Visit http://your-server-ip
 # Default login: admin / (see INIT_ADMIN_PASSWORD in .env)
 ```
 
 ## Installation Methods
 
-See full deployment docs at [`deploy/README.md`](deploy/README.md)
+For detailed deployment instructions, see [`deploy/README.md`](deploy/README.md).
 
 | Method | File | Use Case |
 |--------|------|----------|
-| Docker Run | [`deploy/docker-run.sh`](deploy/docker-run.sh) | Have PG+Redis, deploy app only |
-| Compose Standalone | [`deploy/docker-compose.standalone.yml`](deploy/docker-compose.standalone.yml) | Have PG+Redis, Compose managed |
-| Compose Full Stack | [`deploy/docker-compose.full.yml`](deploy/docker-compose.full.yml) | Fresh server, deploy everything |
+| Docker Run | [`deploy/docker-run.sh`](deploy/docker-run.sh) | Existing PG + Redis, deploy the app only |
+| Compose Standalone | [`deploy/docker-compose.standalone.yml`](deploy/docker-compose.standalone.yml) | Existing PG + Redis, Compose-managed |
+| Compose Full Stack | [`deploy/docker-compose.full.yml`](deploy/docker-compose.full.yml) | Fresh server, deploy everything at once |
 
-Each method supports both **Named Volumes** (Docker-managed) and **Bind Mounts** (host directory mapping), switchable via comments in yml files.
+Each method supports both **Named Volumes** (Docker-managed) and **Bind Mounts** (host directory mapping). Switch between them by toggling the comments in the respective yml file.
 
 ## Project Structure
 
@@ -218,32 +267,47 @@ ADMINCHAT_PANEL/
 │   ├── app/
 │   │   ├── api/v1/            # REST API routes (17 modules)
 │   │   ├── bot/               # Telegram Bot core
-│   │   ├── faq/               # FAQ engine + AI handler + RAG
+│   │   │   ├── manager.py     # Multi-bot lifecycle management
+│   │   │   ├── handlers/      # Message handlers (private/group/commands)
+│   │   │   ├── dispatcher.py  # Message dispatch + failover
+│   │   │   └── rate_limiter.py# Rate-limit detection (Redis token bucket)
+│   │   ├── faq/               # FAQ engine
+│   │   │   ├── engine.py      # Match engine
+│   │   │   ├── matcher.py     # 5 match mode functions
+│   │   │   ├── ai_handler.py  # AI reply handler (8 modes)
+│   │   │   ├── rag_handler.py # RAG compatibility wrapper
+│   │   │   └── rag/           # Modular RAG system
+│   │   │       ├── base.py    # RAGProvider abstract base class
+│   │   │       └── dify_provider.py  # Dify Knowledge API provider
 │   │   ├── oauth/             # OAuth 2.0 multi-auth
-│   │   │   ├── base.py        # OAuthProvider abstract base
+│   │   │   ├── base.py        # OAuthProvider abstract base class
 │   │   │   ├── encryption.py  # Fernet token encryption
 │   │   │   ├── openai.py      # OpenAI OAuth + PKCE
 │   │   │   ├── claude.py      # Claude OAuth + Session Token
 │   │   │   ├── gemini.py      # Gemini/Google OAuth + PKCE
-│   │   │   └── token_refresh.py # Auto token refresh task
-│   │   ├── models/            # SQLAlchemy ORM (28 tables)
-│   │   ├── schemas/           # Pydantic models
-│   │   ├── services/          # Business services
-│   │   ├── ws/                # WebSocket real-time
-│   │   └── tasks/             # Scheduled tasks
+│   │   │   └── token_refresh.py # Automatic token refresh task
+│   │   ├── models/            # SQLAlchemy ORM (30 tables)
+│   │   ├── schemas/           # Pydantic request/response models
+│   │   ├── services/          # Business services (Redis/audit/media/Turnstile)
+│   │   ├── ws/                # WebSocket real-time communication
+│   │   └── tasks/             # Scheduled tasks (APScheduler)
+│   ├── alembic/               # Database migrations
 │   └── Dockerfile
 ├── frontend/                   # React frontend
 │   ├── src/
 │   │   ├── pages/             # 14+ pages
-│   │   ├── components/        # Reusable components
-│   │   │   └── ai/           # OAuth auth components
+│   │   ├── components/        # Reusable components (chat/layout/ui/ai)
+│   │   │   └── ai/           # OAuth authentication components
+│   │   │       ├── AuthMethodSelector.tsx  # Auth method selector
+│   │   │       └── OAuthFlowModal.tsx      # OAuth flow modal
 │   │   ├── stores/            # Zustand state management
 │   │   ├── services/          # API service layer (11 modules)
-│   │   └── hooks/             # Custom hooks
+│   │   ├── hooks/             # Custom hooks (WebSocket, debounce)
+│   │   └── types/             # TypeScript type definitions
 │   └── Dockerfile
-├── deploy/                     # Deployment configs
+├── deploy/                     # Deployment configurations
 ├── docs/                       # Design documents
-├── docker-compose.yml          # Local dev (PG+Redis only)
+├── docker-compose.yml          # Local dev (PG + Redis only)
 ├── .env.example
 └── LICENSE                     # GPL-3.0
 ```
@@ -256,8 +320,14 @@ ADMINCHAT_PANEL/
 cd backend
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-# Start PostgreSQL + Redis: docker compose up postgres redis -d
+
+# Start PostgreSQL and Redis (if not already running)
+docker compose up postgres redis -d
+
+# Run database migrations
 alembic upgrade head
+
+# Start the development server
 uvicorn app.main:app --reload --port 8000
 ```
 
@@ -270,16 +340,25 @@ npm run dev
 # Visit http://localhost:5173
 ```
 
+## What's New in v0.8.0
+
+- **Missed Keyword Filters** &mdash; Configurable filter system with 4 match modes (exact, prefix, contains, regex) to automatically bypass irrelevant keywords like bot commands (`/start`, `/about`) from the missed knowledge rankings
+- **Catch All Match Mode** &mdash; New FAQ question `match_mode` that matches any incoming message, designed as a low-priority fallback for RAG-based rules
+- **N+1 Query Optimizations** &mdash; Eager loading applied across critical API endpoints to eliminate redundant database queries
+- **Schema Validation Fixes** &mdash; Corrected Pydantic schema definitions and added missing foreign key constraints and indexes
+- **Global Error Boundary** &mdash; Frontend error isolation component preventing unhandled exceptions from crashing the entire application
+- **Improved Error Logging** &mdash; Structured error output across backend services for easier debugging
+
 ## License
 
 This project is licensed under the [GNU General Public License v3.0](LICENSE).
 
 **Copyright &copy; 2026 NovaHelix & SAKAKIBARA**
 
-You are free to use, modify, and distribute this software, provided you:
-- Keep it open source (no closed-source commercial use, except by copyright holders)
+You are free to use, modify, and distribute this software, provided that you:
+- Keep derivative works open source (closed-source commercial use is permitted only by the copyright holders)
 - Retain the original copyright notice
-- Use the same GPL-3.0 license
+- License derivative works under the same GPL-3.0 terms
 
 ---
 

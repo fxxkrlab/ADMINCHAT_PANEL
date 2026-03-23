@@ -34,7 +34,7 @@ class AdminResponse(BaseModel):
     email: Optional[str] = None
     role: str
     is_active: bool
-    permissions: Dict[str, Any] = {}
+    permissions: Dict[str, Any] = Field(default_factory=dict)
     created_at: datetime
     updated_at: datetime
 
@@ -42,5 +42,5 @@ class AdminResponse(BaseModel):
 
 
 class AdminListResponse(BaseModel):
-    items: List[AdminResponse] = []
+    items: List[AdminResponse] = Field(default_factory=list)
     total: int = 0

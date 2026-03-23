@@ -4,14 +4,14 @@ Pydantic schemas for RAG Config API endpoints.
 from __future__ import annotations
 
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Literal, Optional
 
 from pydantic import BaseModel, Field
 
 
 class RagConfigCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
-    provider: str = Field(..., pattern=r"^(dify)$")
+    provider: Literal["dify"]
     base_url: str = Field(..., min_length=1, max_length=500)
     api_key: str = Field(..., min_length=1, max_length=500)
     dataset_id: str = Field(..., min_length=1, max_length=200)
@@ -20,7 +20,7 @@ class RagConfigCreate(BaseModel):
 
 class RagConfigUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=100)
-    provider: Optional[str] = Field(None, pattern=r"^(dify)$")
+    provider: Optional[Literal["dify"]] = None
     base_url: Optional[str] = Field(None, min_length=1, max_length=500)
     api_key: Optional[str] = Field(None, min_length=1, max_length=500)
     dataset_id: Optional[str] = Field(None, min_length=1, max_length=200)
@@ -44,7 +44,7 @@ class RagConfigResponse(BaseModel):
 
 
 class RagConfigListResponse(BaseModel):
-    items: List[RagConfigResponse] = []
+    items: List[RagConfigResponse] = Field(default_factory=list)
     total: int = 0
 
 
