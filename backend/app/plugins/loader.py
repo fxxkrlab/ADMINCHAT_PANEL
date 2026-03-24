@@ -38,6 +38,7 @@ from app.plugins.schemas import PluginInfo
 from app.plugins.secret_store import PluginSecretStore
 from app.plugins.signature_verifier import BundleSignatureVerifier
 from app.plugins.static_server import PluginStaticServer
+from app.plugins.utils import extract_plugin_zip
 
 logger = logging.getLogger("acp.plugins.loader")
 
@@ -125,18 +126,13 @@ def _parse_manifest(plugin_path: Path) -> dict[str, Any]:
     return manifest
 
 
-def _extract_plugin_zip(zip_path: Path, target_dir: Path) -> None:
-    """Extract a plugin zip bundle to the target directory."""
-    import zipfile
+def _extract_plugin_zip(zip_path: Path, target_dir: Path) -> Path:
+    """Extract a plugin zip bundle to the target directory.
 
-    target_dir.mkdir(parents=True, exist_ok=True)
-    try:
-        with zipfile.ZipFile(zip_path, "r") as zf:
-            zf.extractall(target_dir)
-    except zipfile.BadZipFile as exc:
-        raise PluginManifestError(
-            f"Invalid zip file: {zip_path}"
-        ) from exc
+    Delegates to utils.extract_plugin_zip which includes path traversal
+    protection.
+    """
+    return extract_plugin_zip(zip_path, target_dir)
 
 
 def _read_panel_version() -> str:
@@ -534,16 +530,8 @@ class PluginManager:
                     plugin_id=plugin_id,
                 ) from exc
 
-        # Store loaded plugin
-        self._loaded[plugin_id] = _LoadedPlugin(
-            plugin_id=plugin_id,
-            version=version,
-            manifest=manifest,
-            module=module,
-            plugin_path=plugin_path,
-        )
-
-        # 6. Update DB status
+        # 6. Update DB status BEFORE adding to _loaded dict
+        #    If the DB commit fails, the plugin won't be in _loaded.
         async with async_session_factory() as session:
             await session.execute(
                 update(InstalledPlugin)
@@ -565,6 +553,15 @@ class PluginManager:
             )
             record = result.scalar_one()
             info = _plugin_to_info(record)
+
+        # Store loaded plugin (after successful DB commit)
+        self._loaded[plugin_id] = _LoadedPlugin(
+            plugin_id=plugin_id,
+            version=version,
+            manifest=manifest,
+            module=module,
+            plugin_path=plugin_path,
+        )
 
         await _publish_plugin_event(plugin_id, "activated")
         logger.info("Plugin %s v%s activated", plugin_id, version)

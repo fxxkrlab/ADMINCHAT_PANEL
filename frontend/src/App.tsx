@@ -78,11 +78,13 @@ function AppRoutes() {
 
   // Build plugin routes from active plugins
   const pluginRoutes = (activePlugins || []).flatMap(p =>
-    (p.manifest.frontend?.sidebar || []).map(item => ({
-      path: item.path,
-      pluginId: p.plugin_id,
-      pluginName: p.name,
-    }))
+    (p.manifest.frontend?.sidebar || [])
+      .filter(item => item.path.startsWith('/p/'))
+      .map(item => ({
+        path: item.path,
+        pluginId: p.plugin_id,
+        pluginName: p.name,
+      }))
   );
 
   return (

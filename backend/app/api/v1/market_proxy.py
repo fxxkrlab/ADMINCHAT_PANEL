@@ -2,9 +2,10 @@
 from __future__ import annotations
 
 import logging
+import re
 from typing import Annotated, Optional
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 import httpx
 
@@ -66,6 +67,8 @@ async def get_market_plugin(
     _admin: Annotated[Admin, Depends(require_admin)],
 ) -> APIResponse:
     """Get details of a specific plugin from ACP Market."""
+    if not re.match(r'^[a-z][a-z0-9-]{2,49}$', plugin_id):
+        raise HTTPException(status_code=400, detail="Invalid plugin ID")
     data = await _market_request("GET", f"/plugins/{plugin_id}")
     return APIResponse(data=data.get("data"))
 

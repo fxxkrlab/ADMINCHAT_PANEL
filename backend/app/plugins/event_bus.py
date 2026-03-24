@@ -63,18 +63,25 @@ class PluginEventBus:
         logger.debug("Emitting event %s to %d handler(s)", event, len(handlers))
 
         for plugin_id, handler in handlers:
+            task = asyncio.create_task(handler(data))
             try:
                 await asyncio.wait_for(
-                    handler(data),
+                    asyncio.shield(task),
                     timeout=HANDLER_TIMEOUT_SECONDS,
                 )
             except asyncio.TimeoutError:
+                task.cancel()
                 logger.error(
                     "Handler for event %s from plugin %s timed out after %ds",
                     event,
                     plugin_id,
                     HANDLER_TIMEOUT_SECONDS,
                 )
+                # Suppress the CancelledError from the cancelled task
+                try:
+                    await task
+                except (asyncio.CancelledError, Exception):
+                    pass
             except Exception:
                 logger.exception(
                     "Handler for event %s from plugin %s raised an error",

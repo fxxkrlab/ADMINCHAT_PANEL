@@ -10,7 +10,7 @@ from app.plugins.exceptions import PluginManifestError
 
 logger = logging.getLogger("acp.plugins.utils")
 
-_REQUIRED_MANIFEST_FIELDS = {"id", "name", "version", "acp_version"}
+_REQUIRED_MANIFEST_FIELDS = {"id", "name", "version", "entry_point"}
 _PLUGIN_DATA_DIR_ENV = "ACP_PLUGIN_DATA_DIR"
 _DEFAULT_PLUGIN_DATA_DIR = "/data/plugins"
 

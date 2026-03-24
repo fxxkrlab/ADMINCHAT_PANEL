@@ -1,6 +1,5 @@
 import { Component, type ReactNode, type ErrorInfo } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
-import api from '../services/api';
 
 interface Props {
   pluginId: string;
@@ -25,11 +24,6 @@ export class PluginErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.error(`[Plugin:${this.props.pluginId}]`, error, info.componentStack);
-
-    api.post(`/plugins/${this.props.pluginId}/action`, {
-      action: 'report_error',
-      error: error.message,
-    }).catch(() => {});
   }
 
   render() {

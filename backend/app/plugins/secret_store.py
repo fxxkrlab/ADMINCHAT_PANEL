@@ -23,7 +23,7 @@ def _load_or_generate_key() -> bytes:
         return env_key.encode()
 
     if _KEY_FILE_PATH.exists():
-        return _KEY_FILE_PATH.read_bytes().strip()
+        return _KEY_FILE_PATH.read_text().strip().encode()
 
     logger.warning(
         "No %s env var found, generating new key at %s",
