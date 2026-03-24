@@ -75,7 +75,7 @@ async def lifespan(app: FastAPI):
         logger.exception("Failed to start BotManager (will continue without bots)")
 
     # --- Plugin System ---
-    from app.plugins.loader import PluginManager, _set_plugin_manager
+    from app.plugins.loader import PluginManager
     plugin_manager = PluginManager(app)
     results = await plugin_manager.startup()
     logger.info("Plugin system started: %s", results)
