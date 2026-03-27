@@ -5,6 +5,20 @@ All notable changes to the ADMINCHAT Panel project will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.4] - 2026-03-27
+
+### Fixed
+- **"Update to v" empty version** — Plugin detail modal showed "Update to v" with no version number because the detail API doesn't return `latest_version`; now falls back to `versions[0].version`
+- **Hardcoded Market URL in frontend** — `installFromMarket()` hardcoded `acpmarket.novahelix.org` download URL; now backend constructs the URL from `settings.ACP_MARKET_URL`, making the frontend Market-URL-agnostic
+
+### Added
+- **Uninstall confirmation dialog** — Trash button now shows a confirmation modal before uninstalling, with a "Delete all plugin data" checkbox that sends `drop_tables: true` to the backend
+- **Plugin settings button** — Installed plugins with `settings_tabs` in their manifest now show a gear icon that navigates directly to Settings with the plugin's tab auto-selected
+- **Install success/error toast** — Fixed top-right notification toast on plugin install success ("Plugin installed and activated successfully") or failure (error message), auto-dismisses after 4 seconds
+- **Uninstall success/error toast** — Same notification pattern for uninstall actions
+
+[1.0.4]: https://github.com/fxxkrlab/ADMINCHAT_PANEL/compare/v1.0.3...v1.0.4
+
 ## [1.0.3] - 2026-03-27
 
 ### Added

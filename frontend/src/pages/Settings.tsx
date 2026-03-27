@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Save, Clock, Shield, Database, Settings as SettingsIcon, Loader2, RefreshCw, ExternalLink, LogIn, Key, Unplug, Info, CheckCircle2 } from 'lucide-react';
 import Header from '../components/layout/Header';
@@ -424,6 +425,7 @@ function VersionInfoCard() {
 
 export default function Settings() {
   const queryClient = useQueryClient();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState<string>('admins');
   const [localSettings, setLocalSettings] = useState<Record<string, unknown>>({});
   const { data: activePlugins } = useActivePlugins();
@@ -437,6 +439,19 @@ export default function Settings() {
       module: tab.module,
     }))
   );
+
+  // Auto-select plugin settings tab when navigated from Market
+  useEffect(() => {
+    const state = location.state as { pluginTab?: string } | null;
+    if (state?.pluginTab) {
+      const matchingTab = pluginSettingsTabs.find(t => t.pluginId === state.pluginTab);
+      if (matchingTab) {
+        setActiveTab(matchingTab.key);
+      }
+      // Clear the state so it doesn't re-trigger
+      window.history.replaceState({}, '');
+    }
+  }, [location.state, pluginSettingsTabs]);
 
   // Merge with core TABS
   const allTabs = [...TABS, ...pluginSettingsTabs.map(t => ({ key: t.key, label: t.label }))];

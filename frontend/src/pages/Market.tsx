@@ -1,5 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import {
   Search,
   Download,
@@ -12,6 +13,10 @@ import {
   Trash2,
   ArrowUpCircle,
   X,
+  Settings,
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
 } from 'lucide-react';
 import Header from '../components/layout/Header';
 import {
@@ -103,7 +108,8 @@ function PluginCard({
   installing: boolean;
 }) {
   const isFree = plugin.pricing_model === 'free';
-  const hasUpdate = isInstalled && installedVersion && installedVersion !== plugin.latest_version;
+  const latestVersion = plugin.latest_version;
+  const hasUpdate = isInstalled && installedVersion && latestVersion && installedVersion !== latestVersion;
 
   return (
     <div
@@ -139,7 +145,7 @@ function PluginCard({
           </span>
           <span>by {plugin.author_name || plugin.author?.display_name || plugin.author?.username || 'Unknown'}</span>
         </div>
-        <span className="text-[10px] text-[#6a6a6a] font-['JetBrains_Mono']">v{plugin.latest_version}</span>
+        {latestVersion && <span className="text-[10px] text-[#6a6a6a] font-['JetBrains_Mono']">v{latestVersion}</span>}
       </div>
 
       <div className="mt-3 pt-3 border-t border-[#1A1A1A]">
@@ -191,7 +197,8 @@ function PluginDetailModal({
   if (!plugin) return null;
 
   const isFree = plugin.pricing_model === 'free';
-  const hasUpdate = isInstalled && installedVersion && installedVersion !== plugin.latest_version;
+  const latestVersion = plugin.latest_version || plugin.versions?.[0]?.version;
+  const hasUpdate = isInstalled && installedVersion && latestVersion && installedVersion !== latestVersion;
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
@@ -218,7 +225,7 @@ function PluginDetailModal({
             <div className="flex items-center gap-4 mt-2 text-[11px] text-[#6a6a6a]">
               <span className="flex items-center gap-1"><Download size={11} /> {formatDownloads(plugin.download_count)}</span>
               <span>by {plugin.author_name || plugin.author?.display_name || plugin.author?.username || 'Unknown'}</span>
-              <span className="font-['JetBrains_Mono']">v{plugin.latest_version}</span>
+              {latestVersion && <span className="font-['JetBrains_Mono']">v{latestVersion}</span>}
             </div>
           </div>
           <button onClick={onClose} className="p-1.5 rounded-md hover:bg-[#141414] text-[#6a6a6a] hover:text-white transition-colors">
@@ -299,7 +306,7 @@ function PluginDetailModal({
               className="flex items-center gap-1.5 px-5 py-2 rounded-md bg-[#FF8800] text-black text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-40"
             >
               {installing ? <Loader2 size={16} className="animate-spin" /> : <ArrowUpCircle size={16} />}
-              Update to v{plugin.latest_version}
+              Update to v{latestVersion}
             </button>
           ) : (
             <button
@@ -317,16 +324,77 @@ function PluginDetailModal({
   );
 }
 
+// ---- Uninstall Confirmation Dialog ----
+function UninstallDialog({
+  pluginName,
+  onConfirm,
+  onCancel,
+}: {
+  pluginName: string;
+  onConfirm: (dropTables: boolean) => void;
+  onCancel: () => void;
+}) {
+  const [dropTables, setDropTables] = useState(false);
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onCancel}>
+      <div
+        className="bg-[#0A0A0A] border border-[#2f2f2f] rounded-[10px] w-full max-w-md p-6"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 rounded-lg bg-[#FF4444]/10">
+            <AlertTriangle size={20} className="text-[#FF4444]" />
+          </div>
+          <h3 className="text-base font-semibold text-white font-['Space_Grotesk']">Uninstall Plugin</h3>
+        </div>
+        <p className="text-sm text-[#8a8a8a] mb-4">
+          Are you sure you want to uninstall <span className="text-white font-medium">{pluginName}</span>? This action cannot be undone.
+        </p>
+        <label className="flex items-center gap-2.5 mb-5 cursor-pointer group">
+          <input
+            type="checkbox"
+            checked={dropTables}
+            onChange={(e) => setDropTables(e.target.checked)}
+            className="w-4 h-4 rounded border-[#2f2f2f] bg-[#141414] text-[#FF4444] focus:ring-[#FF4444]/30 cursor-pointer"
+          />
+          <span className="text-sm text-[#8a8a8a] group-hover:text-white transition-colors">
+            Delete all plugin data (database tables)
+          </span>
+        </label>
+        <div className="flex items-center justify-end gap-3">
+          <button
+            onClick={onCancel}
+            className="px-4 py-2 rounded-md text-sm text-[#8a8a8a] hover:text-white hover:bg-[#141414] transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => onConfirm(dropTables)}
+            className="px-4 py-2 rounded-md bg-[#FF4444] text-white text-sm font-medium hover:opacity-90 transition-opacity"
+          >
+            Uninstall
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ---- Installed Plugins Table ----
 function InstalledTab({
   plugins,
   updates,
   onAction,
+  onUninstall,
+  onOpenSettings,
   actionLoading,
 }: {
   plugins: InstalledPlugin[];
   updates: Array<{ plugin_id: string; current: string; latest: string; changelog?: string; compatible: boolean }>;
   onAction: (pluginId: string, action: string) => void;
+  onUninstall: (plugin: InstalledPlugin) => void;
+  onOpenSettings: (pluginId: string) => void;
   actionLoading: string | null;
 }) {
   const updatesMap = useMemo(() => new Map(updates.map((u) => [u.plugin_id, u])), [updates]);
@@ -356,6 +424,7 @@ function InstalledTab({
           {plugins.map((plugin) => {
             const update = updatesMap.get(plugin.plugin_id);
             const isLoading = actionLoading === plugin.plugin_id;
+            const hasSettings = (plugin.manifest.frontend?.settings_tabs?.length ?? 0) > 0;
             return (
               <tr key={plugin.plugin_id} className="border-b border-[#1A1A1A] last:border-0">
                 <td className="px-5 py-3.5">
@@ -392,6 +461,15 @@ function InstalledTab({
                         <ArrowUpCircle size={16} />
                       </button>
                     )}
+                    {hasSettings && (
+                      <button
+                        onClick={() => onOpenSettings(plugin.plugin_id)}
+                        className="p-1.5 rounded-md text-[#8a8a8a] hover:text-[#00D9FF] hover:bg-[#00D9FF]/10 transition-colors"
+                        title="Settings"
+                      >
+                        <Settings size={16} />
+                      </button>
+                    )}
                     {plugin.status === 'active' ? (
                       <button
                         onClick={() => onAction(plugin.plugin_id, 'deactivate')}
@@ -412,7 +490,7 @@ function InstalledTab({
                       </button>
                     ) : null}
                     <button
-                      onClick={() => onAction(plugin.plugin_id, 'uninstall')}
+                      onClick={() => onUninstall(plugin)}
                       disabled={isLoading}
                       className="p-1.5 rounded-md text-[#FF4444] hover:bg-[#FF4444]/10 transition-colors disabled:opacity-40"
                       title="Uninstall"
@@ -431,10 +509,43 @@ function InstalledTab({
   );
 }
 
+// ---- Inline Notification ----
+function Notification({
+  type,
+  message,
+  onDismiss,
+}: {
+  type: 'success' | 'error';
+  message: string;
+  onDismiss: () => void;
+}) {
+  useEffect(() => {
+    const timer = setTimeout(onDismiss, 4000);
+    return () => clearTimeout(timer);
+  }, [onDismiss]);
+
+  return (
+    <div
+      className={`fixed top-6 right-6 z-[200] flex items-center gap-2.5 px-4 py-3 rounded-lg border shadow-lg animate-in slide-in-from-top-2 ${
+        type === 'success'
+          ? 'bg-[#059669]/10 border-[#059669]/30 text-[#059669]'
+          : 'bg-[#FF4444]/10 border-[#FF4444]/30 text-[#FF4444]'
+      }`}
+    >
+      {type === 'success' ? <CheckCircle size={16} /> : <XCircle size={16} />}
+      <span className="text-sm font-medium">{message}</span>
+      <button onClick={onDismiss} className="ml-2 p-0.5 rounded hover:bg-white/10 transition-colors">
+        <X size={14} />
+      </button>
+    </div>
+  );
+}
+
 // ---- Main Market Page ----
 export default function Market() {
   const queryClient = useQueryClient();
   const invalidatePlugins = useInvalidatePlugins();
+  const navigate = useNavigate();
 
   // State
   const [activeTab, setActiveTab] = useState<'browse' | 'installed'>('browse');
@@ -444,6 +555,8 @@ export default function Market() {
   const [sort, setSort] = useState<'popular' | 'newest' | 'updated'>('popular');
   const [selectedPluginId, setSelectedPluginId] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [uninstallTarget, setUninstallTarget] = useState<InstalledPlugin | null>(null);
+  const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Queries
   const { data: browseData, isLoading: browseLoading } = useQuery({
@@ -476,6 +589,8 @@ export default function Market() {
     staleTime: 300_000,
   });
 
+  const dismissNotification = useCallback(() => setNotification(null), []);
+
   // Install mutation
   const installMutation = useMutation({
     mutationFn: ({ pluginId, version }: { pluginId: string; version: string }) =>
@@ -483,6 +598,13 @@ export default function Market() {
     onSuccess: () => {
       invalidatePlugins();
       queryClient.invalidateQueries({ queryKey: ['market-updates'] });
+      setNotification({ type: 'success', message: 'Plugin installed and activated successfully' });
+    },
+    onError: (error: Error) => {
+      setNotification({
+        type: 'error',
+        message: error.message || 'Failed to install plugin',
+      });
     },
   });
 
@@ -500,9 +622,7 @@ export default function Market() {
   const handlePluginAction = async (pluginId: string, action: string) => {
     setActionLoading(pluginId);
     try {
-      if (action === 'uninstall') {
-        await api.post(`/plugins/${pluginId}/action`, { action: 'uninstall' });
-      } else if (action === 'activate') {
+      if (action === 'activate') {
         await api.post(`/plugins/${pluginId}/action`, { action: 'activate' });
       } else if (action === 'deactivate') {
         await api.post(`/plugins/${pluginId}/action`, { action: 'deactivate' });
@@ -517,6 +637,27 @@ export default function Market() {
     } finally {
       setActionLoading(null);
     }
+  };
+
+  const handleUninstallConfirm = async (dropTables: boolean) => {
+    if (!uninstallTarget) return;
+    const pluginId = uninstallTarget.plugin_id;
+    setUninstallTarget(null);
+    setActionLoading(pluginId);
+    try {
+      await api.post(`/plugins/${pluginId}/action`, { action: 'uninstall', drop_tables: dropTables });
+      invalidatePlugins();
+      queryClient.invalidateQueries({ queryKey: ['market-updates'] });
+      setNotification({ type: 'success', message: `${uninstallTarget.name} uninstalled successfully` });
+    } catch {
+      setNotification({ type: 'error', message: `Failed to uninstall ${uninstallTarget.name}` });
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleOpenSettings = (pluginId: string) => {
+    navigate('/settings', { state: { pluginTab: pluginId } });
   };
 
   const marketPlugins = browseData?.items || [];
@@ -661,6 +802,8 @@ export default function Market() {
             plugins={installedPlugins}
             updates={updates}
             onAction={handlePluginAction}
+            onUninstall={setUninstallTarget}
+            onOpenSettings={handleOpenSettings}
             actionLoading={actionLoading}
           />
         )}
@@ -672,11 +815,32 @@ export default function Market() {
             isInstalled={installedMap.has(selectedPluginId)}
             installedVersion={installedMap.get(selectedPluginId)?.version}
             onClose={() => setSelectedPluginId(null)}
-            onInstall={() => handleInstall(selectedPluginId, pluginDetail?.latest_version || '')}
+            onInstall={() => {
+              const latestVersion = pluginDetail?.latest_version || pluginDetail?.versions?.[0]?.version || '';
+              handleInstall(selectedPluginId, latestVersion);
+            }}
             installing={installMutation.isPending}
           />
         )}
+
+        {/* Uninstall Confirmation Dialog */}
+        {uninstallTarget && (
+          <UninstallDialog
+            pluginName={uninstallTarget.name}
+            onConfirm={handleUninstallConfirm}
+            onCancel={() => setUninstallTarget(null)}
+          />
+        )}
       </div>
+
+      {/* Notification Toast */}
+      {notification && (
+        <Notification
+          type={notification.type}
+          message={notification.message}
+          onDismiss={dismissNotification}
+        />
+      )}
     </div>
   );
 }

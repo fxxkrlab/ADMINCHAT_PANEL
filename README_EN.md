@@ -151,9 +151,11 @@ User message → FAQ match → Get template with {variable} placeholders → AI 
 
 ### Plugin System
 - **ACP Plugin Architecture** &mdash; Sandboxed plugin runtime with 5 capability declarations: database, bot handler, API routes, frontend pages, settings tab
-- **ACP Market Integration** &mdash; Browse, install and manage third-party plugins via [ACP Market](https://acpmarket.novahelix.org) with one-click install/uninstall
+- **ACP Market Integration** &mdash; Browse, install and manage third-party plugins via [ACP Market](https://acpmarket.novahelix.org) with instant success/error toast notifications
 - **Market JWT Authentication** &mdash; Connect to Market via email/password login or API key paste; Bearer token management with account status display in Settings
 - **Ed25519 Bundle Signature Verification** &mdash; Auto-fetches Market's public key; verifies Ed25519 signatures on plugin downloads to prevent bundle tampering
+- **Uninstall Confirmation & Data Cleanup** &mdash; Confirmation dialog before uninstalling with optional "Delete all plugin data (database tables)" checkbox
+- **Plugin Settings Shortcut** &mdash; Installed plugins with settings tabs show a gear icon that navigates directly to the corresponding Settings tab
 - **Plugin SDK + CLI** &mdash; [acp-plugin-sdk](https://github.com/fxxkrlab/acp-plugin-sdk) provides type hints + `acp-cli` CLI tool for init / validate / build / publish workflow
 - **Official Plugin Repository** &mdash; [ACP_PLUGINS](https://github.com/fxxkrlab/ACP_PLUGINS) open-source example plugins (e.g. TMDB Movie Request System)
 

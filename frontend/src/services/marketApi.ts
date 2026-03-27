@@ -56,7 +56,6 @@ export async function installFromMarket(pluginId: string, version: string, licen
   const { data } = await api.post('/plugins/install', {
     plugin_id: pluginId,
     version,
-    market_url: `https://acpmarket.novahelix.org/api/v1/plugins/${pluginId}/versions/${version}/download`,
     license_key: licenseKey,
   });
   return data.data;

@@ -166,14 +166,15 @@ async def install_plugin(
 
     zip_path: Path | None = None
     try:
-        # Download bundle if market_url provided
-        if body.market_url:
-            zip_path = await _download_zip(body.market_url)
-        else:
-            raise HTTPException(
-                status_code=400,
-                detail="market_url is required for remote installation",
+        # Build download URL from Market settings if not explicitly provided
+        download_url = body.market_url
+        if not download_url:
+            from app.config import settings as app_settings
+            download_url = (
+                f"{app_settings.ACP_MARKET_URL}/plugins/{body.plugin_id}"
+                f"/versions/{body.version}/download"
             )
+        zip_path = await _download_zip(download_url)
 
         # Install
         info = await pm.install(
