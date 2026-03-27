@@ -5,6 +5,15 @@ All notable changes to the ADMINCHAT Panel project will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.8] - 2026-03-27
+
+### Fixed
+- **Plugin import crash: `ModuleNotFoundError`** — Plugin loader did not add the plugin root directory to `sys.path` before importing, so intra-plugin imports like `from backend.routes import router` failed; now inserts plugin path into `sys.path` before `exec_module()` and cleans up on deactivate
+- **Market status slow loading (3-10s)** — `GET /plugins/market/status` called Market's `/auth/me` endpoint on every request; now caches account info in `system_settings` during connect, status reads from DB instantly
+- **Market not-connected banner** — Browse tab shows orange warning when Market is not connected, with "Go to Settings" button linking directly to Market tab
+
+[1.0.8]: https://github.com/fxxkrlab/ADMINCHAT_PANEL/compare/v1.0.7...v1.0.8
+
 ## [1.0.7] - 2026-03-27
 
 ### Added

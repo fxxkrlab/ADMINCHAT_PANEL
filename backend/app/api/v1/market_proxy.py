@@ -235,6 +235,11 @@ async def market_connect(
     else:
         raise HTTPException(status_code=400, detail="method must be 'login' or 'api_key'")
 
+    # Fetch account info while we have a fresh token
+    account = await _fetch_market_account_fresh(auth_record)
+    if account:
+        auth_record["cached_account"] = account
+
     # Upsert into system_settings
     result = await db.execute(
         select(SystemSetting).where(SystemSetting.key == MARKET_SETTINGS_KEY)
@@ -249,7 +254,7 @@ async def market_connect(
     # Auto-fetch public key after connecting
     await _try_fetch_public_key(db)
 
-    return APIResponse(data={"connected": True, "auth_type": auth_record["auth_type"]})
+    return APIResponse(data={"connected": True, "auth_type": auth_record["auth_type"], "account": account})
 
 
 @router.get("/market/status")
@@ -260,13 +265,11 @@ async def market_status(
     """Get Market connection status and account info."""
     # Check env var first
     if _is_env_connected():
-        # Try to fetch account info using env var
-        account = await _fetch_market_account(db)
         return APIResponse(data={
             "connected": True,
             "auth_type": "env",
             "source": "environment_variable",
-            "account": account,
+            "account": None,
         })
 
     # Check stored credentials
@@ -285,24 +288,43 @@ async def market_status(
     if not data.get("access_token"):
         return APIResponse(data={"connected": False})
 
-    account = await _fetch_market_account(db)
+    # Return cached account info (fetched on connect), no external API call
     return APIResponse(data={
         "connected": True,
         "auth_type": stored.value.get("auth_type", "unknown"),
         "source": "stored",
         "connected_at": stored.value.get("connected_at"),
-        "account": account,
+        "account": _get_cached_account(stored.value),
     })
 
 
-async def _fetch_market_account(db: AsyncSession) -> Optional[Dict[str, Any]]:
-    """Fetch account info from Market's /auth/me endpoint."""
+async def _fetch_market_account_fresh(auth_record: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Fetch account info from Market's /auth/me using a specific token.
+
+    Used during connect to cache the account info. Does NOT go through
+    _get_market_auth_headers to avoid a DB round-trip.
+    """
     try:
-        result = await _market_request("GET", "/auth/me", db=db, auth=True)
-        return result.get("data", result)
+        token_data = decrypt_oauth_data(auth_record)
+        token = token_data.get("access_token")
+        if not token:
+            return None
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.get(
+                f"{settings.ACP_MARKET_URL}/auth/me",
+                headers={"Authorization": f"Bearer {token}"},
+            )
+            resp.raise_for_status()
+            data = resp.json()
+            return data.get("data", data)
     except Exception as e:
         logger.warning("Failed to fetch Market account info: %s", e)
         return None
+
+
+def _get_cached_account(stored_value: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Read cached account info from the stored market_auth record."""
+    return stored_value.get("cached_account")
 
 
 @router.post("/market/disconnect")

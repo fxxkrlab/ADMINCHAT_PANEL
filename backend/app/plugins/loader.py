@@ -471,6 +471,12 @@ class PluginManager:
 
         mod_name = f"plg_{plugin_id}"
         try:
+            # Add plugin root to sys.path so intra-plugin imports work
+            # e.g. "from backend.routes import router" inside backend/plugin.py
+            plugin_path_str = str(plugin_path)
+            if plugin_path_str not in sys.path:
+                sys.path.insert(0, plugin_path_str)
+
             spec = importlib.util.spec_from_file_location(
                 mod_name, str(entry_file)
             )
@@ -625,11 +631,17 @@ class PluginManager:
         # 3. Unsubscribe events
         self._event_bus.unsubscribe_all(plugin_id)
 
-        # 4. Clean up module
+        # 4. Clean up module and sys.path
         mod_name = f"plg_{plugin_id}"
         sys.modules.pop(mod_name, None)
         self._loaded.pop(plugin_id, None)
         self._contexts.pop(plugin_id, None)
+
+        # Remove plugin path from sys.path
+        if loaded:
+            plugin_path_str = str(loaded.plugin_path)
+            if plugin_path_str in sys.path:
+                sys.path.remove(plugin_path_str)
 
         # 5. Update DB status
         async with async_session_factory() as session:

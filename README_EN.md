@@ -150,7 +150,7 @@ User message → FAQ match → Get template with {variable} placeholders → AI 
 </details>
 
 ### Plugin System
-- **ACP Plugin Architecture** &mdash; Sandboxed plugin runtime with 5 capability declarations: database, bot handler, API routes, frontend pages, settings tab
+- **ACP Plugin Architecture** &mdash; Sandboxed plugin runtime with 5 capability declarations: database, bot handler, API routes, frontend pages, settings tab; automatic `sys.path` isolation for intra-plugin imports
 - **ACP Market Integration** &mdash; Browse, install and manage third-party plugins via [ACP Market](https://acpmarket.novahelix.org) with instant success/error toast notifications and connection status banner guiding users to connect
 - **Market JWT Authentication** &mdash; Connect to Market via email/password login or API key paste; Bearer token management with account status display in Settings
 - **Ed25519 Bundle Signature Verification** &mdash; Auto-fetches Market's public key; verifies Ed25519 signatures on plugin downloads to prevent bundle tampering
