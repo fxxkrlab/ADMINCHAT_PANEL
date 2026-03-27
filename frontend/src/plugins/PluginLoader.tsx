@@ -38,7 +38,9 @@ async function loadRemoteModule(pluginId: string, moduleName: string): Promise<C
     throw new Error(`Plugin ${pluginId} failed to load previously`);
   }
 
-  const remoteUrl = `/plugins/${pluginId}/remoteEntry.js`;
+  // Plugin static files served under /api/v1/plugins/{id}/static/
+  // The zip bundles frontend/dist/* so the file is at dist/remoteEntry.js
+  const remoteUrl = `/api/v1/plugins/${pluginId}/static/dist/remoteEntry.js`;
 
   await new Promise<void>((resolve, reject) => {
     if (window[`__acp_plugin_${pluginId}`]) {

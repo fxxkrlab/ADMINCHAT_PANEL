@@ -30,7 +30,7 @@ class PluginStaticServer:
             )
             return
 
-        mount_path = f"/plugins/{plugin_id}"
+        mount_path = f"/api/v1/plugins/{plugin_id}/static"
         self._app.mount(
             mount_path,
             StaticFiles(directory=str(frontend_dir), html=True),
@@ -51,7 +51,7 @@ class PluginStaticServer:
         self._app.routes[:] = [
             route
             for route in self._app.routes
-            if not (hasattr(route, "path") and route.path == mount_path)
+            if not (hasattr(route, "path") and getattr(route, "path", None) == mount_path)
         ]
         del self._mounted[plugin_id]
         logger.info("Unmounted static files for plugin %s", plugin_id)

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - **Plugin import crash: `ModuleNotFoundError`** — Plugin loader did not add the plugin root directory to `sys.path` before importing, so intra-plugin imports like `from backend.routes import router` failed; now inserts plugin path into `sys.path` before `exec_module()` and cleans up on deactivate
+- **Plugin static files unreachable via reverse proxy** — Plugin frontend assets were mounted at `/plugins/{id}` which APISIX didn't route to backend; moved to `/api/v1/plugins/{id}/static/` which goes through the existing `/api/*` route
 - **Market status slow loading (3-10s)** — `GET /plugins/market/status` called Market's `/auth/me` endpoint on every request; now caches account info in `system_settings` during connect, status reads from DB instantly
 - **Market not-connected banner** — Browse tab shows orange warning when Market is not connected, with "Go to Settings" button linking directly to Market tab
 
