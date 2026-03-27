@@ -185,6 +185,7 @@ function PluginDetailModal({
   installedVersion,
   onClose,
   onInstall,
+  onUninstall,
   installing,
 }: {
   plugin: MarketPluginDetail | null;
@@ -192,6 +193,7 @@ function PluginDetailModal({
   installedVersion?: string;
   onClose: () => void;
   onInstall: () => void;
+  onUninstall?: () => void;
   installing: boolean;
 }) {
   if (!plugin) return null;
@@ -294,6 +296,15 @@ function PluginDetailModal({
 
         {/* Footer */}
         <div className="px-6 py-4 border-t border-[#2f2f2f] flex items-center justify-end gap-3">
+          {isInstalled && onUninstall && (
+            <button
+              onClick={onUninstall}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-md text-[#FF4444] hover:bg-[#FF4444]/10 text-sm font-medium transition-colors mr-auto"
+            >
+              <Trash2 size={16} />
+              Uninstall
+            </button>
+          )}
           {isInstalled && !hasUpdate ? (
             <div className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-[#059669]/10 text-[#059669] text-sm font-medium">
               <Check size={16} />
@@ -819,6 +830,13 @@ export default function Market() {
               const latestVersion = pluginDetail?.latest_version || pluginDetail?.versions?.[0]?.version || '';
               handleInstall(selectedPluginId, latestVersion);
             }}
+            onUninstall={installedMap.has(selectedPluginId) ? () => {
+              const installed = installedMap.get(selectedPluginId);
+              if (installed) {
+                setSelectedPluginId(null);
+                setUninstallTarget(installed);
+              }
+            } : undefined}
             installing={installMutation.isPending}
           />
         )}
