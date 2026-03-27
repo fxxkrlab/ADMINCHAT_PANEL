@@ -5,6 +5,13 @@ All notable changes to the ADMINCHAT Panel project will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.13] - 2026-03-27
+
+### Fixed
+- **Plugin static files 404** — Static mount path `/api/v1/plugins/{id}/static/` conflicted with existing `/api/v1/plugins/{plugin_id}` route; moved to `/api/v1/p-static/{id}/` to avoid FastAPI route conflicts
+
+[1.0.13]: https://github.com/fxxkrlab/ADMINCHAT_PANEL/compare/v1.0.12...v1.0.13
+
 ## [1.0.12] - 2026-03-27
 
 ### Fixed

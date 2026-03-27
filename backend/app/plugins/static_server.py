@@ -30,7 +30,7 @@ class PluginStaticServer:
             )
             return
 
-        mount_path = f"/api/v1/plugins/{plugin_id}/static"
+        mount_path = f"/api/v1/p-static/{plugin_id}"
         self._app.mount(
             mount_path,
             StaticFiles(directory=str(frontend_dir), html=True),
