@@ -665,10 +665,11 @@ export default function Market() {
       queryClient.invalidateQueries({ queryKey: ['market-updates'] });
       setNotification({ type: 'success', message: 'Plugin installed and activated successfully' });
     },
-    onError: (error: Error) => {
+    onError: (error: unknown) => {
+      const axiosDetail = (error as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
       setNotification({
         type: 'error',
-        message: error.message || 'Failed to install plugin',
+        message: axiosDetail || (error instanceof Error ? error.message : 'Failed to install plugin'),
       });
     },
   });

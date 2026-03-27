@@ -92,6 +92,17 @@ async def _download_zip(url: str) -> Path:
             sig_path.write_bytes(base64.b64decode(sig_b64))
             logger.info("Bundle signature saved to %s", sig_path)
 
+    except httpx.HTTPStatusError as exc:
+        Path(tmp.name).unlink(missing_ok=True)
+        if exc.response.status_code in (401, 403):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Market authentication required. Please connect to ACP Market in Settings > Market before installing plugins.",
+            ) from exc
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=f"Market returned {exc.response.status_code}: {exc.response.text[:200]}",
+        ) from exc
     except httpx.HTTPError as exc:
         Path(tmp.name).unlink(missing_ok=True)
         raise HTTPException(
