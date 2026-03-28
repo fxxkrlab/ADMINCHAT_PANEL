@@ -102,11 +102,28 @@ body {
   background: color-mix(in srgb, var(--color-bg-sidebar) 80%, transparent);
 }
 
+/* Light mode: solid opaque sidebar */
+[data-theme="light"] .glass-sidebar {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  background: var(--color-bg-sidebar);
+  box-shadow: 1px 0 8px rgba(0, 0, 0, 0.04);
+}
+
 .glass-card {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   background: color-mix(in srgb, var(--color-bg-card) 70%, transparent);
   border: 1px solid color-mix(in srgb, var(--color-border) 50%, transparent);
+}
+
+/* Light mode: frosted glass with visible blur */
+[data-theme="light"] .glass-card {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
 .glass-header {
@@ -134,8 +151,9 @@ body {
 [data-theme="light"] .flowing-bg {
   opacity: 1;
   background:
-    radial-gradient(ellipse 60% 50% at 80% 20%, rgba(14, 165, 233, 0.08), transparent),
-    radial-gradient(ellipse 50% 60% at 20% 80%, rgba(124, 58, 237, 0.06), transparent);
+    radial-gradient(ellipse 60% 50% at 75% 15%, rgba(14, 165, 233, 0.12), transparent 70%),
+    radial-gradient(ellipse 50% 60% at 20% 80%, rgba(124, 58, 237, 0.10), transparent 70%),
+    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(236, 72, 153, 0.05), transparent 70%);
   animation: gradient-flow 15s ease infinite;
   background-size: 200% 200%;
 }

@@ -24,7 +24,7 @@ function StatCard({ label, value, icon: Icon, color, trend }: {
   trend?: number;
 }) {
   return (
-    <div className="bg-bg-card border border-border rounded-[10px] p-5">
+    <div className="bg-bg-card border border-border rounded-[10px] p-5 glass-card">
       <div className="flex items-center gap-2 mb-3">
         <Icon size={18} className={color} />
         <span className="text-[13px] text-text-secondary font-['Inter'] font-medium">{label}</span>
@@ -138,7 +138,7 @@ export default function Dashboard() {
         {/* Two-column panels */}
         <div className="grid grid-cols-2 gap-4 mb-6">
           {/* Bot Pool Status */}
-          <div className="bg-bg-card border border-border rounded-[10px] p-5">
+          <div className="bg-bg-card border border-border rounded-[10px] p-5 glass-card">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-[18px] font-semibold text-text-primary font-['Space_Grotesk']">Bot Pool Status</h3>
               <span className="text-[10px] font-semibold font-['JetBrains_Mono'] px-2 py-0.5 rounded bg-green/10 text-green">
@@ -166,7 +166,7 @@ export default function Dashboard() {
           </div>
 
           {/* FAQ Performance */}
-          <div className="bg-bg-card border border-border rounded-[10px] p-5">
+          <div className="bg-bg-card border border-border rounded-[10px] p-5 glass-card">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-[18px] font-semibold text-text-primary font-['Space_Grotesk']">FAQ Performance</h3>
               <span className="text-[10px] font-semibold font-['JetBrains_Mono'] px-2 py-0.5 rounded bg-accent/10 text-accent">
@@ -191,7 +191,7 @@ export default function Dashboard() {
         {/* Missed Knowledge + Today Messages */}
         <div className="grid grid-cols-2 gap-4">
           {/* Missed Knowledge */}
-          <div className="bg-bg-card border border-border rounded-[10px] p-5">
+          <div className="bg-bg-card border border-border rounded-[10px] p-5 glass-card">
             <div className="flex items-center gap-2 mb-4">
               <AlertCircle size={16} className="text-orange" />
               <h3 className="text-[18px] font-semibold text-text-primary font-['Space_Grotesk']">Missed Knowledge</h3>
@@ -213,7 +213,7 @@ export default function Dashboard() {
           </div>
 
           {/* Quick Stats */}
-          <div className="bg-bg-card border border-border rounded-[10px] p-5">
+          <div className="bg-bg-card border border-border rounded-[10px] p-5 glass-card">
             <div className="flex items-center gap-2 mb-4">
               <MessageSquare size={16} className="text-accent" />
               <h3 className="text-[18px] font-semibold text-text-primary font-['Space_Grotesk']">Today's Activity</h3>

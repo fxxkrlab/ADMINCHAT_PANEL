@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import { Download, User, Sparkles, BookOpen } from 'lucide-react';
 import type { Message } from '../../types';
 import { useAuthStore } from '../../stores/authStore';
-import { formatTime } from '../../utils/time';
+import { formatDateTime } from '../../utils/time';
 
 interface MessageBubbleProps {
   message: Message;
@@ -132,7 +132,7 @@ function MessageBubbleInner({ message }: MessageBubbleProps) {
             </span>
           )}
           <span className="text-[10px] text-text-muted font-['JetBrains_Mono']">
-            {formatTime(message.created_at)}
+            {formatDateTime(message.created_at)}
           </span>
         </div>
       </div>

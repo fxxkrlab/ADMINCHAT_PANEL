@@ -164,7 +164,19 @@ async def _try_send(
         )
         return None
     except TelegramBadRequest as exc:
-        logger.error("TelegramBadRequest bot=%s: %s", bot_db_id, exc)
+        logger.warning("TelegramBadRequest bot=%s: %s", bot_db_id, exc)
+        # Retry without reply_to (stale message IDs cause this)
+        if reply_to is not None:
+            try:
+                result = await aiogram_bot.send_message(
+                    chat_id=chat_id,
+                    text=text,
+                    parse_mode=parse_mode,
+                )
+                logger.info("Sent without reply_to after BadRequest (bot=%s)", bot_db_id)
+                return result.message_id
+            except Exception:
+                logger.exception("Retry without reply_to also failed (bot=%s)", bot_db_id)
         return None
     except Exception:
         logger.exception("Unexpected error sending via bot %s", bot_db_id)
