@@ -8,9 +8,11 @@ import App from './App';
 
 // Expose shared libs to window for plugin IIFE bundles
 // Plugins use external + globals to reference these instead of bundling their own copy
+import * as ReactJSXRuntime from 'react/jsx-runtime';
 import * as TanStackReactQuery from '@tanstack/react-query';
 (window as any).React = React;
 (window as any).ReactDOM = ReactDOM;
+(window as any).ReactJSXRuntime = ReactJSXRuntime;
 (window as any).TanStackReactQuery = TanStackReactQuery;
 
 const queryClient = new QueryClient({
