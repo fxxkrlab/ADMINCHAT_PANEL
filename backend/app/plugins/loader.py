@@ -132,44 +132,122 @@ def _parse_manifest(plugin_path: Path) -> dict[str, Any]:
     return manifest
 
 
-def _clear_plugin_orm_tables(plugin_id: str) -> int:
-    """Remove ORM table definitions registered by this plugin from Base.metadata.
+def _clear_plugin_orm_state(plugin_id: str) -> int:
+    """Remove ORM state registered by this plugin from the host's ``Base``.
 
     Plugin models inherit from the host's ``Base`` (singleton), so
-    ``class TmdbApiKey(Base)`` registers the ``__tablename__`` in
-    ``Base.metadata.tables``. When the plugin module is re-imported after a
-    deactivate / activate cycle, SQLAlchemy raises
-    ``InvalidRequestError("Table '…' is already defined")``.
+    ``class TmdbApiKey(Base)`` registers state in three places that all need
+    to be purged before the plugin module is re-imported:
 
-    This helper preemptively drops any metadata table whose name starts with
-    ``plg_{plugin_id}_``. It does NOT touch the actual database — only the
-    in-memory Python-side registry.
+    1. ``Base.metadata.tables`` — the SQL Table objects. Stale entries here
+       cause ``InvalidRequestError("Table '…' is already defined")`` on
+       re-import. ``extend_existing=True`` on the plugin's ``__table_args__``
+       can mask this but the table object itself still gets replaced.
+
+    2. ``Base.registry.mappers`` / ``_class_registry`` — the ORM-level mapped
+       class registry. Even with ``extend_existing=True``, re-executing
+       ``class MovieRequest(Base)`` registers a NEW class object in the
+       registry without removing the old one. Subsequent string-based
+       relationship lookups (e.g. ``relationship("MovieRequestUser")``) then
+       find multiple candidates and raise ``InvalidRequestError("Multiple
+       classes found for path …")``, which causes plugin handlers to crash
+       silently with the message falling through to FAQ / RAG fallbacks.
+
+    3. ``Base.registry._dependents_registry`` (touched by ``_dispose_cls``).
+
+    This helper drops every entry whose ``__tablename__`` (or class
+    ``__module__``) suggests it belongs to ``plugin_id``, leaving the
+    database itself untouched.
 
     Returns the number of table definitions removed.
     """
     prefix = f"plg_{plugin_id.replace('-', '_')}_"
+    removed_tables = 0
     try:
         from app.models.base import Base  # noqa: N811
 
+        # 1. Dispose mapped classes — this also removes them from the
+        #    string-lookup registry that ``relationship("Foo")`` uses.
+        classes_to_dispose: list[type] = []
+        try:
+            for mapper in list(Base.registry.mappers):
+                cls = getattr(mapper, "class_", None)
+                if cls is None:
+                    continue
+                tablename = getattr(cls, "__tablename__", None)
+                if isinstance(tablename, str) and tablename.startswith(prefix):
+                    classes_to_dispose.append(cls)
+        except Exception:
+            logger.debug(
+                "Could not enumerate Base.registry.mappers for %s",
+                plugin_id,
+                exc_info=True,
+            )
+
+        for cls in classes_to_dispose:
+            try:
+                Base.registry._dispose_cls(cls)  # noqa: SLF001 — SQLAlchemy internal
+            except Exception:
+                logger.debug(
+                    "Could not _dispose_cls(%s) for %s",
+                    cls.__name__,
+                    plugin_id,
+                    exc_info=True,
+                )
+
+        # 2. Drop any leftover Table objects from metadata.tables. Most are
+        #    already gone via _dispose_cls but defensive cleanup is cheap.
         to_drop = [
             name for name in list(Base.metadata.tables)
             if name.startswith(prefix)
         ]
         for name in to_drop:
-            Base.metadata.remove(Base.metadata.tables[name])
-        if to_drop:
+            try:
+                Base.metadata.remove(Base.metadata.tables[name])
+                removed_tables += 1
+            except Exception:
+                logger.debug(
+                    "Could not remove metadata table %s for %s",
+                    name,
+                    plugin_id,
+                    exc_info=True,
+                )
+
+        # 3. Belt-and-suspenders: scrub any lingering string-name entries
+        #    from the legacy declarative class registry, which some lookups
+        #    still consult. The keys are class names (e.g. "MovieRequest").
+        try:
+            class_reg = getattr(Base.registry, "_class_registry", None)
+            if class_reg is not None:
+                disposed_names = {c.__name__ for c in classes_to_dispose}
+                for key in list(class_reg.keys()):
+                    if key in disposed_names:
+                        # Could be a class or a _MultipleClassMarker; drop both.
+                        try:
+                            del class_reg[key]
+                        except Exception:
+                            pass
+        except Exception:
+            pass
+
+        if classes_to_dispose or removed_tables:
             logger.debug(
-                "Cleared %d ORM table defs from Base.metadata for plugin %s: %s",
-                len(to_drop),
+                "Cleared ORM state for plugin %s: classes=%d tables=%d",
                 plugin_id,
-                to_drop,
+                len(classes_to_dispose),
+                removed_tables,
             )
-        return len(to_drop)
+        return len(classes_to_dispose) + removed_tables
     except Exception:
         logger.debug(
-            "Could not clear ORM tables for plugin %s", plugin_id, exc_info=True
+            "Could not clear ORM state for plugin %s", plugin_id, exc_info=True
         )
         return 0
+
+
+# Backwards-compatible alias — older code in this module may still call the
+# previous name. Keep it pointing at the new, broader implementation.
+_clear_plugin_orm_tables = _clear_plugin_orm_state
 
 
 def _extract_plugin_zip(zip_path: Path, target_dir: Path) -> Path:
