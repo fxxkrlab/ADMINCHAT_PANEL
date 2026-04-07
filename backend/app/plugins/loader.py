@@ -132,6 +132,46 @@ def _parse_manifest(plugin_path: Path) -> dict[str, Any]:
     return manifest
 
 
+def _clear_plugin_orm_tables(plugin_id: str) -> int:
+    """Remove ORM table definitions registered by this plugin from Base.metadata.
+
+    Plugin models inherit from the host's ``Base`` (singleton), so
+    ``class TmdbApiKey(Base)`` registers the ``__tablename__`` in
+    ``Base.metadata.tables``. When the plugin module is re-imported after a
+    deactivate / activate cycle, SQLAlchemy raises
+    ``InvalidRequestError("Table '…' is already defined")``.
+
+    This helper preemptively drops any metadata table whose name starts with
+    ``plg_{plugin_id}_``. It does NOT touch the actual database — only the
+    in-memory Python-side registry.
+
+    Returns the number of table definitions removed.
+    """
+    prefix = f"plg_{plugin_id.replace('-', '_')}_"
+    try:
+        from app.models.base import Base  # noqa: N811
+
+        to_drop = [
+            name for name in list(Base.metadata.tables)
+            if name.startswith(prefix)
+        ]
+        for name in to_drop:
+            Base.metadata.remove(Base.metadata.tables[name])
+        if to_drop:
+            logger.debug(
+                "Cleared %d ORM table defs from Base.metadata for plugin %s: %s",
+                len(to_drop),
+                plugin_id,
+                to_drop,
+            )
+        return len(to_drop)
+    except Exception:
+        logger.debug(
+            "Could not clear ORM tables for plugin %s", plugin_id, exc_info=True
+        )
+        return 0
+
+
 def _extract_plugin_zip(zip_path: Path, target_dir: Path) -> Path:
     """Extract a plugin zip bundle to the target directory.
 
@@ -620,6 +660,9 @@ class PluginManager:
         cache_evict_targets = top_level_names | {mod_name}
         evicted_by_name = _pop_modules_by_names(cache_evict_targets)
         evicted_by_path = _pop_modules_under_path(plugin_path)
+        # Also clear ORM table definitions left in Base.metadata from the
+        # previous load — otherwise SQLAlchemy raises "Table already defined".
+        _clear_plugin_orm_tables(plugin_id)
         if evicted_by_name or evicted_by_path:
             logger.debug(
                 "Evicted %d stale sys.modules entries before loading %s "
