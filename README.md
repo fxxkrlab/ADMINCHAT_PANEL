@@ -354,6 +354,9 @@ docker network connect your-shared-network gte-embedding
 
 ### 插件系统 (Plugin System)
 - **ACP 插件架构** &mdash; 沙箱化插件运行时，支持数据库/Bot Handler/API 路由/前端页面/设置面板五种能力声明，插件内部模块自动路径隔离
+- **热更新模块缓存** &mdash; 停用插件时精确清除其在 `sys.modules` 中的全部子模块（含 `backend.routes` 等）以及插件目录下任何运行期惰性导入的模块；重新启用后立刻读取磁盘上的最新代码，无需重启面板容器
+- **跨插件命名空间隔离** &mdash; 启用插件前主动清理与其顶层包同名的缓存条目（例如两个插件都自带 `backend/`），避免后启用的插件被先启用的插件遮蔽；同时启用同名插件会有警告
+- **事务化挂载** &mdash; 插件激活的 mount + setup 阶段是事务性的，`setup()` 抛错会回滚已挂载的 API 路由 / Bot Router / 静态文件 / 事件订阅，避免半挂载状态
 - **ACP Market 集成** &mdash; 通过 [ACP Market](https://acpmarket.novahelix.org) 浏览、安装和管理第三方插件，安装成功/失败有即时通知提示，未连接 Market 时自动显示引导提示
 - **Market JWT 认证** &mdash; 支持邮箱密码登录或 API Key 粘贴连接 Market，Bearer Token 自动管理，Settings 页面显示 Market 账户状态
 - **Ed25519 插件签名验证** &mdash; 自动从 Market 获取公钥，下载插件时验证 Ed25519 签名，防止插件包被篡改

@@ -6,7 +6,7 @@ import json
 import logging
 import shutil
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from types import ModuleType
@@ -56,6 +56,12 @@ class _LoadedPlugin:
     manifest: dict[str, Any]
     module: ModuleType
     plugin_path: Path
+    # Names of all sys.modules entries that were created while importing this
+    # plugin. Used by deactivate() to fully purge the plugin's import footprint
+    # so a subsequent activate() picks up freshly written files instead of stale
+    # cached modules. Without this, ``from backend.routes import router`` keeps
+    # returning the previous version's router after an in-place update.
+    imported_modules: set[str] = field(default_factory=set)
 
 
 @dataclass
@@ -133,6 +139,107 @@ def _extract_plugin_zip(zip_path: Path, target_dir: Path) -> Path:
     protection.
     """
     return extract_plugin_zip(zip_path, target_dir)
+
+
+# ---------------------------------------------------------------------------
+# sys.modules hygiene
+# ---------------------------------------------------------------------------
+#
+# Plugins are loaded with the plugin directory appended to ``sys.path`` so that
+# intra-plugin imports like ``from backend.routes import router`` work without
+# requiring authors to use a per-plugin namespace prefix. This is convenient
+# but means submodules end up in ``sys.modules`` under unqualified, top-level
+# names (``backend``, ``backend.routes``, ``backend.handlers`` …).
+#
+# That creates two failure modes the helpers below address:
+#
+# 1. **Stale code on reactivate / update.** When a plugin is updated in place
+#    and reactivated, ``importlib`` re-executes the entry point file but any
+#    ``from backend.routes import router`` it runs hits Python's module cache
+#    and returns the *old* module object built from the previous version's
+#    file. The newly written ``backend/routes.py`` on disk is never re-read.
+#
+# 2. **Cross-plugin namespace collisions.** Two plugins that both ship a
+#    top-level ``backend`` package will silently shadow each other — whichever
+#    activated first wins, and the second plugin's submodules are simply never
+#    loaded.
+#
+# The fix is to (a) snapshot what each plugin imports so we can purge it
+# precisely on deactivate, (b) clear conflicting cached entries before each
+# activate, and (c) use a path-based fallback to catch lazily-imported modules
+# (e.g. inside ``teardown()``).
+
+
+def _scan_top_level_names(plugin_path: Path) -> set[str]:
+    """Return the set of top-level module/package names a plugin exposes.
+
+    Looks at the immediate children of ``plugin_path``: subdirectories with
+    an ``__init__.py`` are packages; ``.py`` files are modules. The result
+    drives proactive cache cleanup so a plugin's first import doesn't pick up
+    a same-named package left behind by another plugin.
+    """
+    names: set[str] = set()
+    if not plugin_path.is_dir():
+        return names
+    try:
+        for child in plugin_path.iterdir():
+            if child.is_dir() and (child / "__init__.py").is_file():
+                names.add(child.name)
+            elif child.is_file() and child.suffix == ".py" and child.stem != "__init__":
+                names.add(child.stem)
+    except OSError:
+        logger.debug("Could not scan top-level names for %s", plugin_path)
+    return names
+
+
+def _pop_modules_under_path(plugin_path: Path) -> set[str]:
+    """Remove every ``sys.modules`` entry whose ``__file__`` lives under ``plugin_path``.
+
+    Returns the set of module names that were removed. Best-effort — modules
+    without a resolvable ``__file__`` (built-ins, namespace packages, frozen
+    modules) are skipped silently. Never raises.
+    """
+    try:
+        plugin_str = str(plugin_path.resolve())
+    except OSError:
+        plugin_str = str(plugin_path)
+
+    removed: set[str] = set()
+    for mod_name, mod in list(sys.modules.items()):
+        if mod is None:
+            continue
+        mod_file = getattr(mod, "__file__", None)
+        if not mod_file:
+            continue
+        try:
+            mod_file_resolved = str(Path(mod_file).resolve())
+        except (OSError, ValueError):
+            continue
+        if mod_file_resolved.startswith(plugin_str):
+            removed.add(mod_name)
+
+    for name in removed:
+        sys.modules.pop(name, None)
+    return removed
+
+
+def _pop_modules_by_names(names: set[str]) -> set[str]:
+    """Remove ``sys.modules`` entries equal to or descended from any name in ``names``.
+
+    Used to evict ``backend`` AND ``backend.routes``, ``backend.services.tmdb``,
+    etc. in one shot when only the top-level package name is known. Returns
+    the set of removed module names.
+    """
+    if not names:
+        return set()
+    removed: set[str] = set()
+    prefixes = tuple(f"{name}." for name in names)
+    for mod_name in list(sys.modules.keys()):
+        if mod_name in names or mod_name.startswith(prefixes):
+            removed.add(mod_name)
+    for name in removed:
+        sys.modules.pop(name, None)
+    return removed
 
 
 def _read_panel_version() -> str:
@@ -349,16 +456,24 @@ class PluginManager:
         plugin_ids = list(reversed(list(self._loaded.keys())))
 
         for plugin_id in plugin_ids:
+            loaded = self._loaded.get(plugin_id)
             try:
-                loaded = self._loaded[plugin_id]
-                if hasattr(loaded.module, "teardown"):
+                if loaded and hasattr(loaded.module, "teardown"):
                     await loaded.module.teardown()
                     logger.info("Plugin %s teardown complete", plugin_id)
             except Exception:
                 logger.exception("Error tearing down plugin %s", plugin_id)
 
-            # Clean up module from sys.modules
+            # Fully purge the plugin's import footprint so a hot reload of
+            # the host process picks up fresh code.
             mod_name = f"plg_{plugin_id}"
+            if loaded is not None:
+                for name in loaded.imported_modules:
+                    sys.modules.pop(name, None)
+                _pop_modules_under_path(loaded.plugin_path)
+                plugin_path_str = str(loaded.plugin_path)
+                if plugin_path_str in sys.path:
+                    sys.path.remove(plugin_path_str)
             sys.modules.pop(mod_name, None)
 
         self._loaded.clear()
@@ -493,13 +608,40 @@ class PluginManager:
             )
 
         mod_name = f"plg_{plugin_id}"
+        plugin_path_str = str(plugin_path)
+        sys_path_was_appended = False
+
+        # Hygiene: clear any cached modules from a previous load of this plugin
+        # OR from a different plugin that happens to expose the same top-level
+        # package name. Without this, ``from backend.routes import router``
+        # below would resolve to a stale module object cached by Python's
+        # import system. See the docstring on _pop_modules_by_names above.
+        top_level_names = _scan_top_level_names(plugin_path)
+        cache_evict_targets = top_level_names | {mod_name}
+        evicted_by_name = _pop_modules_by_names(cache_evict_targets)
+        evicted_by_path = _pop_modules_under_path(plugin_path)
+        if evicted_by_name or evicted_by_path:
+            logger.debug(
+                "Evicted %d stale sys.modules entries before loading %s "
+                "(by-name=%d, by-path=%d)",
+                len(evicted_by_name | evicted_by_path),
+                plugin_id,
+                len(evicted_by_name),
+                len(evicted_by_path),
+            )
+
+        # Snapshot sys.modules so we can compute exactly which entries this
+        # plugin's import populates. The diff is stored on _LoadedPlugin and
+        # used by deactivate() to purge them precisely.
+        modules_before = set(sys.modules.keys())
+
         try:
             # Add plugin root to sys.path so intra-plugin imports work
             # e.g. "from backend.routes import router" inside backend/plugin.py
             # Append (not insert) to avoid shadowing the host app's 'app' package
-            plugin_path_str = str(plugin_path)
             if plugin_path_str not in sys.path:
                 sys.path.append(plugin_path_str)
+                sys_path_was_appended = True
 
             spec = importlib.util.spec_from_file_location(
                 mod_name, str(entry_file)
@@ -513,13 +655,24 @@ class PluginManager:
             sys.modules[mod_name] = module
             spec.loader.exec_module(module)
         except PluginImportError:
+            # Roll back sys.path / sys.modules so a retry starts clean.
+            if sys_path_was_appended and plugin_path_str in sys.path:
+                sys.path.remove(plugin_path_str)
+            sys.modules.pop(mod_name, None)
+            _pop_modules_by_names(set(sys.modules.keys()) - modules_before)
             raise
         except Exception as exc:
+            if sys_path_was_appended and plugin_path_str in sys.path:
+                sys.path.remove(plugin_path_str)
             sys.modules.pop(mod_name, None)
+            _pop_modules_by_names(set(sys.modules.keys()) - modules_before)
             raise PluginImportError(
                 f"Failed to import plugin '{plugin_id}': {exc}",
                 plugin_id=plugin_id,
             ) from exc
+
+        imported_modules = set(sys.modules.keys()) - modules_before
+        imported_modules.add(mod_name)
 
         # 3. Run migrations (best-effort — module may not exist yet)
         try:
@@ -540,53 +693,87 @@ class PluginManager:
         # Use the verified FastAPI app reference
         _real_app = self._app
 
-        # 4. Mount API router
-        if hasattr(module, "get_router"):
-            try:
+        # ── 4. Mount API router / bot handler / static files (transactional) ──
+        # Track which subsystems were successfully mounted so we can roll them
+        # back as a unit if any later step (mount, setup, DB commit) fails.
+        # Without this, a setup() exception would leave a half-mounted plugin
+        # whose routes are still served and can't be cleanly removed.
+        api_mounted = False
+        bot_mounted = False
+        static_mounted = False
+        ctx: PluginContext | None = None
+
+        try:
+            if hasattr(module, "get_router"):
                 api_router = module.get_router()
                 self._router_mount.mount(_real_app, plugin_id, api_router)
-            except Exception:
-                logger.exception(
-                    "Failed to mount API router for plugin %s", plugin_id
-                )
+                api_mounted = True
 
-        # 4b. Mount bot handler
-        if hasattr(module, "get_bot_router"):
-            try:
+            if hasattr(module, "get_bot_router"):
                 bot_router = module.get_bot_router()
                 priority = manifest.get("bot_handler_priority", 50)
                 self._handler_mount.add(plugin_id, bot_router, priority)
-            except Exception:
-                logger.exception(
-                    "Failed to mount bot router for plugin %s", plugin_id
-                )
+                bot_mounted = True
 
-        # 4c. Mount static files
-        self._static_server._app = _real_app  # ensure correct app ref
-        self._static_server.mount(plugin_id, plugin_path)
+            self._static_server._app = _real_app  # ensure correct app ref
+            self._static_server.mount(plugin_id, plugin_path)
+            static_mounted = plugin_id in self._static_server.mounted_plugins
 
-        # 5. Create PluginContext and call setup()
-        ctx = PluginContext(
-            plugin_id=plugin_id,
-            version=version,
-            manifest=manifest,
-            plugin_path=plugin_path,
-            sdk=CoreSDKBridge(plugin_id, manifest, async_session_factory),
-            secrets=PluginSecretStore(plugin_id),
-            config=PluginConfigStore(plugin_id),
-            event_bus=self._event_bus,
-            logger=logging.getLogger(f"acp.plugin.{plugin_id}"),
-        )
-        self._contexts[plugin_id] = ctx
+            # 5. Create PluginContext and call setup()
+            ctx = PluginContext(
+                plugin_id=plugin_id,
+                version=version,
+                manifest=manifest,
+                plugin_path=plugin_path,
+                sdk=CoreSDKBridge(plugin_id, manifest, async_session_factory),
+                secrets=PluginSecretStore(plugin_id),
+                config=PluginConfigStore(plugin_id),
+                event_bus=self._event_bus,
+                logger=logging.getLogger(f"acp.plugin.{plugin_id}"),
+            )
 
-        if hasattr(module, "setup"):
-            try:
+            if hasattr(module, "setup"):
                 await module.setup(ctx)
-            except Exception as exc:
-                raise PluginSetupError(
-                    f"setup() failed for plugin '{plugin_id}': {exc}",
-                    plugin_id=plugin_id,
-                ) from exc
+
+        except Exception as exc:
+            # Roll back any partial mounts so the next activation starts clean.
+            if api_mounted:
+                try:
+                    self._router_mount.unmount(_real_app, plugin_id)
+                except Exception:
+                    logger.exception(
+                        "Cleanup: failed to unmount API router for %s", plugin_id
+                    )
+            if bot_mounted:
+                try:
+                    self._handler_mount.remove(plugin_id)
+                except Exception:
+                    logger.exception(
+                        "Cleanup: failed to remove bot router for %s", plugin_id
+                    )
+            if static_mounted:
+                try:
+                    self._static_server.unmount(plugin_id)
+                except Exception:
+                    logger.exception(
+                        "Cleanup: failed to unmount static for %s", plugin_id
+                    )
+            self._event_bus.unsubscribe_all(plugin_id)
+            for name in imported_modules:
+                sys.modules.pop(name, None)
+            _pop_modules_under_path(plugin_path)
+            if sys_path_was_appended and plugin_path_str in sys.path:
+                sys.path.remove(plugin_path_str)
+
+            if isinstance(exc, PluginSetupError):
+                raise
+            raise PluginSetupError(
+                f"setup() failed for plugin '{plugin_id}': {exc}",
+                plugin_id=plugin_id,
+            ) from exc
+
+        # Commit context only after setup() succeeded.
+        self._contexts[plugin_id] = ctx
 
         # 6. Update DB status BEFORE adding to _loaded dict
         #    If the DB commit fails, the plugin won't be in _loaded.
@@ -619,6 +806,7 @@ class PluginManager:
             manifest=manifest,
             module=module,
             plugin_path=plugin_path,
+            imported_modules=imported_modules,
         )
 
         await _publish_plugin_event(plugin_id, "activated")
@@ -659,9 +847,25 @@ class PluginManager:
         # 3. Unsubscribe events
         self._event_bus.unsubscribe_all(plugin_id)
 
-        # 4. Clean up module and sys.path
+        # 4. Clean up modules and sys.path
+        #
+        # Pop ALL submodules the plugin populated in sys.modules — not just
+        # the ``plg_{id}`` entry point. This is the fix for the long-standing
+        # "reactivate doesn't pick up new code" bug: without it, modules like
+        # ``backend.routes`` linger in the cache and the next ``from
+        # backend.routes import router`` returns the *previous* version's
+        # router object even though the file on disk has been replaced.
         mod_name = f"plg_{plugin_id}"
+        if loaded is not None:
+            for name in loaded.imported_modules:
+                sys.modules.pop(name, None)
+            # Belt-and-suspenders: also evict anything whose ``__file__``
+            # lives under the plugin directory. Catches modules imported
+            # *after* activate() — typically inside teardown() handlers
+            # (e.g. ``from backend.services.tmdb import close_tmdb_client``).
+            _pop_modules_under_path(loaded.plugin_path)
         sys.modules.pop(mod_name, None)
+
         self._loaded.pop(plugin_id, None)
         self._contexts.pop(plugin_id, None)
 

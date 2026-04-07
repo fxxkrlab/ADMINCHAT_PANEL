@@ -30,11 +30,22 @@ class PluginStaticServer:
             )
             return
 
+        # If a previous mount is still in the routing table (e.g. after a
+        # crash that bypassed deactivate), tear it down before re-mounting
+        # so we don't end up with two Mount routes serving stale files.
+        if plugin_id in self._mounted:
+            logger.warning(
+                "Plugin %s already has a static mount, unmounting first",
+                plugin_id,
+            )
+            self.unmount(plugin_id)
+
         mount_path = f"/api/v1/p-static/{plugin_id}"
+        mount_name = f"plugin_static_{plugin_id}"
         self._app.mount(
             mount_path,
             StaticFiles(directory=str(frontend_dir), html=True),
-            name=f"plugin_static_{plugin_id}",
+            name=mount_name,
         )
         self._mounted[plugin_id] = mount_path
         logger.info(
@@ -42,16 +53,24 @@ class PluginStaticServer:
         )
 
     def unmount(self, plugin_id: str) -> None:
-        """Remove a plugin's static file mount from app routes."""
+        """Remove a plugin's static file mount from app routes.
+
+        Filters by both the registered ``name`` and the mount ``path`` so the
+        route is removed regardless of which attribute the underlying Starlette
+        Mount exposes (``Mount.path`` is the configured prefix; ``Mount.name``
+        is the value we set in :meth:`mount`).
+        """
         if plugin_id not in self._mounted:
-            logger.warning("No static mount for plugin %s", plugin_id)
+            logger.debug("No static mount for plugin %s, skipping", plugin_id)
             return
 
         mount_path = self._mounted[plugin_id]
+        mount_name = f"plugin_static_{plugin_id}"
         self._app.routes[:] = [
             route
             for route in self._app.routes
-            if not (hasattr(route, "path") and getattr(route, "path", None) == mount_path)
+            if getattr(route, "name", None) != mount_name
+            and getattr(route, "path", None) != mount_path
         ]
         del self._mounted[plugin_id]
         logger.info("Unmounted static files for plugin %s", plugin_id)

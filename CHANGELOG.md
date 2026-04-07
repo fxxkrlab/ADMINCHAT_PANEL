@@ -5,6 +5,44 @@ All notable changes to the ADMINCHAT Panel project will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.3] - 2026-04-07
+
+### Fixed
+- **Plugin reactivation served stale code (CRITICAL)** — `PluginManager.deactivate()` only removed the top-level `plg_{id}` entry from `sys.modules`, leaving submodules like `backend.routes`, `backend.handlers`, and `backend.services.*` cached. On reactivate (after an update or a manual deactivate/activate cycle) `from backend.routes import router` returned the *previous* version's router object even though the file on disk had been replaced. Symptom: a freshly installed plugin update kept exposing old endpoints; movie-request 1.0.6 → 1.0.8 update never took effect until the panel container was restarted. Fixed by snapshotting `sys.modules` around `exec_module`, recording every module the plugin imported on `_LoadedPlugin.imported_modules`, and purging that exact set on deactivate. A path-based fallback (`_pop_modules_under_path`) catches modules that were lazy-imported during runtime — typically inside `teardown()` handlers.
+- **Cross-plugin namespace collision** — Two plugins that both ship a top-level `backend` package silently shadowed each other: whichever activated first won, and the second plugin's `from backend.routes import router` resolved to the first plugin's module. Fixed by scanning each plugin directory's top-level packages on activate and proactively evicting any conflicting `sys.modules` entries before `exec_module` runs.
+- **`sys.path` leaked on activation failure** — If `exec_module` raised, the plugin directory was left appended to `sys.path` even though the plugin failed to load, polluting later imports. Now removed in the failure path alongside the partial `sys.modules` rollback.
+- **Partial activation leaked mounted routes** — If `setup()` raised after `get_router()` had already mounted the API router (and possibly the bot router and static files), those mounts stayed in the routing table because the previous code only logged the exception. Now the mount + setup phase is wrapped in a transactional `try/except` that unmounts API router, bot router, and static files (and unsubscribes events) in the rollback path before re-raising.
+- **`_contexts` polluted on `setup()` failure** — `PluginContext` was committed to `self._contexts` *before* `setup()` ran, so a setup exception left a dangling context entry that other code paths could observe. Context is now stored only after `setup()` succeeds.
+
+### Added
+- **OpenAPI schema invalidation on plugin mount/unmount** — `DynamicRouterMount.mount/unmount` now clear `app.openapi_schema` so `/docs` and `/openapi.json` reflect plugin route changes without a process restart.
+- **Robust plugin route filtering on unmount** — `DynamicRouterMount.unmount` now matches both `route.path` and `route.path_format`, so parametrised routes (e.g. `/{request_id:int}`) are removed reliably regardless of which attribute the underlying Starlette `Route` exposes.
+- **Static mount idempotency** — `PluginStaticServer.mount` now tears down a stale mount before adding a fresh one, preventing duplicate `Mount` routes after a crash that bypassed `deactivate`. Unmount filters by both `name` and `path` for symmetry.
+
+### Plugin Authoring Notes
+- Plugin authors should now expect that `from backend.routes import router` is always re-evaluated against the current files on disk after a deactivate / activate cycle — no need to restart the panel after publishing a fix.
+- Two plugins may now safely share top-level package names (e.g. both have a `backend/` directory) as long as only one is active at a time. Simultaneous activation of name-conflicting plugins will still log a warning and the later one wins; we recommend using a unique top-level name (e.g. `myplugin_backend/`) when shipping a plugin to the Market.
+
+[1.1.3]: https://github.com/fxxkrlab/ADMINCHAT_PANEL/compare/v1.1.2...v1.1.3
+
+## [1.1.2] - 2026-03-28
+
+### Fixed
+- **Plugin bot router mount crash on startup** — `RuntimeError: Router is already attached` raised in `HotSwappableRouter._rebuild()` when re-including a router that retained a stale `_parent_router` reference; now resets the reference before re-including. As a side effect, plugin API routes (`/api/v1/p/*`) failed to mount on startup until the next manual activation.
+
+[1.1.2]: https://github.com/fxxkrlab/ADMINCHAT_PANEL/compare/v1.1.1...v1.1.2
+
+## [1.1.1] - 2026-03-28
+
+### Fixed
+- **Light-mode sidebar transparency** — Sidebar is now opaque white in light mode instead of see-through glass.
+- **Dashboard card glass effect in light mode** — Real frosted-glass `backdrop-blur` instead of plain background.
+- **Plugin bot handlers fired after FAQ** — Plugin handlers are now registered *before* FAQ handlers so commands like `/req` reach plugins first.
+- **Telegram replies to stale message IDs failed silently** — Now retries the send without `reply_to_message_id` on `TelegramBadRequest` instead of dropping the reply.
+- **Chat timestamps showed time only** — Chat list now displays full date + time.
+
+[1.1.1]: https://github.com/fxxkrlab/ADMINCHAT_PANEL/compare/v1.1.0...v1.1.1
+
 ## [1.1.0] - 2026-03-28
 
 ### Added

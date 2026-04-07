@@ -151,6 +151,9 @@ User message → FAQ match → Get template with {variable} placeholders → AI 
 
 ### Plugin System
 - **ACP Plugin Architecture** &mdash; Sandboxed plugin runtime with 5 capability declarations: database, bot handler, API routes, frontend pages, settings tab; automatic `sys.path` isolation for intra-plugin imports
+- **Hot Module Reload** &mdash; Deactivating a plugin precisely evicts every `sys.modules` entry it created (including submodules like `backend.routes`) plus any module lazily imported under its plugin directory at runtime; the next activation reads fresh code from disk without needing a panel container restart
+- **Cross-Plugin Namespace Isolation** &mdash; Before activating a plugin, the loader proactively clears any cached top-level packages with the same name (e.g. two plugins both shipping `backend/`) so the second plugin is never silently shadowed by the first; concurrent same-name activations log a warning
+- **Transactional Mounting** &mdash; The mount + setup phase is transactional: a `setup()` exception rolls back the API router, bot router, static files and event subscriptions in one shot, so a half-mounted plugin never lingers in the routing table
 - **ACP Market Integration** &mdash; Browse, install and manage third-party plugins via [ACP Market](https://acpmarket.novahelix.org) with instant success/error toast notifications and connection status banner guiding users to connect
 - **Market JWT Authentication** &mdash; Connect to Market via email/password login or API key paste; Bearer token management with account status display in Settings
 - **Ed25519 Bundle Signature Verification** &mdash; Auto-fetches Market's public key; verifies Ed25519 signatures on plugin downloads to prevent bundle tampering
