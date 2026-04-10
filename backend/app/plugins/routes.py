@@ -320,6 +320,7 @@ async def update_plugin_config(
     merged = {**plugin.config, **body.config}
     plugin.config = merged
     await db.flush()
+    await db.refresh(plugin)
 
     return APIResponse(
         data=_plugin_to_info(plugin).model_dump(),
